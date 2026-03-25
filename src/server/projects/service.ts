@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../lib/supabaseAdmin';
+import { supabase } from '../../lib/supabaseClient';
 import { AppError } from '../common/errors';
 import { logEvent } from '../common/logger';
 
@@ -7,7 +7,7 @@ export async function createProjectServer(input: {
   type: 'free' | 'premium';
   idempotencyKey?: string | null;
 }) {
-  const { data, error } = await supabaseAdmin.rpc('create_project_atomic', {
+  const { data, error } = await supabase.rpc('create_project_atomic', {
     p_user_id: input.userId,
     p_type: input.type,
     p_idempotency_key: input.idempotencyKey ?? null,
@@ -30,7 +30,7 @@ export async function createProjectServer(input: {
 }
 
 export async function assertProjectOwner(userId: string, projectId: string) {
-  const { error } = await supabaseAdmin.rpc('assert_project_ownership', {
+  const { error } = await supabase.rpc('assert_project_ownership', {
     p_user_id: userId,
     p_project_id: projectId,
   });

@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../lib/supabaseAdmin';
+import { supabase } from '../../lib/supabaseClient';
 import { AppError } from '../common/errors';
 
 export async function enforceWorkspacePaywall(input: {
@@ -6,7 +6,7 @@ export async function enforceWorkspacePaywall(input: {
   projectId: string;
   action: 'download' | 'chat_after_generation' | 'revision';
 }) {
-  const { error } = await supabaseAdmin.rpc('enforce_paywall_action', {
+  const { error } = await supabase.rpc('enforce_paywall_action', {
     p_user_id: input.userId,
     p_project_id: input.projectId,
     p_action: input.action,

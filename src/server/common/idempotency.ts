@@ -1,20 +1,19 @@
-import { supabaseAdmin } from '../../lib/supabaseAdmin';
-import { AppError } from './errors';
+import { supabase } from '../../lib/supabaseClient';
 
 type Scope = 'payment:manual:create' | 'payment:tripay:create' | 'project:create';
 
 export async function getIdempotentResponse(scope: Scope, idempotencyKey?: string | null) {
   if (!idempotencyKey) return null;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('api_idempotency_keys')
-    .select('request_hash,response')
+    .select('response')
     .eq('scope', scope)
     .eq('idempotency_key', idempotencyKey)
     .maybeSingle();
 
-  if (error) throw new AppError('IDEMPOTENCY_READ_FAILED', error.message, 500);
-  return data ?? null;
+  if (error) throw new Error(error.message);
+  return data?.response ?? null;
 }
 
 export async function saveIdempotentResponse(
@@ -25,16 +24,7 @@ export async function saveIdempotentResponse(
 ) {
   if (!idempotencyKey) return;
 
-  const existing = await getIdempotentResponse(scope, idempotencyKey);
-  if (existing?.request_hash && existing.request_hash !== requestHash) {
-    throw new AppError(
-      'IDEMPOTENCY_KEY_REUSED',
-      'Idempotency key sudah dipakai untuk payload berbeda.',
-      409,
-    );
-  }
-
-  const { error } = await supabaseAdmin.from('api_idempotency_keys').upsert(
+  const { error } = await supabase.from('api_idempotency_keys').upsert(
     {
       scope,
       idempotency_key: idempotencyKey,
@@ -45,5 +35,5 @@ export async function saveIdempotentResponse(
     { onConflict: 'scope,idempotency_key' },
   );
 
-  if (error) throw new AppError('IDEMPOTENCY_WRITE_FAILED', error.message, 500);
+  if (error) throw new Error(error.message);
 }
