@@ -1,3 +1,5 @@
+'use client';
+
 import { FormEvent, useMemo, useReducer, useState } from 'react';
 import { generateCopyOnce, saveAnswersDraft } from '../../api/workspace';
 import type { ProjectType } from '../../types/project';

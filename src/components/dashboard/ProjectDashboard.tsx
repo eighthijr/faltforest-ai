@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useMemo, useReducer } from 'react';
 import { createProject, listProjects } from '../../api/projects';
 import type { Project } from '../../types/project';
