@@ -1,3 +1,5 @@
+'use client';
+
 import { FormEvent, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { buildRedirectTo } from './useRedirectTo';

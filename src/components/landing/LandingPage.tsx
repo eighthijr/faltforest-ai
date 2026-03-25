@@ -1,16 +1,33 @@
+ 'use client';
+
+import { useState } from 'react';
 import { landingCopy } from './landingCopy.id';
+import { AuthModal } from '../auth';
 import '../../styles/landing-page.css';
 
 export function LandingPage() {
+  const [authOpen, setAuthOpen] = useState(false);
+
   return (
     <main className="lp-root">
+      <header className="lp-nav">
+        <p className="lp-brand">Faltforest AI</p>
+        <button type="button" className="lp-btn-secondary" onClick={() => setAuthOpen(true)}>
+          Login
+        </button>
+      </header>
+
       <section className="lp-hero" id="hero">
         <p className="lp-badge">{landingCopy.hero.badge}</p>
         <h1>{landingCopy.hero.title}</h1>
         <p>{landingCopy.hero.subtitle}</p>
         <div className="lp-row">
-          <button type="button" className="lp-btn-primary">{landingCopy.hero.primaryCta}</button>
-          <button type="button" className="lp-btn-secondary">{landingCopy.hero.secondaryCta}</button>
+          <button type="button" className="lp-btn-primary" onClick={() => setAuthOpen(true)}>
+            {landingCopy.hero.primaryCta}
+          </button>
+          <a href="#demo" className="lp-btn-secondary">
+            {landingCopy.hero.secondaryCta}
+          </a>
         </div>
       </section>
 
@@ -35,7 +52,9 @@ export function LandingPage() {
             <li key={step}>{step}</li>
           ))}
         </ol>
-        <button type="button" className="lp-btn-primary">{landingCopy.demo.cta}</button>
+        <button type="button" className="lp-btn-primary" onClick={() => setAuthOpen(true)}>
+          {landingCopy.demo.cta}
+        </button>
       </section>
 
       <section id="benefits">
@@ -69,7 +88,9 @@ export function LandingPage() {
       <section id="cta" className="lp-cta">
         <h2>{landingCopy.cta.title}</h2>
         <p>{landingCopy.cta.body}</p>
-        <button type="button" className="lp-btn-primary">{landingCopy.cta.button}</button>
+        <button type="button" className="lp-btn-primary" onClick={() => setAuthOpen(true)}>
+          {landingCopy.cta.button}
+        </button>
         <small>{landingCopy.cta.note}</small>
       </section>
 
@@ -78,11 +99,20 @@ export function LandingPage() {
         <nav aria-label="Footer">
           <ul className="lp-row lp-links">
             {landingCopy.footer.links.map((link) => (
-              <li key={link}>{link}</li>
+              <li key={link}>
+                <a href="#hero">{link}</a>
+              </li>
             ))}
           </ul>
         </nav>
       </footer>
+
+      <AuthModal
+        isOpen={authOpen}
+        onClose={() => setAuthOpen(false)}
+        postAuthRedirect="/workspace"
+        title="Mulai gratis sekarang"
+      />
     </main>
   );
 }
