@@ -1,12 +1,9 @@
 import crypto from 'crypto';
 import { supabase } from '../../lib/supabaseClient';
-import { AppError } from '../common/errors';
-import { logEvent } from '../common/logger';
-import { assertProjectOwner } from '../projects/service';
 import type { PaymentRecord, TripayWebhookPayload } from './types';
 
 function requireValue(value: string | undefined, name: string): string {
-  if (!value) throw new AppError('MISSING_ENV', `Missing required env: ${name}`, 500);
+  if (!value) throw new Error(`Missing required env: ${name}`);
   return value;
 }
 
@@ -20,8 +17,6 @@ export async function createManualQrisPayment(input: {
   reference: string;
   amount: number;
 }) {
-  await assertProjectOwner(input.userId, input.projectId);
-
   const { data, error } = await supabase.rpc('create_manual_qris_payment', {
     p_user_id: input.userId,
     p_project_id: input.projectId,
@@ -29,19 +24,8 @@ export async function createManualQrisPayment(input: {
     p_amount: input.amount,
   });
 
-  if (error) throw new AppError('PAYMENT_CREATE_FAILED', error.message, 500);
-
-  const payment = mapRecord(data);
-  logEvent('info', 'payment_created', {
-    mode: 'manual_qris',
-    user_id: input.userId,
-    project_id: input.projectId,
-    reference: input.reference,
-    amount: input.amount,
-    payment_id: payment.id,
-  });
-
-  return payment;
+  if (error) throw new Error(error.message);
+  return mapRecord(data);
 }
 
 export async function markManualWaitingConfirmation(input: { userId: string; reference: string }) {
@@ -50,21 +34,8 @@ export async function markManualWaitingConfirmation(input: { userId: string; ref
     p_reference: input.reference,
   });
 
-  if (error) throw new AppError('PAYMENT_CONFIRM_FAILED', error.message, 500);
-
-  const payment = mapRecord(data);
-  if (payment.user_id && payment.user_id !== input.userId) {
-    throw new AppError('FORBIDDEN', 'Payment bukan milik user.', 403);
-  }
-
-  logEvent('info', 'payment_waiting_confirmation', {
-    user_id: input.userId,
-    reference: input.reference,
-    payment_id: payment.id,
-    status: payment.status,
-  });
-
-  return payment;
+  if (error) throw new Error(error.message);
+  return mapRecord(data);
 }
 
 export async function adminDecideManualPayment(input: {
@@ -78,19 +49,8 @@ export async function adminDecideManualPayment(input: {
     p_approve: input.approve,
   });
 
-  if (error) throw new AppError('PAYMENT_ADMIN_DECISION_FAILED', error.message, 500);
-
-  const payment = mapRecord(data);
-
-  logEvent('info', 'payment_admin_decision', {
-    admin_id: input.adminId,
-    reference: input.reference,
-    approve: input.approve,
-    payment_id: payment.id,
-    status: payment.status,
-  });
-
-  return payment;
+  if (error) throw new Error(error.message);
+  return mapRecord(data);
 }
 
 export async function createTripayQrisPayment(input: {
@@ -99,8 +59,6 @@ export async function createTripayQrisPayment(input: {
   reference: string;
   amount: number;
 }) {
-  await assertProjectOwner(input.userId, input.projectId);
-
   const tripayApiKey = requireValue(process.env.TRIPAY_API_KEY, 'TRIPAY_API_KEY');
   const tripayMerchantCode = requireValue(process.env.TRIPAY_MERCHANT_CODE, 'TRIPAY_MERCHANT_CODE');
   const callbackUrl = requireValue(process.env.TRIPAY_CALLBACK_URL, 'TRIPAY_CALLBACK_URL');
@@ -130,12 +88,12 @@ export async function createTripayQrisPayment(input: {
   });
 
   if (!response.ok) {
-    throw new AppError('TRIPAY_CREATE_FAILED', `Tripay create transaction failed: ${response.status}`, 502);
+    throw new Error(`Tripay create transaction failed: ${response.status}`);
   }
 
   const json = await response.json();
   const gatewayRef = json?.data?.reference as string | undefined;
-  if (!gatewayRef) throw new AppError('TRIPAY_INVALID_RESPONSE', 'Tripay response missing reference', 502);
+  if (!gatewayRef) throw new Error('Tripay response missing reference');
 
   const { data, error } = await supabase.rpc('create_tripay_qris_payment', {
     p_user_id: input.userId,
@@ -145,21 +103,10 @@ export async function createTripayQrisPayment(input: {
     p_gateway_ref: gatewayRef,
   });
 
-  if (error) throw new AppError('PAYMENT_CREATE_FAILED', error.message, 500);
-
-  const payment = mapRecord(data);
-  logEvent('info', 'payment_created', {
-    mode: 'tripay_qris',
-    user_id: input.userId,
-    project_id: input.projectId,
-    reference: input.reference,
-    amount: input.amount,
-    payment_id: payment.id,
-    gateway_ref: gatewayRef,
-  });
+  if (error) throw new Error(error.message);
 
   return {
-    payment,
+    payment: mapRecord(data),
     checkoutUrl: json?.data?.checkout_url as string,
     qrUrl: json?.data?.qr_url as string | undefined,
   };
@@ -182,18 +129,6 @@ export async function processTripayWebhook(payload: TripayWebhookPayload, eventI
     p_payload: payload,
   });
 
-  if (error) throw new AppError('WEBHOOK_PROCESS_FAILED', error.message, 500);
-
-  const payment = mapRecord(data);
-  logEvent('info', 'webhook_processed', {
-    provider: 'tripay',
-    event_id: eventId,
-    merchant_ref: payload.merchant_ref,
-    gateway_ref: payload.reference,
-    status: payload.status,
-    payment_id: payment.id,
-    payment_status: payment.status,
-  });
-
-  return payment;
+  if (error) throw new Error(error.message);
+  return mapRecord(data);
 }

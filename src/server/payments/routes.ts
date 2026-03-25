@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import {
   adminDecideManualPayment,
   createManualQrisPayment,
@@ -8,9 +7,6 @@ import {
   verifyTripayWebhookSignature,
 } from './service';
 import type { TripayWebhookPayload } from './types';
-import { getIdempotentResponse, saveIdempotentResponse } from '../common/idempotency';
-import { AppError, toHttpError } from '../common/errors';
-import { logEvent } from '../common/logger';
 
 type HttpRequest = {
   body: unknown;
@@ -32,19 +28,27 @@ function badRequest(message: string): HttpResponse {
   return { status: 400, body: { message } };
 }
 
+function forbidden(message: string): HttpResponse {
+  return { status: 403, body: { message } };
+}
+
+function unauthorized(message: string): HttpResponse {
+  return { status: 401, body: { message } };
+}
+
+function serverError(error: unknown): HttpResponse {
+  return { status: 500, body: { message: error instanceof Error ? error.message : 'Internal server error' } };
+}
+
 function requireUser(req: HttpRequest) {
-  if (!req.user?.id) throw new AppError('UNAUTHORIZED', 'Unauthorized', 401);
+  if (!req.user?.id) throw new Error('Unauthorized');
   return req.user;
 }
 
 function requireAdmin(req: HttpRequest) {
   const user = requireUser(req);
-  if (user.role !== 'admin') throw new AppError('FORBIDDEN', 'Admin only', 403);
+  if (user.role !== 'admin') throw new Error('Forbidden');
   return user;
-}
-
-function buildRequestHash(payload: unknown) {
-  return crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
 }
 
 export async function postManualQrisCreate(req: HttpRequest): Promise<HttpResponse> {
@@ -58,14 +62,6 @@ export async function postManualQrisCreate(req: HttpRequest): Promise<HttpRespon
 
     if (!projectId || !reference || !amount) return badRequest('projectId, reference, amount wajib diisi.');
 
-    const idempotencyKey = req.headers['x-idempotency-key'] ?? null;
-    const requestHash = buildRequestHash({ projectId, reference, amount, userId: user.id });
-
-    const cached = await getIdempotentResponse('payment:manual:create', idempotencyKey);
-    if (cached) {
-      return ok({ payment: cached, idempotent: true });
-    }
-
     const payment = await createManualQrisPayment({
       userId: user.id,
       projectId,
@@ -73,11 +69,10 @@ export async function postManualQrisCreate(req: HttpRequest): Promise<HttpRespon
       amount,
     });
 
-    await saveIdempotentResponse('payment:manual:create', idempotencyKey, requestHash, payment);
-
-    return ok({ payment, idempotent: false });
+    return ok({ payment });
   } catch (error) {
-    return toHttpError(error);
+    if (error instanceof Error && error.message === 'Unauthorized') return unauthorized('Unauthorized');
+    return serverError(error);
   }
 }
 
@@ -95,7 +90,8 @@ export async function postManualQrisAlreadyPaid(req: HttpRequest): Promise<HttpR
 
     return ok({ payment });
   } catch (error) {
-    return toHttpError(error);
+    if (error instanceof Error && error.message === 'Unauthorized') return unauthorized('Unauthorized');
+    return serverError(error);
   }
 }
 
@@ -116,7 +112,9 @@ export async function postManualQrisAdminDecision(req: HttpRequest): Promise<Htt
 
     return ok({ payment });
   } catch (error) {
-    return toHttpError(error);
+    if (error instanceof Error && error.message === 'Unauthorized') return unauthorized('Unauthorized');
+    if (error instanceof Error && error.message === 'Forbidden') return forbidden('Admin only');
+    return serverError(error);
   }
 }
 
@@ -131,14 +129,6 @@ export async function postTripayQrisCreate(req: HttpRequest): Promise<HttpRespon
 
     if (!projectId || !reference || !amount) return badRequest('projectId, reference, amount wajib diisi.');
 
-    const idempotencyKey = req.headers['x-idempotency-key'] ?? null;
-    const requestHash = buildRequestHash({ projectId, reference, amount, userId: user.id });
-
-    const cached = await getIdempotentResponse('payment:tripay:create', idempotencyKey);
-    if (cached) {
-      return ok({ ...cached, idempotent: true });
-    }
-
     const transaction = await createTripayQrisPayment({
       userId: user.id,
       projectId,
@@ -146,11 +136,10 @@ export async function postTripayQrisCreate(req: HttpRequest): Promise<HttpRespon
       amount,
     });
 
-    await saveIdempotentResponse('payment:tripay:create', idempotencyKey, requestHash, transaction as Record<string, unknown>);
-
-    return ok({ ...transaction, idempotent: false });
+    return ok(transaction);
   } catch (error) {
-    return toHttpError(error);
+    if (error instanceof Error && error.message === 'Unauthorized') return unauthorized('Unauthorized');
+    return serverError(error);
   }
 }
 
@@ -161,7 +150,7 @@ export async function postTripayWebhook(req: HttpRequest): Promise<HttpResponse>
     const rawBody = req.rawBody ?? JSON.stringify(req.body);
 
     if (!verifyTripayWebhookSignature(rawBody, signature)) {
-      throw new AppError('INVALID_SIGNATURE', 'Invalid signature', 403);
+      return forbidden('Invalid signature');
     }
 
     const payload = req.body as TripayWebhookPayload;
@@ -172,9 +161,6 @@ export async function postTripayWebhook(req: HttpRequest): Promise<HttpResponse>
     const payment = await processTripayWebhook(payload, eventId);
     return ok({ payment, idempotentEventId: eventId });
   } catch (error) {
-    logEvent('error', 'webhook_failed', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-    return toHttpError(error);
+    return serverError(error);
   }
 }
