@@ -7,12 +7,18 @@ import '../../styles/landing-page.css';
 
 export function LandingPage() {
   const [authOpen, setAuthOpen] = useState(false);
+  const [authRedirectTarget, setAuthRedirectTarget] = useState<'/dashboard' | '/workspace'>('/workspace');
+
+  const openAuth = (target: '/dashboard' | '/workspace') => {
+    setAuthRedirectTarget(target);
+    setAuthOpen(true);
+  };
 
   return (
     <main className="lp-root">
       <header className="lp-nav">
         <p className="lp-brand">Faltforest AI</p>
-        <button type="button" className="lp-btn-secondary" onClick={() => setAuthOpen(true)}>
+        <button type="button" className="lp-btn-secondary" onClick={() => openAuth('/dashboard')}>
           Login
         </button>
       </header>
@@ -22,7 +28,7 @@ export function LandingPage() {
         <h1>{landingCopy.hero.title}</h1>
         <p>{landingCopy.hero.subtitle}</p>
         <div className="lp-row">
-          <button type="button" className="lp-btn-primary" onClick={() => setAuthOpen(true)}>
+          <button type="button" className="lp-btn-primary" onClick={() => openAuth('/workspace')}>
             {landingCopy.hero.primaryCta}
           </button>
           <a href="#demo" className="lp-btn-secondary">
@@ -52,7 +58,7 @@ export function LandingPage() {
             <li key={step}>{step}</li>
           ))}
         </ol>
-        <button type="button" className="lp-btn-primary" onClick={() => setAuthOpen(true)}>
+        <button type="button" className="lp-btn-primary" onClick={() => openAuth('/workspace')}>
           {landingCopy.demo.cta}
         </button>
       </section>
@@ -88,7 +94,7 @@ export function LandingPage() {
       <section id="cta" className="lp-cta">
         <h2>{landingCopy.cta.title}</h2>
         <p>{landingCopy.cta.body}</p>
-        <button type="button" className="lp-btn-primary" onClick={() => setAuthOpen(true)}>
+        <button type="button" className="lp-btn-primary" onClick={() => openAuth('/workspace')}>
           {landingCopy.cta.button}
         </button>
         <small>{landingCopy.cta.note}</small>
@@ -110,8 +116,8 @@ export function LandingPage() {
       <AuthModal
         isOpen={authOpen}
         onClose={() => setAuthOpen(false)}
-        postAuthRedirect="/workspace"
-        title="Mulai gratis sekarang"
+        postAuthRedirect={authRedirectTarget}
+        title={authRedirectTarget === '/workspace' ? 'Mulai gratis sekarang' : 'Welcome back'}
       />
     </main>
   );
