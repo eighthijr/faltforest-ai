@@ -1,0 +1,96 @@
+.lp-root {
+  margin: 0 auto;
+  max-width: 980px;
+  padding: 1.5rem;
+  color: #0f172a;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.lp-root section {
+  padding: 2.5rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.lp-hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  margin: 0.5rem 0;
+}
+
+.lp-badge {
+  display: inline-block;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 0.35rem 0.7rem;
+  border-radius: 99px;
+  font-weight: 600;
+}
+
+.lp-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.lp-btn-primary,
+.lp-btn-secondary {
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lp-btn-primary {
+  background: #2563eb;
+  color: #fff;
+}
+
+.lp-btn-secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.lp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.lp-card {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 0.9rem;
+  background: #fff;
+}
+
+.lp-proof-stats strong {
+  font-size: 1.3rem;
+}
+
+.lp-proof-quotes {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.lp-proof-quotes blockquote {
+  margin: 0;
+  padding: 0.9rem;
+  background: #f8fafc;
+  border-left: 4px solid #2563eb;
+}
+
+.lp-cta {
+  text-align: center;
+}
+
+.lp-footer {
+  padding-bottom: 1rem;
+}
+
+.lp-links {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
