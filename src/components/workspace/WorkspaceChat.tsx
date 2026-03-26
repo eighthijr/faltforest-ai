@@ -102,7 +102,7 @@ export function WorkspaceChat({
       {
         id: uid(),
         role: 'system',
-        content: 'Halo! Saya akan tanya 4 hal dulu untuk membuat copy jualanmu.',
+        content: 'Halo! Saya akan tanya 4 hal dulu untuk membuat landing page siap pakai buat jualanmu.',
       },
     ],
   });
@@ -220,9 +220,9 @@ export function WorkspaceChat({
 
       const copy = await generateCopyOnce({ projectId: state.projectId, answers: state.answers });
       dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_SUCCEEDED', copy } });
-      dispatch({ type: 'ADD_MESSAGE', value: { id: uid(), role: 'system', content: 'Copy selesai dibuat ✅' } });
+      dispatch({ type: 'ADD_MESSAGE', value: { id: uid(), role: 'system', content: 'Landing page selesai dibuat ✅' } });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Gagal generate copy.';
+      const errorMessage = error instanceof Error ? error.message : 'Gagal generate landing page.';
       dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_FAILED' } });
       dispatch({ type: 'SET_ERROR', value: errorMessage });
       dispatch({
@@ -244,11 +244,11 @@ export function WorkspaceChat({
       return;
     }
 
-    const blob = new Blob([state.generatedCopy ?? ''], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([state.generatedCopy ?? ''], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `copy-${state.projectId}.txt`;
+    anchor.download = `landing-page-${state.projectId}.html`;
     anchor.click();
     URL.revokeObjectURL(url);
   };
@@ -267,7 +267,7 @@ export function WorkspaceChat({
             </Link>{' '}
             / <span className="font-semibold text-slate-700">Workspace</span>
           </nav>
-          <h1 className="text-xl font-bold text-slate-900">Workspace Chat</h1>
+          <h1 className="text-xl font-bold text-slate-900">Landing Page Builder</h1>
           <p className="text-sm text-slate-600">
             Status project: <strong>{state.state}</strong> · Project aktif: <span className="font-mono text-xs">{projectId}</span>
           </p>
@@ -315,14 +315,19 @@ export function WorkspaceChat({
 
       {state.generatedCopy && (
         <article className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-          <h2 className="mb-2 font-semibold text-emerald-800">Hasil Copy</h2>
-          <pre className="whitespace-pre-wrap text-sm text-slate-700">{state.generatedCopy}</pre>
+          <h2 className="mb-3 font-semibold text-emerald-800">Preview Landing Page</h2>
+          <iframe
+            title="Landing page preview"
+            className="h-[560px] w-full rounded-lg border border-emerald-100 bg-white"
+            srcDoc={state.generatedCopy}
+            sandbox="allow-same-origin"
+          />
         </article>
       )}
 
       {state.generationError && !state.generatedCopy && (
         <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
-          <p>Generate gagal: {state.generationError}</p>
+          <p>Generate landing page gagal: {state.generationError}</p>
           <p className="mt-1">Klik tombol &quot;Ulangi Generate&quot; untuk mencoba lagi.</p>
         </div>
       )}
@@ -347,7 +352,7 @@ export function WorkspaceChat({
           disabled={state.loading || state.state === 'generated'}
           className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
         >
-          {state.loading ? 'Memproses...' : state.generationError ? 'Ulangi Generate' : 'Generate Copy'}
+          {state.loading ? 'Memproses...' : state.generationError ? 'Ulangi Generate' : 'Generate Landing Page'}
         </button>
 
         <button
