@@ -47,13 +47,23 @@ export async function saveAnswersDraft(input: GenerateCopyInput) {
 }
 
 export async function generateCopyOnce(input: GenerateCopyInput): Promise<string> {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) throw new Error(userError.message);
+  if (!user?.id) throw new Error('Sesi login tidak ditemukan. Silakan login ulang.');
+
   const { data: project, error: readError } = await supabase
     .from('projects')
     .select('id, status, generated_html')
     .eq('id', input.projectId)
-    .single();
+    .eq('user_id', user.id)
+    .maybeSingle();
 
   if (readError) throw new Error(readError.message);
+  if (!project) throw new Error('Project tidak ditemukan atau kamu tidak punya akses.');
 
   if (project.generated_html) {
     return project.generated_html;
@@ -82,6 +92,7 @@ export async function generateCopyOnce(input: GenerateCopyInput): Promise<string
       generated_html: generatedCopy,
     })
     .eq('id', input.projectId)
+    .eq('user_id', user.id)
     .is('generated_html', null);
 
   if (updateError) throw new Error(updateError.message);
