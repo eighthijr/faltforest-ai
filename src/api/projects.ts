@@ -15,46 +15,24 @@ export async function listProjects(userId: string): Promise<Project[]> {
   return (data ?? []) as Project[];
 }
 
-async function hasFreeProject(userId: string): Promise<boolean> {
-  const { count, error } = await supabase
-    .from('projects')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('type', 'free');
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (count ?? 0) > 0;
-}
-
 export async function createProject(input: CreateProjectInput): Promise<CreateProjectResult> {
   const type = input.type ?? 'free';
 
-  if (type === 'free') {
-    const alreadyHasFree = await hasFreeProject(input.userId);
+  const { data, error } = await supabase.rpc('create_project_atomic', {
+    p_user_id: input.userId,
+    p_type: type,
+    p_idempotency_key: null,
+  });
 
-    if (alreadyHasFree) {
+  if (error || !data) {
+    if (error?.message?.includes('FREE_LIMIT_REACHED')) {
       return {
         ok: false,
         reason: 'FREE_LIMIT_REACHED',
         message: 'Kamu sudah punya 1 project FREE. Upgrade untuk buat project baru.',
       };
     }
-  }
 
-  const { data, error } = await supabase
-    .from('projects')
-    .insert({
-      user_id: input.userId,
-      type,
-      status: 'draft',
-    })
-    .select('id, user_id, type, status, generated_html, created_at')
-    .single();
-
-  if (error || !data) {
     return {
       ok: false,
       reason: 'UNKNOWN_ERROR',
