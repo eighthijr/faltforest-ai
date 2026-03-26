@@ -9,7 +9,9 @@ import { supabase } from '@/lib/supabaseClient';
 import type { Project } from '@/types/project';
 
 const PREMIUM_PRICE = 99000;
-const MANUAL_QRIS_IMAGE_URL = process.env.NEXT_PUBLIC_MANUAL_QRIS_IMAGE_URL ?? '';
+const MANUAL_QRIS_IMAGE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/payment-assets/manual-qris/current.png`
+  : '';
 
 const reasonLabel: Record<string, string> = {
   download: 'Fitur download file HTML',
@@ -346,7 +348,8 @@ function PricingPageContent() {
                   />
                 ) : (
                   <p className="text-xs text-amber-700">
-                    QRIS manual belum disetel di env <code>NEXT_PUBLIC_MANUAL_QRIS_IMAGE_URL</code>. Hubungi admin untuk upload QR code.
+                    QRIS manual belum tersedia. Upload dulu ke Supabase Storage bucket <code>payment-assets</code> dengan path{' '}
+                    <code>manual-qris/current.png</code>.
                   </p>
                 )}
                 <div className="flex flex-wrap gap-2">
