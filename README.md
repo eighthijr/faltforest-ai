@@ -50,6 +50,12 @@ Buat `.env.local` (untuk lokal) dan set juga di Vercel Project Settings -> Envir
 - `GEMINI_API_KEY` (jika ingin generate copy langsung dari Next.js route tanpa Supabase Edge Function)
 - `GEMINI_MODEL` (opsional, default: `gemini-2.5-flash`)
 
+### Environment Admin (untuk /admin)
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+- `ADMIN_SESSION_SECRET` (string random panjang untuk sign cookie session admin)
+- `ADMIN_USER_ID` (UUID user admin di Supabase Auth untuk kolom `confirmed_by`)
+
 > Catatan: `SUPABASE_SERVICE_ROLE_KEY` dan `GEMINI_API_KEY` **hanya untuk server**. Jangan expose ke browser.
 
 ---
@@ -127,6 +133,14 @@ Buka: `http://localhost:3000`
 ### Analytics
 - `POST /api/analytics/track`
 - `GET /api/analytics/dashboard?from=...&to=...`
+
+### Admin
+- `GET /admin` (login admin + panel)
+- `POST /api/admin/login`
+- `POST /api/admin/logout`
+- `GET /api/admin/session`
+- `GET/POST /api/admin/manual-payments`
+- `GET/POST /api/admin/qris-image`
 
 ---
 
