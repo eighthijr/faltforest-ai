@@ -18,15 +18,21 @@ export function LandingPage() {
     <main className="lp-root">
       <header className="lp-nav">
         <p className="lp-brand">Faltforest AI</p>
-        <button type="button" className="lp-btn-secondary" onClick={() => openAuth('/dashboard')}>
-          Login
-        </button>
+        <div className="lp-row">
+          <button type="button" className="lp-btn-secondary" onClick={() => openAuth('/dashboard')}>
+            Masuk Dashboard
+          </button>
+          <button type="button" className="lp-btn-primary" onClick={() => openAuth('/workspace')}>
+            Coba Workspace
+          </button>
+        </div>
       </header>
 
       <section className="lp-hero" id="hero">
         <p className="lp-badge">{landingCopy.hero.badge}</p>
         <h1>{landingCopy.hero.title}</h1>
         <p>{landingCopy.hero.subtitle}</p>
+        <p className="lp-flow-hint">Mulai dari landing page, lanjut buat project di dashboard, lalu eksekusi di workspace.</p>
         <div className="lp-row">
           <button type="button" className="lp-btn-primary" onClick={() => openAuth('/workspace')}>
             {landingCopy.hero.primaryCta}
