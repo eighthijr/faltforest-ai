@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { listProjects } from '@/api/projects';
 import { supabase } from '@/lib/supabaseClient';
 import { WorkspaceChat } from '@/components/workspace';
@@ -12,6 +13,7 @@ export default function WorkspacePage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const loadWorkspaceProject = async () => {
