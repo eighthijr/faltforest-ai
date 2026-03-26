@@ -209,6 +209,29 @@ function extractJson(raw: string) {
   return fenced?.[1]?.trim() ?? trimmed;
 }
 
+function tryParseJsonObject(raw: string) {
+  const normalizedRaw = extractJson(raw)
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2018\u2019]/g, "'");
+  const parseCandidates = [normalizedRaw];
+  const objectStart = normalizedRaw.indexOf('{');
+  const objectEnd = normalizedRaw.lastIndexOf('}');
+
+  if (objectStart !== -1 && objectEnd !== -1 && objectEnd > objectStart) {
+    parseCandidates.push(normalizedRaw.slice(objectStart, objectEnd + 1));
+  }
+
+  for (const candidate of parseCandidates) {
+    try {
+      return JSON.parse(candidate) as Partial<LandingPageSpec>;
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
 function buildPrompt(body: Required<GenerateCopyPayload>) {
   return [
     'Kamu adalah AI landing page strategist untuk seller dan affiliator Indonesia.',
@@ -312,15 +335,14 @@ async function generateWithGemini(body: Required<GenerateCopyPayload>) {
     };
   }
 
-  let parsedSpec: Partial<LandingPageSpec>;
-
-  try {
-    parsedSpec = JSON.parse(extractJson(responseText)) as Partial<LandingPageSpec>;
-  } catch {
+  const parsedSpec = tryParseJsonObject(responseText);
+  if (!parsedSpec) {
+    const fallbackSpec = normalizeSpec({}, body);
+    const copy = buildLandingPageHtml(fallbackSpec, body);
     return {
-      ok: false,
-      status: 502,
-      result: { message: 'Format output AI tidak valid untuk template landing page.' } as GenerateCopyResult,
+      ok: true,
+      status: 200,
+      result: { copy } as GenerateCopyResult,
     };
   }
 
