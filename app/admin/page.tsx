@@ -14,6 +14,8 @@ type ManualPayment = {
   user_id: string;
 };
 
+const QRIS_BUCKET_NAME = process.env.NEXT_PUBLIC_QRIS_BUCKET || 'payment-assets';
+
 function formatRupiah(amount: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
 }
@@ -196,7 +198,9 @@ export default function AdminPage() {
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-900">Manage Image QRIS</h2>
-        <p className="mt-1 text-sm text-slate-600">File akan disimpan ke bucket Supabase: payment-assets/manual-qris/current.png</p>
+        <p className="mt-1 text-sm text-slate-600">
+          File akan disimpan ke bucket Supabase: {QRIS_BUCKET_NAME}/manual-qris/current.png
+        </p>
 
         {qrisImageUrl && <img src={qrisImageUrl} alt="QRIS manual terbaru" className="mt-4 w-64 rounded-lg border border-slate-200" />}
 

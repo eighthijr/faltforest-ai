@@ -49,6 +49,7 @@ Buat `.env.local` (untuk lokal) dan set juga di Vercel Project Settings -> Envir
 - `NEXT_PUBLIC_APP_URL` (contoh: `https://your-app.vercel.app`)
 - `GEMINI_API_KEY` (jika ingin generate copy langsung dari Next.js route tanpa Supabase Edge Function)
 - `GEMINI_MODEL` (opsional, default: `gemini-2.5-flash`)
+- `NEXT_PUBLIC_QRIS_BUCKET` (opsional, default: `payment-assets`)
 
 ### Environment Admin (untuk /admin)
 - `ADMIN_USERNAME`
@@ -90,6 +91,12 @@ Jalankan SQL berikut di Supabase SQL Editor (urutan penting):
 - Set callback URL ke:
   - `https://<domain-anda>/api/payments/tripay/webhook`
 - Pastikan signature header `x-callback-signature` dikirim Tripay.
+
+### F. Supabase Storage untuk QRIS Manual
+1. Buka **Storage** di dashboard Supabase.
+2. Buat bucket bernama `payment-assets` (atau nama lain sesuai `NEXT_PUBLIC_QRIS_BUCKET`).
+3. Set bucket sebagai **public** agar URL QRIS bisa ditampilkan di halaman pricing.
+4. File QRIS akan disimpan di path: `manual-qris/current.png`.
 
 ---
 
