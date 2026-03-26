@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useReducer } from 'react';
 import { createProject, listProjects } from '../../api/projects';
+import { LogoutButton } from '../auth';
 import type { Project } from '../../types/project';
 import { UpgradeModal } from './UpgradeModal';
 
@@ -108,14 +109,17 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
           <p className="text-slate-600">Kelola semua project kamu di satu tempat.</p>
         </div>
 
-        <button
-          type="button"
-          onClick={handleCreateProject}
-          disabled={state.creating}
-          className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
-        >
-          {state.creating ? 'Membuat...' : 'Buat Project'}
-        </button>
+        <div className="flex flex-wrap items-start gap-2 md:justify-end">
+          <button
+            type="button"
+            onClick={handleCreateProject}
+            disabled={state.creating}
+            className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
+          >
+            {state.creating ? 'Membuat...' : 'Buat Project'}
+          </button>
+          <LogoutButton />
+        </div>
       </header>
 
       {hasFreeProject && (
