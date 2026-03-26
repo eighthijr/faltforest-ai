@@ -118,10 +118,10 @@ export default function AdminAnalyticsPage() {
   if (!authenticated) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-10">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="material-surface p-6">
           <h1 className="text-xl font-bold text-slate-900">Session Admin Diperlukan</h1>
           <p className="mt-2 text-sm text-slate-600">Silakan login lewat halaman admin dulu, lalu kembali ke analytics.</p>
-          <Link href="/admin" className="mt-4 inline-flex rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">
+          <Link href="/admin" className="mt-4 inline-flex rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)]">
             Ke Admin Login
           </Link>
         </section>
@@ -130,18 +130,18 @@ export default function AdminAnalyticsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl space-y-6 px-4 py-10">
-      <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <main className="material-page mx-auto max-w-6xl space-y-6 px-4 py-10">
+      <section className="flex flex-wrap items-center justify-between gap-3 material-surface p-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Admin Analytics</h1>
           <p className="text-sm text-slate-600">Lihat ringkasan metrics harian dan funnel konversi event.</p>
         </div>
-        <Link href="/admin" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
+        <Link href="/admin" className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
           Kembali ke Admin
         </Link>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="material-surface p-6">
         <div className="flex flex-wrap items-end gap-3">
           <label className="text-sm text-slate-700">
             Dari
@@ -161,7 +161,7 @@ export default function AdminAnalyticsPage() {
               className="mt-1 block rounded-lg border border-slate-300 px-3 py-2"
             />
           </label>
-          <button onClick={loadAnalytics} disabled={loading} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+          <button onClick={loadAnalytics} disabled={loading} className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)] disabled:opacity-60">
             {loading ? 'Memuat...' : 'Refresh Analytics'}
           </button>
         </div>
@@ -169,26 +169,26 @@ export default function AdminAnalyticsPage() {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <article className="material-surface p-4 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-slate-500">Total Users</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{dashboard?.totalUsers ?? 0}</p>
         </article>
-        <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <article className="material-surface p-4 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-slate-500">Page View</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{totals.pageView}</p>
         </article>
-        <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <article className="material-surface p-4 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-slate-500">Project Created</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{totals.projectCreated}</p>
         </article>
-        <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <article className="material-surface p-4 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-slate-500">Payment Success</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{totals.paymentSuccess}</p>
         </article>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="material-surface p-6">
           <h2 className="text-lg font-semibold text-slate-900">Funnel</h2>
           <div className="mt-3 overflow-x-auto">
             <table className="min-w-full text-sm">
@@ -212,7 +212,7 @@ export default function AdminAnalyticsPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="material-surface p-6">
           <h2 className="text-lg font-semibold text-slate-900">Daily Metrics</h2>
           <div className="mt-3 max-h-[420px] overflow-auto">
             <table className="min-w-full text-sm">

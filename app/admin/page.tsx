@@ -161,7 +161,7 @@ export default function AdminPage() {
   if (!authenticated) {
     return (
       <main className="mx-auto max-w-md px-4 py-10">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="material-surface p-6">
           <h1 className="text-xl font-bold text-slate-900">Admin Login</h1>
           <p className="mt-2 text-sm text-slate-600">Masuk untuk mengelola QRIS manual dan verifikasi pembayaran.</p>
 
@@ -192,23 +192,23 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl space-y-6 px-4 py-10">
-      <section className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <main className="material-page mx-auto max-w-5xl space-y-6 px-4 py-10">
+      <section className="flex items-center justify-between material-surface p-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Admin Panel Pembayaran</h1>
           <p className="text-sm text-slate-600">Kelola QRIS manual dan approve/reject pembayaran manual user.</p>
         </div>
         <div className="flex items-center gap-2">
-          <a href="/admin/analytics" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
+          <a href="/admin/analytics" className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
             Analytics
           </a>
-          <button onClick={handleLogout} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
+          <button onClick={handleLogout} className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
             Logout
           </button>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="material-surface p-6">
         <h2 className="text-lg font-semibold text-slate-900">Manage Image QRIS</h2>
         <p className="mt-1 text-sm text-slate-600">
           File akan disimpan ke bucket Supabase: {QRIS_BUCKET_NAME}/manual-qris/current.png
@@ -223,7 +223,7 @@ export default function AdminPage() {
             onChange={(event) => setQrisFile(event.target.files?.[0] ?? null)}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
-          <button onClick={uploadQrisImage} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">
+          <button onClick={uploadQrisImage} className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)]">
             Upload Gambar
           </button>
         </div>
@@ -231,10 +231,10 @@ export default function AdminPage() {
         {qrisMessage && <p className="mt-3 text-sm text-slate-700">{qrisMessage}</p>}
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="material-surface p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900">Verifikasi Pembayaran Manual</h2>
-          <button onClick={loadPayments} className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700">
+          <button onClick={loadPayments} className="rounded-full border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700">
             Refresh
           </button>
         </div>

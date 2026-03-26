@@ -75,21 +75,21 @@ export default function WorkspacePage() {
   }, []);
 
   if (loading) {
-    return <p className="p-4 text-sm text-slate-600">Memuat workspace...</p>;
+    return <p className="material-page p-4 text-sm text-slate-600">Memuat workspace...</p>;
   }
 
   if (error) {
-    return <p className="p-4 text-sm text-rose-700">Gagal memuat workspace: {error}</p>;
+    return <p className="material-page p-4 text-sm text-rose-700">Gagal memuat workspace: {error}</p>;
   }
 
   if (!selectedProject) {
     return (
-      <section className="mx-auto mt-6 w-full max-w-3xl rounded-xl border border-slate-200 bg-white p-6">
+      <section className="material-surface mx-auto mt-6 w-full max-w-3xl p-6">
         <h1 className="text-xl font-bold text-slate-900">Belum ada project</h1>
         <p className="mt-2 text-sm text-slate-600">
           Supaya bisa pakai workspace, buat project dulu dari dashboard.
         </p>
-        <Link href="/dashboard" className="mt-4 inline-flex rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white">
+        <Link href="/dashboard" className="mt-4 inline-flex rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">
           Buka Dashboard
         </Link>
       </section>

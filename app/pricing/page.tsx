@@ -224,7 +224,7 @@ function PricingPageContent() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-10">
+    <main className="material-page mx-auto w-full max-w-4xl px-4 py-10">
       <section className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
         <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">Upgrade Premium</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 md:text-3xl">Buka semua fitur tanpa batasan paywall</h1>

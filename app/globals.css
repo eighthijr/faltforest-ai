@@ -2,7 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-body { @apply bg-slate-100 text-slate-900; }
+body {
+  @apply text-slate-900;
+  background:
+    radial-gradient(circle at top, #dbeafe 0%, #eef2ff 22%, #f8fafc 54%, #f8fafc 100%);
+}
+
+.material-page {
+  @apply relative;
+}
+
+.material-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, rgba(248, 250, 252, 0) 45%);
+}
+
+.material-surface {
+  @apply rounded-[28px] border border-slate-200/70 bg-white/95 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_rgba(99,102,241,0.1)] backdrop-blur;
+}
+
+.material-chip {
+  @apply rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700;
+}
 
 @keyframes toast-in {
   from {
