@@ -18,6 +18,7 @@ export function PaywallModal({ open, reason, onClose, onUpgrade }: PaywallModalP
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <h3 className="text-xl font-bold text-slate-900">Upgrade ke PREMIUM</h3>
         <p className="mt-2 text-slate-600">{reasonText[reason]}</p>
+        <p className="mt-1 text-sm text-slate-500">Klik upgrade untuk lihat detail paket dan lanjut ke pembayaran.</p>
 
         <div className="mt-6 flex gap-3">
           <button type="button" onClick={onClose} className="flex-1 rounded-lg border border-slate-300 px-4 py-2">
@@ -28,7 +29,7 @@ export function PaywallModal({ open, reason, onClose, onUpgrade }: PaywallModalP
             onClick={onUpgrade}
             className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white"
           >
-            Upgrade Sekarang
+            Lihat Paket Premium
           </button>
         </div>
       </div>
