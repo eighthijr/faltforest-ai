@@ -15,7 +15,7 @@ type WorkspaceChatProps = {
   projectCount?: number;
   initialState?: 'draft' | 'ready' | 'generated';
   initialGeneratedCopy?: string | null;
-  onUpgradeClick?: () => void;
+  onUpgradeClick?: (reason: 'download' | 'chat_after_generated') => void;
 };
 
 type LocalState = WorkspaceContext & {
@@ -370,8 +370,9 @@ export function WorkspaceChat({
         reason={state.paywall ?? 'download'}
         onClose={() => dispatch({ type: 'SET_PAYWALL', value: null })}
         onUpgrade={() => {
+          const reason = state.paywall ?? 'download';
           dispatch({ type: 'SET_PAYWALL', value: null });
-          onUpgradeClick?.();
+          onUpgradeClick?.(reason);
         }}
       />
     </section>

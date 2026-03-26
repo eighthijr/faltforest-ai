@@ -38,5 +38,10 @@ export default function DashboardPage() {
     return <p className="p-4 text-sm text-slate-600">Memuat dashboard...</p>;
   }
 
-  return <ProjectDashboard userId={userId} onUpgradeClick={() => (window.location.href = '/pricing')} />;
+  return (
+    <ProjectDashboard
+      userId={userId}
+      onUpgradeClick={() => (window.location.href = '/pricing?source=dashboard&reason=project_limit')}
+    />
+  );
 }
