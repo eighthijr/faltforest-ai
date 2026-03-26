@@ -24,6 +24,7 @@ export function AuthModal({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +34,14 @@ export function AuthModal({
   );
 
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    setClosing(true);
+    window.setTimeout(() => {
+      setClosing(false);
+      onClose();
+    }, 180);
+  };
 
   const clearFeedback = () => {
     setMessage(null);
@@ -93,9 +102,9 @@ export function AuthModal({
   };
 
   return (
-    <div className="auth-modal-backdrop" role="dialog" aria-modal="true" aria-label="Authentication Modal">
-      <div className="auth-modal">
-        <button className="auth-modal-close" onClick={onClose} type="button" aria-label="Close authentication modal">
+    <div className={`auth-modal-backdrop ${closing ? 'is-closing' : 'is-opening'}`} role="dialog" aria-modal="true" aria-label="Authentication Modal">
+      <div className={`auth-modal ${closing ? 'is-closing' : 'is-opening'}`}>
+        <button className="auth-modal-close" onClick={handleClose} type="button" aria-label="Close authentication modal">
           ×
         </button>
 

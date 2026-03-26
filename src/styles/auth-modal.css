@@ -5,6 +5,7 @@
   display: grid;
   place-items: center;
   z-index: 999;
+  animation: auth-backdrop-in 180ms ease-out forwards;
 }
 
 .auth-modal {
@@ -14,6 +15,16 @@
   padding: 1.25rem;
   position: relative;
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+  transform-origin: center;
+  animation: auth-modal-in 180ms ease-out forwards;
+}
+
+.auth-modal-backdrop.is-closing {
+  animation: auth-backdrop-out 180ms ease-in forwards;
+}
+
+.auth-modal.is-closing {
+  animation: auth-modal-out 180ms ease-in forwards;
 }
 
 .auth-modal-close {
@@ -91,4 +102,36 @@
 
 .auth-success {
   color: #166534;
+}
+
+@keyframes auth-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes auth-backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes auth-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes auth-modal-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
 }

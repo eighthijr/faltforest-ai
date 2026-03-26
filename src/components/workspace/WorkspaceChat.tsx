@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useReducer, useState } from 'react';
 import Link from 'next/link';
 import { generateCopyOnce, saveAnswersDraft } from '../../api/workspace';
 import { LogoutButton } from '../auth';
+import { Spinner, useToast } from '../ui';
 import type { ProjectType } from '../../types/project';
 import type { QuestionKey, WorkspaceAnswers, WorkspaceContext, WorkspaceMessage } from '../../types/workspace';
 import { getMissingFields, questionLabels, questionOrder, reduceWorkspace } from '../../workspace/stateMachine';
@@ -86,6 +87,7 @@ export function WorkspaceChat({
   initialGeneratedCopy = null,
   onUpgradeClick,
 }: WorkspaceChatProps) {
+  const { pushToast } = useToast();
   const [input, setInput] = useState('');
   const [hydrated, setHydrated] = useState(false);
   const [state, dispatch] = useReducer(reducer, {
@@ -221,6 +223,7 @@ export function WorkspaceChat({
       const copy = await generateCopyOnce({ projectId: state.projectId, answers: state.answers });
       dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_SUCCEEDED', copy } });
       dispatch({ type: 'ADD_MESSAGE', value: { id: uid(), role: 'system', content: 'Landing page selesai dibuat ✅' } });
+      pushToast({ type: 'success', title: 'Generate berhasil', description: 'Landing page draft sudah siap.' });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Gagal generate landing page.';
       dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_FAILED' } });
@@ -233,6 +236,7 @@ export function WorkspaceChat({
           content: errorMessage,
         },
       });
+      pushToast({ type: 'error', title: 'Generate gagal', description: errorMessage });
     } finally {
       dispatch({ type: 'SET_LOADING', value: false });
     }
@@ -352,7 +356,16 @@ export function WorkspaceChat({
           disabled={state.loading || state.state === 'generated'}
           className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
         >
-          {state.loading ? 'Memproses...' : state.generationError ? 'Ulangi Generate' : 'Generate Landing Page'}
+          {state.loading ? (
+            <span className="inline-flex items-center gap-2">
+              <Spinner className="text-white" />
+              Memproses...
+            </span>
+          ) : state.generationError ? (
+            'Ulangi Generate'
+          ) : (
+            'Generate Landing Page'
+          )}
         </button>
 
         <button

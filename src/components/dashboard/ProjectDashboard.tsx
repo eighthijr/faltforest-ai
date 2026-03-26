@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createProject, listProjects } from '../../api/projects';
 import { LogoutButton } from '../auth';
+import { Spinner, useToast } from '../ui';
 import type { Project } from '../../types/project';
 import { UpgradeModal } from './UpgradeModal';
 
@@ -65,6 +66,7 @@ type ProjectDashboardProps = {
 export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
   const router = useRouter();
+  const { pushToast } = useToast();
 
   useEffect(() => {
     const load = async () => {
@@ -74,12 +76,14 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
         const projects = await listProjects(userId);
         dispatch({ type: 'LOAD_SUCCESS', payload: projects });
       } catch (error) {
-        dispatch({ type: 'LOAD_ERROR', payload: error instanceof Error ? error.message : 'Gagal memuat project.' });
+        const message = error instanceof Error ? error.message : 'Gagal memuat project.';
+        dispatch({ type: 'LOAD_ERROR', payload: message });
+        pushToast({ type: 'error', title: 'Gagal memuat project', description: message });
       }
     };
 
     void load();
-  }, [userId]);
+  }, [userId, pushToast]);
 
   const freeProjectCount = useMemo(
     () => state.projects.filter((project) => project.type === 'free').length,
@@ -95,16 +99,19 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
     if (!result.ok) {
       if (result.reason === 'FREE_LIMIT_REACHED') {
         dispatch({ type: 'OPEN_UPGRADE' });
+        pushToast({ type: 'info', title: 'Kuota FREE habis', description: 'Upgrade untuk menambah project baru.' });
         return;
       }
 
       dispatch({ type: 'CREATE_ERROR', payload: result.message });
+      pushToast({ type: 'error', title: 'Gagal membuat project', description: result.message });
       return;
     }
 
     try {
       const refreshedProjects = await listProjects(userId);
       dispatch({ type: 'CREATE_SUCCESS', payload: refreshedProjects });
+      pushToast({ type: 'success', title: 'Project berhasil dibuat', description: 'Mengarahkan kamu ke workspace...' });
       const params = new URLSearchParams({
         projectId: result.project.id,
         projectType: result.project.type,
@@ -112,13 +119,15 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
       });
       router.push(`/workspace?${params.toString()}`);
     } catch (error) {
+      const message =
+        error instanceof Error
+          ? `${error.message}. Project berhasil dibuat, tapi list belum sinkron. Coba refresh halaman.`
+          : 'Project berhasil dibuat, tapi list belum sinkron. Coba refresh halaman.';
       dispatch({
         type: 'CREATE_ERROR',
-        payload:
-          error instanceof Error
-            ? `${error.message}. Project berhasil dibuat, tapi list belum sinkron. Coba refresh halaman.`
-            : 'Project berhasil dibuat, tapi list belum sinkron. Coba refresh halaman.',
+        payload: message,
       });
+      pushToast({ type: 'error', title: 'Sinkronisasi gagal', description: message });
     }
   };
 
@@ -141,7 +150,14 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
             disabled={state.creating}
             className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
           >
-            {state.creating ? 'Membuat...' : 'Buat Project'}
+            {state.creating ? (
+              <span className="inline-flex items-center gap-2">
+                <Spinner className="text-white" />
+                Membuat...
+              </span>
+            ) : (
+              'Buat Project'
+            )}
           </button>
           {state.projects[0] && (
             <Link
