@@ -22,13 +22,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isAdmin = pathname.startsWith('/admin');
 
   if (!isAdmin) {
-    return <div className="min-h-screen bg-slate-100 text-slate-900">{children}</div>;
+    return <div className="material-page min-h-screen text-slate-900">{children}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+    <div className="material-page min-h-screen text-slate-900">
+      <header className="sticky top-0 z-40">
+        <div className="mx-auto mt-3 flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 rounded-[24px] border border-slate-200/80 bg-white/90 px-4 py-3 shadow-[0_8px_24px_rgba(15,23,42,0.08)] backdrop-blur">
           <Link href="/admin" className="text-sm font-extrabold tracking-tight text-slate-900">
             Faltforest Admin
           </Link>
@@ -39,7 +39,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors md:text-sm ${
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors md:text-sm ${
                     active ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >

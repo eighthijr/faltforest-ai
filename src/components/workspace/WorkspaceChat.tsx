@@ -258,7 +258,7 @@ export function WorkspaceChat({
   };
 
   return (
-    <section className="mx-auto flex w-full max-w-4xl flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 md:p-6">
+    <section className="material-surface mx-auto flex w-full max-w-4xl flex-col gap-4 p-4 md:p-6">
       <header className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
         <div>
           <nav aria-label="Breadcrumb" className="mb-1 text-xs text-slate-500">
@@ -299,12 +299,14 @@ export function WorkspaceChat({
         <LogoutButton />
       </header>
 
-      <div className="h-[360px] overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <div className="h-[360px] overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50/90 p-3">
         {state.messages.map((msg) => (
           <div key={msg.id} className={`mb-2 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
               className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
-                msg.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700'
+                msg.role === 'user'
+                  ? 'rounded-2xl bg-indigo-600 text-white shadow-[0_6px_16px_rgba(79,70,229,0.35)]'
+                  : 'rounded-2xl bg-white text-slate-700 shadow-sm'
               }`}
             >
               {msg.content}

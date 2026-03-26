@@ -133,7 +133,7 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
 
   return (
     <section className="mx-auto w-full max-w-5xl p-4 md:p-6">
-      <header className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <header className="material-surface mb-6 flex flex-col gap-3 p-5 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Dashboard Project</h1>
           <p className="text-slate-600">Kelola semua project kamu di satu tempat, lalu lanjutkan kerja di workspace.</p>
@@ -148,7 +148,7 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
             type="button"
             onClick={handleCreateProject}
             disabled={state.creating}
-            className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
+            className="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)] disabled:opacity-60"
           >
             {state.creating ? (
               <span className="inline-flex items-center gap-2">
@@ -162,7 +162,7 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
           {state.projects[0] && (
             <Link
               href={`/workspace?projectId=${state.projects[0].id}`}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-700"
+              className="rounded-full border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-700"
             >
               Lanjutkan Workspace
             </Link>
@@ -172,25 +172,25 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
       </header>
 
       {hasFreeProject && (
-        <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+        <p className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
           Kamu sudah memakai project FREE. Untuk tambah project, silakan upgrade ke PREMIUM.
         </p>
       )}
 
       {state.error && (
-        <p className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{state.error}</p>
+        <p className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{state.error}</p>
       )}
 
       <div className="space-y-3 md:hidden">
         {state.loading ? (
-          <p className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500">Memuat project...</p>
+          <p className="material-surface px-4 py-6 text-sm text-slate-500">Memuat project...</p>
         ) : state.projects.length === 0 ? (
-          <p className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500">
+          <p className="material-surface px-4 py-6 text-sm text-slate-500">
             Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.
           </p>
         ) : (
           state.projects.map((project) => (
-            <article key={project.id} className="rounded-xl border border-slate-200 bg-white p-4">
+            <article key={project.id} className="material-surface p-4">
               <p className="text-xs text-slate-500">Project ID</p>
               <p className="mt-1 break-all font-mono text-xs text-slate-700">{project.id}</p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -216,7 +216,7 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
         )}
       </div>
 
-      <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white md:block">
+      <div className="material-surface hidden overflow-x-auto md:block">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-slate-50 text-slate-500">
             <tr>

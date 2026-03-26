@@ -56,8 +56,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl space-y-4 px-4 py-10">
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <main className="material-page mx-auto w-full max-w-4xl space-y-4 px-4 py-10">
+      <section className="material-surface p-6">
         <h1 className="text-2xl font-bold text-slate-900">Profil Akun</h1>
         <p className="mt-2 text-sm text-slate-600">Kelola informasi akun dan ringkasan aktivitas project kamu.</p>
 
@@ -83,13 +83,13 @@ export default function ProfilePage() {
         </dl>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="material-surface p-6">
         <h2 className="text-lg font-semibold text-slate-900">Akses Cepat</h2>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Link href="/transactions" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">
+          <Link href="/transactions" className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)]">
             Lihat Riwayat Transaksi
           </Link>
-          <Link href="/dashboard" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
+          <Link href="/dashboard" className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
             Kembali ke Dashboard
           </Link>
         </div>

@@ -31,11 +31,11 @@ export default function DashboardPage() {
   }, []);
 
   if (authError) {
-    return <p className="p-4 text-sm text-rose-700">Gagal memuat sesi login: {authError}</p>;
+    return <p className="material-page p-4 text-sm text-rose-700">Gagal memuat sesi login: {authError}</p>;
   }
 
   if (!userId) {
-    return <p className="p-4 text-sm text-slate-600">Memuat dashboard...</p>;
+    return <p className="material-page p-4 text-sm text-slate-600">Memuat dashboard...</p>;
   }
 
   return (

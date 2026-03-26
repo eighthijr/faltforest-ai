@@ -75,8 +75,8 @@ export default function TransactionsPage() {
   }, [payments]);
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-10">
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <main className="material-page mx-auto w-full max-w-5xl space-y-4 px-4 py-10">
+      <section className="material-surface p-6">
         <h1 className="text-2xl font-bold text-slate-900">Riwayat Transaksi</h1>
         <p className="mt-2 text-sm text-slate-600">Pantau status pembayaran premium per project secara real-time.</p>
 
@@ -96,10 +96,10 @@ export default function TransactionsPage() {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="/pricing" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">
+          <Link href="/pricing" className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)]">
             Upgrade Project
           </Link>
-          <Link href="/dashboard" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
+          <Link href="/dashboard" className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
             Kembali ke Dashboard
           </Link>
         </div>
