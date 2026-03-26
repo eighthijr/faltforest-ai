@@ -1,63 +1,122 @@
 export const landingCopy = {
+  navbar: {
+    logo: 'Flatforest AI',
+    menu: [
+      { label: 'How it works', href: '#how-it-works' },
+      { label: 'Pricing', href: '/pricing' },
+    ],
+    login: 'Login',
+    cta: 'Coba Gratis',
+  },
   hero: {
-    badge: 'Untuk penjual online yang ingin jualan lebih cepat',
-    title: 'Buat halaman jualan yang bikin orang langsung ingin beli',
+    title: 'Landing page yang bikin jualan lebih laku. Bukan lebih ribet.',
     subtitle:
-      'Tanpa bingung, tanpa ribet. Tinggal isi produkmu, langsung jadi halaman jualan yang rapi dan meyakinkan.',
-    primaryCta: 'Mulai Gratis Sekarang',
-    secondaryCta: 'Lihat Contoh Hasil',
+      'Buat halaman jualan yang enak dibaca dan lebih meyakinkan dalam hitungan menit. Tinggal isi info produk, langsung jadi.',
+    primaryCta: 'Coba gratis sekarang',
+    microTrust: 'Tanpa coding • Tanpa skill copywriting • Tinggal pakai',
   },
   problem: {
-    title: 'Masalah yang sering bikin capek',
+    title: 'Capek udah promosi, tapi yang beli masih sedikit?',
+    intro: 'Banyak seller ngerasain ini:',
     points: [
-      'Sudah capek promosi, tapi orang cuma lihat lalu pergi.',
-      'Jualan bagus, tapi tampilannya kurang meyakinkan.',
-      'Waktu habis untuk ngurus tampilan, bukan fokus jualan.',
+      'Udah traffic masuk, tapi orang cuma lihat lalu pergi.',
+      'Bingung nulis kata-kata jualan yang bikin yakin.',
+      'Buka laptop lama, hasilnya gitu-gitu aja.',
+      'Mau landing page bagus, tapi takut ribet teknis.',
     ],
+    emotion: 'Kalau halaman jualan nggak “ngomong” dengan jelas, calon pembeli gampang skip.',
   },
   solution: {
-    title: 'Solusi simpel untuk jualan lebih yakin',
+    title: 'Flatforest AI bantu kamu bikin halaman yang lebih “jualan”',
     body:
-      'Kami bantu kamu bikin halaman jualan yang jelas, menarik, dan bikin calon pembeli lebih percaya. Kamu fokus jualan, kami urus tampilannya.',
+      'Flatforest AI nyusun isi landing page yang fokus ke hal paling penting: bikin orang paham, percaya, lalu beli.',
+    points: [
+      'Judul yang langsung nangkep perhatian.',
+      'Kalimat manfaat produk yang gampang dipahami.',
+      'Susunan penawaran biar lebih meyakinkan.',
+      'Ajakan beli yang jelas dan nggak muter-muter.',
+    ],
+    close:
+      'Hasilnya: pesan jualan kamu terasa lebih rapi, lebih jelas, dan lebih ngedorong orang buat checkout.',
   },
   demo: {
-    title: 'Lihat cara kerjanya',
-    steps: [
-      '1) Isi nama produk, harga, dan foto.',
-      '2) Pilih gaya yang kamu suka.',
-      '3) Halaman jualan langsung siap dipakai.',
+    title: 'Dari info produk sederhana jadi landing page siap pakai',
+    inputTitle: 'Input (yang kamu isi):',
+    input: ['Nama produk', 'Siapa target pembelinya', 'Manfaat utama produk', 'Harga / promo'],
+    outputTitle: 'Output (yang kamu dapat):',
+    output: [
+      'Landing page lengkap dengan struktur jualan.',
+      'Teks yang udah disusun biar enak dibaca.',
+      'CTA yang jelas buat dorong pembelian.',
     ],
-    cta: 'Coba Demo Gratis',
+    note: 'Semua prosesnya cepat. Nggak perlu setting aneh-aneh.',
+    cta: 'Lihat contoh hasilnya',
   },
   benefits: {
-    title: 'Kenapa penjual suka pakai ini',
+    title: 'Kenapa seller suka pakai Flatforest AI?',
     items: [
-      'Lebih cepat mulai jualan tanpa pusing.',
-      'Tampilan lebih rapi sehingga lebih dipercaya.',
-      'Pesan jualan lebih jelas, pembeli lebih paham.',
-      'Bisa dipakai kapan saja saat ada produk baru.',
+      'Bikin landing page jauh lebih cepat.',
+      'Nggak perlu mikir dari nol.',
+      'Lebih gampang dipahami calon pembeli.',
+      'Bantu naikin peluang produk jadi lebih laku.',
+      'Cocok buat seller digital, fisik, sampai affiliate.',
+      'Bahkan kalau kamu belum pernah bikin landing page sama sekali.',
     ],
   },
   proof: {
-    title: 'Sudah dipakai banyak penjual',
-    stats: [
-      { label: 'Penjual aktif', value: '2.300+' },
-      { label: 'Halaman dibuat', value: '18.000+' },
-      { label: 'Rata-rata waktu jadi', value: '< 10 menit' },
-    ],
+    title: 'Dipakai seller yang pengen jualan lebih konsisten',
     quotes: [
-      '“Dulu saya bingung mulai dari mana. Sekarang tinggal isi data, langsung jadi.” — Rina, penjual skincare',
-      '“Calon pembeli jadi lebih cepat paham produknya. Chat yang masuk juga lebih serius.” — Dedi, penjual fashion',
+      {
+        text: 'Biasanya saya nulis lama banget dan tetap bingung. Sekarang tinggal isi data produk, hasilnya langsung kepakai.',
+        author: 'Rina, Seller Produk Digital',
+      },
+      {
+        text: 'Saya nggak ngerti teknis sama sekali. Tapi bisa bikin halaman promo sendiri dan lebih pede pas ngiklan.',
+        author: 'Dimas, Seller Produk Fisik',
+      },
+      {
+        text: 'Buat affiliate, ini ngebantu banget. Halamannya jadi lebih jelas dan orang lebih ngerti kenapa harus beli.',
+        author: 'Niko, Affiliate Marketer',
+      },
+    ],
+    softProof: 'Dipakai oleh berbagai tipe seller yang pengen proses jualan lebih simpel.',
+  },
+  howItWorks: {
+    title: '3 langkah, langsung jalan',
+    steps: [
+      {
+        title: 'Isi detail produk kamu',
+        body: 'Cukup info basic. Nggak perlu istilah ribet.',
+      },
+      {
+        title: 'AI susun halaman jualanmu',
+        body: 'Judul, isi, dan ajakan beli langsung dirangkai otomatis.',
+      },
+      {
+        title: 'Pakai dan mulai jualan',
+        body: 'Tinggal review sebentar, lalu langsung gunakan.',
+      },
     ],
   },
   cta: {
-    title: 'Jangan tunda jualanmu hari ini',
-    body: 'Semakin cepat kamu mulai, semakin cepat kamu dapat pembeli.',
-    button: 'Buat Halaman Jualan Saya Sekarang',
-    note: 'Gratis mulai. Bisa langsung dipakai.',
+    title: 'Kalau bisa lebih gampang, kenapa harus ribet?',
+    body: 'Mulai dari satu produk dulu. Rasain sendiri bedanya halaman jualan yang lebih jelas dan lebih meyakinkan.',
+    button: 'Coba gratis sekarang',
+    note: 'Gratis mulai • Tanpa coding • Bisa langsung dipakai',
   },
   footer: {
-    text: 'Dibuat untuk UMKM dan penjual online Indonesia.',
-    links: ['Tentang', 'Harga', 'Bantuan', 'Kontak'],
+    brand: 'Flatforest AI',
+    tagline: 'Landing page pintar buat bantu jualan lebih lancar.',
+    productLinks: [
+      { label: 'How it works', href: '#how-it-works' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'Login', href: '#login' },
+    ],
+    support: 'support@flatforest.ai',
+    legalLinks: [
+      { label: 'Privacy Policy', href: '#' },
+      { label: 'Terms of Service', href: '#' },
+    ],
+    smallCta: 'Coba Gratis',
   },
 };
