@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
 type PricingPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     source?: string;
     reason?: string;
     projectId?: string;
-  };
+  }>;
 };
 
 const reasonLabel: Record<string, string> = {
@@ -14,10 +14,11 @@ const reasonLabel: Record<string, string> = {
   project_limit: 'Kuota 1 project untuk paket FREE',
 };
 
-export default function PricingPage({ searchParams }: PricingPageProps) {
-  const source = searchParams?.source ?? 'app';
-  const reason = searchParams?.reason ?? 'project_limit';
-  const projectId = searchParams?.projectId;
+export default async function PricingPage({ searchParams }: PricingPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const source = resolvedSearchParams?.source ?? 'app';
+  const reason = resolvedSearchParams?.reason ?? 'project_limit';
+  const projectId = resolvedSearchParams?.projectId;
 
   const requirement = reasonLabel[reason] ?? 'Akses fitur PREMIUM';
 
