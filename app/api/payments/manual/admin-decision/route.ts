@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   const result = await postManualQrisAdminDecision({
     body,
     headers: {},
-    user: getRequestUser(req),
+    user: await getRequestUser(req),
   });
 
   return toNextResponse(result);

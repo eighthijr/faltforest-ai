@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
       from: req.nextUrl.searchParams.get('from') ?? undefined,
       to: req.nextUrl.searchParams.get('to') ?? undefined,
     },
-    user: getRequestUser(req),
+    user: await getRequestUser(req),
   });
 
   return toNextResponse(result);

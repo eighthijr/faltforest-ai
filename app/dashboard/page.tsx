@@ -41,7 +41,15 @@ export default function DashboardPage() {
   return (
     <ProjectDashboard
       userId={userId}
-      onUpgradeClick={() => (window.location.href = '/pricing?source=dashboard&reason=project_limit')}
+      onUpgradeClick={(projectId) => {
+        const params = new URLSearchParams({
+          source: 'dashboard',
+          reason: 'project_limit',
+        });
+
+        if (projectId) params.set('projectId', projectId);
+        window.location.href = `/pricing?${params.toString()}`;
+      }}
     />
   );
 }

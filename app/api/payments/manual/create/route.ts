@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     headers: {
       'x-idempotency-key': req.headers.get('x-idempotency-key') ?? undefined,
     },
-    user: getRequestUser(req),
+    user: await getRequestUser(req),
   });
 
   return toNextResponse(result);
