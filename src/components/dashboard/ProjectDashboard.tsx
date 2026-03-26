@@ -181,7 +181,42 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
         <p className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{state.error}</p>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div className="space-y-3 md:hidden">
+        {state.loading ? (
+          <p className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500">Memuat project...</p>
+        ) : state.projects.length === 0 ? (
+          <p className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500">
+            Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.
+          </p>
+        ) : (
+          state.projects.map((project) => (
+            <article key={project.id} className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-xs text-slate-500">Project ID</p>
+              <p className="mt-1 break-all font-mono text-xs text-slate-700">{project.id}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span
+                  className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+                    project.type === 'premium' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700'
+                  }`}
+                >
+                  {project.type === 'premium' ? 'PREMIUM' : 'FREE'}
+                </span>
+                <span className="text-xs capitalize text-slate-600">{project.status}</span>
+                <span className="text-xs text-slate-500">
+                  {new Date(project.created_at).toLocaleDateString('id-ID', {
+                    dateStyle: 'medium',
+                  })}
+                </span>
+              </div>
+              <Link href={`/workspace?projectId=${project.id}`} className="mt-3 inline-flex text-sm font-semibold text-indigo-700 hover:underline">
+                Buka Workspace
+              </Link>
+            </article>
+          ))
+        )}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white md:block">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-slate-50 text-slate-500">
             <tr>

@@ -256,6 +256,24 @@ function PricingPageContent() {
           Harga upgrade: <strong>{formatRupiah(PREMIUM_PRICE)}</strong> (sekali bayar per project).
         </div>
 
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <article className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Keamanan</p>
+            <p className="mt-1 text-sm font-medium text-slate-800">Pembayaran via QRIS resmi</p>
+            <p className="mt-1 text-xs text-slate-600">Gunakan channel QRIS terpercaya (Tripay/manual) dengan reference unik per transaksi.</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Aktivasi</p>
+            <p className="mt-1 text-sm font-medium text-slate-800">Upgrade otomatis setelah sukses</p>
+            <p className="mt-1 text-xs text-slate-600">Status project akan diperbarui otomatis di halaman ini setelah pembayaran terkonfirmasi.</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">SLA Verifikasi Manual</p>
+            <p className="mt-1 text-sm font-medium text-slate-800">Maksimal 1×24 jam kerja</p>
+            <p className="mt-1 text-xs text-slate-600">Jika memilih QRIS manual, bukti transfer akan dicek admin dan diberi keputusan di panel transaksi.</p>
+          </article>
+        </div>
+
         {loading ? (
           <p className="mt-4 text-sm text-slate-600">Memuat data akun...</p>
         ) : (
@@ -302,6 +320,15 @@ function PricingPageContent() {
               >
                 QRIS Manual
               </button>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+              <p className="font-semibold text-slate-700">Alur pembayaran</p>
+              <ol className="mt-1 list-decimal space-y-1 pl-4">
+                <li>Pilih project yang ingin di-upgrade.</li>
+                <li>Pilih metode pembayaran (Tripay otomatis atau QRIS manual).</li>
+                <li>Selesaikan pembayaran dan tunggu status project berubah menjadi PREMIUM.</li>
+              </ol>
             </div>
 
             {paymentMethod === 'tripay' ? (
