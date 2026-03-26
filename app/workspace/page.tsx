@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { listProjects } from '@/api/projects';
 import { supabase } from '@/lib/supabaseClient';
@@ -13,15 +13,11 @@ export default function WorkspacePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const searchProjectId = useMemo(() => {
-    if (typeof window === 'undefined') return null;
-    return new URLSearchParams(window.location.search).get('projectId');
-  }, []);
-
   useEffect(() => {
     const loadWorkspaceProject = async () => {
       setLoading(true);
       setError(null);
+      const searchProjectId = new URLSearchParams(window.location.search).get('projectId');
 
       const { data, error: userError } = await supabase.auth.getUser();
       if (userError) {
@@ -38,13 +34,13 @@ export default function WorkspacePage() {
 
       try {
         const userProjects = await listProjects(userId);
-        setProjects(userProjects);
-
         const preferredProject = searchProjectId
           ? userProjects.find((project) => project.id === searchProjectId) ?? null
           : null;
 
-        setSelectedProject(preferredProject ?? userProjects[0] ?? null);
+        const resolvedProject = preferredProject ?? userProjects[0] ?? null;
+        setProjects(userProjects);
+        setSelectedProject(resolvedProject);
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : 'Gagal memuat project workspace.');
       } finally {
@@ -53,7 +49,7 @@ export default function WorkspacePage() {
     };
 
     void loadWorkspaceProject();
-  }, [searchProjectId]);
+  }, []);
 
   if (loading) {
     return <p className="p-4 text-sm text-slate-600">Memuat workspace...</p>;
