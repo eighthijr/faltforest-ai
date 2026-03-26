@@ -3,6 +3,7 @@ import { getAdminCookieName, verifySession } from '@/server/admin/auth';
 import { getSupabaseAdmin } from '@/server/supabaseAdmin';
 
 const QRIS_PATH = 'manual-qris/current.png';
+const QRIS_BUCKET = process.env.NEXT_PUBLIC_QRIS_BUCKET || 'payment-assets';
 
 function requireAdminSession(req: NextRequest) {
   const token = req.cookies.get(getAdminCookieName())?.value;
@@ -18,7 +19,7 @@ function requireAdminSession(req: NextRequest) {
 function buildPublicUrl() {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!base) return '';
-  return `${base}/storage/v1/object/public/payment-assets/${QRIS_PATH}`;
+  return `${base}/storage/v1/object/public/${QRIS_BUCKET}/${QRIS_PATH}`;
 }
 
 export async function GET(req: NextRequest) {
@@ -47,12 +48,20 @@ export async function POST(req: NextRequest) {
 
     const bytes = await file.arrayBuffer();
     const supabaseAdmin = getSupabaseAdmin();
-    const { error } = await supabaseAdmin.storage.from('payment-assets').upload(QRIS_PATH, bytes, {
+    const { error } = await supabaseAdmin.storage.from(QRIS_BUCKET).upload(QRIS_PATH, bytes, {
       upsert: true,
       contentType: file.type,
     });
 
     if (error) {
+      if (error.message.includes('Bucket not found')) {
+        return NextResponse.json(
+          {
+            message: `Bucket "${QRIS_BUCKET}" tidak ditemukan. Buat bucket tersebut di Supabase Storage (public), lalu upload ulang.`,
+          },
+          { status: 400 },
+        );
+      }
       throw new Error(error.message);
     }
 

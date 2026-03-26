@@ -9,8 +9,9 @@ import { supabase } from '@/lib/supabaseClient';
 import type { Project } from '@/types/project';
 
 const PREMIUM_PRICE = 99000;
+const QRIS_BUCKET_NAME = process.env.NEXT_PUBLIC_QRIS_BUCKET || 'payment-assets';
 const MANUAL_QRIS_IMAGE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/payment-assets/manual-qris/current.png`
+  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${QRIS_BUCKET_NAME}/manual-qris/current.png`
   : '';
 
 const reasonLabel: Record<string, string> = {
@@ -348,7 +349,7 @@ function PricingPageContent() {
                   />
                 ) : (
                   <p className="text-xs text-amber-700">
-                    QRIS manual belum tersedia. Upload dulu ke Supabase Storage bucket <code>payment-assets</code> dengan path{' '}
+                    QRIS manual belum tersedia. Upload dulu ke Supabase Storage bucket <code>{QRIS_BUCKET_NAME}</code> dengan path{' '}
                     <code>manual-qris/current.png</code>.
                   </p>
                 )}
