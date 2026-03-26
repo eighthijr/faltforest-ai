@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useMemo, useReducer, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useReducer, useState } from 'react';
 import Link from 'next/link';
 import { generateCopyOnce, saveAnswersDraft } from '../../api/workspace';
 import { LogoutButton } from '../auth';
@@ -14,6 +14,7 @@ type WorkspaceChatProps = {
   projectType: ProjectType;
   projectCount?: number;
   initialState?: 'draft' | 'ready' | 'generated';
+  initialGeneratedCopy?: string | null;
   onUpgradeClick?: () => void;
 };
 
@@ -27,10 +28,19 @@ type LocalAction =
   | { type: 'SET_LOADING'; value: boolean }
   | { type: 'SET_PAYWALL'; value: LocalState['paywall'] }
   | { type: 'ADD_MESSAGE'; value: WorkspaceMessage }
+  | { type: 'RESTORE_SNAPSHOT'; value: Pick<LocalState, 'state' | 'answers' | 'generatedCopy' | 'messages'> }
   | { type: 'APPLY_EVENT'; event: Parameters<typeof reduceWorkspace>[1] };
 
 function uid() {
   return crypto.randomUUID();
+}
+
+function storageKey(projectId: string) {
+  return `workspace-session:${projectId}`;
+}
+
+function isWorkspaceState(value: unknown): value is WorkspaceContext['state'] {
+  return value === 'draft' || value === 'ready' || value === 'generated';
 }
 
 const emptyAnswers: WorkspaceAnswers = {
@@ -48,6 +58,15 @@ function reducer(state: LocalState, action: LocalAction): LocalState {
       return { ...state, paywall: action.value };
     case 'ADD_MESSAGE':
       return { ...state, messages: [...state.messages, action.value] };
+    case 'RESTORE_SNAPSHOT':
+      return {
+        ...state,
+        state: action.value.state,
+        answers: action.value.answers,
+        generatedCopy: action.value.generatedCopy,
+        hasGeneratedOnce: action.value.state === 'generated',
+        messages: action.value.messages.length > 0 ? action.value.messages : state.messages,
+      };
     case 'APPLY_EVENT':
       return { ...state, ...reduceWorkspace(state, action.event) };
     default:
@@ -60,15 +79,17 @@ export function WorkspaceChat({
   projectType,
   projectCount = 1,
   initialState = 'draft',
+  initialGeneratedCopy = null,
   onUpgradeClick,
 }: WorkspaceChatProps) {
   const [input, setInput] = useState('');
+  const [hydrated, setHydrated] = useState(false);
   const [state, dispatch] = useReducer(reducer, {
     projectId,
     projectType,
     state: initialState,
     answers: emptyAnswers,
-    generatedCopy: null,
+    generatedCopy: initialGeneratedCopy,
     hasGeneratedOnce: initialState === 'generated',
     loading: false,
     paywall: null,
@@ -81,9 +102,67 @@ export function WorkspaceChat({
     ],
   });
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const raw = window.localStorage.getItem(storageKey(projectId));
+    if (!raw) {
+      setHydrated(true);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as Partial<LocalState>;
+      const snapshotState = isWorkspaceState(parsed.state) ? parsed.state : initialState;
+      const snapshotAnswers: WorkspaceAnswers = {
+        ...emptyAnswers,
+        ...(parsed.answers ?? {}),
+      };
+      const snapshotMessages = Array.isArray(parsed.messages)
+        ? parsed.messages.filter((message): message is WorkspaceMessage => {
+            return Boolean(
+              message &&
+                typeof message.id === 'string' &&
+                typeof message.content === 'string' &&
+                (message.role === 'system' || message.role === 'user'),
+            );
+          })
+        : [];
+
+      dispatch({
+        type: 'RESTORE_SNAPSHOT',
+        value: {
+          state: snapshotState,
+          answers: snapshotAnswers,
+          generatedCopy: parsed.generatedCopy ?? initialGeneratedCopy,
+          messages: snapshotMessages,
+        },
+      });
+    } catch {
+      window.localStorage.removeItem(storageKey(projectId));
+    } finally {
+      setHydrated(true);
+    }
+  }, [projectId, initialGeneratedCopy, initialState]);
+
+  useEffect(() => {
+    if (!hydrated || typeof window === 'undefined') return;
+    window.localStorage.setItem(
+      storageKey(projectId),
+      JSON.stringify({
+        projectId: state.projectId,
+        state: state.state,
+        answers: state.answers,
+        generatedCopy: state.generatedCopy,
+        messages: state.messages,
+      }),
+    );
+  }, [hydrated, projectId, state]);
+
   const missingFields = useMemo(() => getMissingFields(state), [state]);
   const nextQuestionKey = missingFields[0] as QuestionKey | undefined;
   const nextQuestion = nextQuestionKey ? questionLabels[nextQuestionKey] : null;
+  const completedCount = questionOrder.length - missingFields.length;
+  const progressPercent = Math.round((completedCount / questionOrder.length) * 100);
 
   const submitAnswer = async (event: FormEvent) => {
     event.preventDefault();
@@ -184,6 +263,17 @@ export function WorkspaceChat({
           <p className="text-sm text-slate-600">
             Status project: <strong>{state.state}</strong> · Project aktif: <span className="font-mono text-xs">{projectId}</span>
           </p>
+          <div className="mt-2 max-w-md">
+            <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
+              <span>Progress brief</span>
+              <span>
+                {completedCount}/{questionOrder.length} ({progressPercent}%)
+              </span>
+            </div>
+            <div className="h-2 w-full rounded-full bg-slate-200">
+              <div className="h-2 rounded-full bg-indigo-600 transition-all" style={{ width: `${progressPercent}%` }} />
+            </div>
+          </div>
           {projectCount > 1 && (
             <p className="text-xs text-slate-500">
               Punya {projectCount} project.{' '}

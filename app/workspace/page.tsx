@@ -101,6 +101,7 @@ export default function WorkspacePage() {
       projectId={selectedProject.id}
       projectType={selectedProject.type}
       initialState={selectedProject.status}
+      initialGeneratedCopy={selectedProject.generated_html}
       projectCount={projects.length}
       onUpgradeClick={() => (window.location.href = '/pricing')}
     />
