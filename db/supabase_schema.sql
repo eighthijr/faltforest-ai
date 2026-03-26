@@ -49,6 +49,7 @@ create table public.payments (
   reference text not null,
   amount numeric(12,2) not null check (amount > 0),
   status public.payment_status not null default 'pending',
+  proof_path text,
   created_at timestamptz not null default timezone('utc', now()),
 
   -- CRITICAL: payment reference must be unique

@@ -133,6 +133,7 @@ Buka: `http://localhost:3000`
 ### Payments
 - `POST /api/payments/manual/create`
 - `POST /api/payments/manual/already-paid`
+- `POST /api/payments/manual/submit-proof` (buat reference otomatis + upload bukti transfer + kirim verifikasi admin)
 - `POST /api/payments/manual/admin-decision`
 - `POST /api/payments/tripay/create`
 - `POST /api/payments/tripay/webhook`

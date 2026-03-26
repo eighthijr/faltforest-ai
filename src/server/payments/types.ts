@@ -11,6 +11,7 @@ export type PaymentRecord = {
   status: PaymentStatus;
   gateway: PaymentGateway;
   gateway_ref: string | null;
+  proof_path: string | null;
   confirmed_by: string | null;
   confirmed_at: string | null;
 };

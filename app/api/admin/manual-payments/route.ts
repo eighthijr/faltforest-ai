@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('payments')
-      .select('id, reference, amount, status, gateway, created_at, updated_at, project_id, user_id')
+      .select('id, reference, amount, status, gateway, created_at, updated_at, project_id, user_id, proof_path')
       .eq('gateway', 'manual_qris')
       .in('status', ['pending', 'waiting_confirmation'])
       .order('created_at', { ascending: false })
