@@ -21,12 +21,14 @@ type WorkspaceChatProps = {
 type LocalState = WorkspaceContext & {
   loading: boolean;
   paywall: null | 'download' | 'chat_after_generated';
+  generationError: string | null;
   messages: WorkspaceMessage[];
 };
 
 type LocalAction =
   | { type: 'SET_LOADING'; value: boolean }
   | { type: 'SET_PAYWALL'; value: LocalState['paywall'] }
+  | { type: 'SET_ERROR'; value: string | null }
   | { type: 'ADD_MESSAGE'; value: WorkspaceMessage }
   | { type: 'RESTORE_SNAPSHOT'; value: Pick<LocalState, 'state' | 'answers' | 'generatedCopy' | 'messages'> }
   | { type: 'APPLY_EVENT'; event: Parameters<typeof reduceWorkspace>[1] };
@@ -56,6 +58,8 @@ function reducer(state: LocalState, action: LocalAction): LocalState {
       return { ...state, loading: action.value };
     case 'SET_PAYWALL':
       return { ...state, paywall: action.value };
+    case 'SET_ERROR':
+      return { ...state, generationError: action.value };
     case 'ADD_MESSAGE':
       return { ...state, messages: [...state.messages, action.value] };
     case 'RESTORE_SNAPSHOT':
@@ -93,6 +97,7 @@ export function WorkspaceChat({
     hasGeneratedOnce: initialState === 'generated',
     loading: false,
     paywall: null,
+    generationError: null,
     messages: [
       {
         id: uid(),
@@ -209,6 +214,7 @@ export function WorkspaceChat({
 
     try {
       dispatch({ type: 'SET_LOADING', value: true });
+      dispatch({ type: 'SET_ERROR', value: null });
       await saveAnswersDraft({ projectId: state.projectId, answers: state.answers });
       dispatch({ type: 'APPLY_EVENT', event: { type: 'COLLECTION_COMPLETED' } });
 
@@ -216,13 +222,15 @@ export function WorkspaceChat({
       dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_SUCCEEDED', copy } });
       dispatch({ type: 'ADD_MESSAGE', value: { id: uid(), role: 'system', content: 'Copy selesai dibuat ✅' } });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Gagal generate copy.';
       dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_FAILED' } });
+      dispatch({ type: 'SET_ERROR', value: errorMessage });
       dispatch({
         type: 'ADD_MESSAGE',
         value: {
           id: uid(),
           role: 'system',
-          content: error instanceof Error ? error.message : 'Gagal generate copy.',
+          content: errorMessage,
         },
       });
     } finally {
@@ -312,6 +320,13 @@ export function WorkspaceChat({
         </article>
       )}
 
+      {state.generationError && !state.generatedCopy && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+          <p>Generate gagal: {state.generationError}</p>
+          <p className="mt-1">Klik tombol &quot;Ulangi Generate&quot; untuk mencoba lagi.</p>
+        </div>
+      )}
+
       <form onSubmit={submitAnswer} className="flex gap-2">
         <input
           value={input}
@@ -332,7 +347,7 @@ export function WorkspaceChat({
           disabled={state.loading || state.state === 'generated'}
           className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
         >
-          {state.loading ? 'Memproses...' : 'Generate Copy'}
+          {state.loading ? 'Memproses...' : state.generationError ? 'Ulangi Generate' : 'Generate Copy'}
         </button>
 
         <button
