@@ -47,8 +47,10 @@ Buat `.env.local` (untuk lokal) dan set juga di Vercel Project Settings -> Envir
 
 ### Opsional (disarankan)
 - `NEXT_PUBLIC_APP_URL` (contoh: `https://your-app.vercel.app`)
+- `GEMINI_API_KEY` (jika ingin generate copy langsung dari Next.js route tanpa Supabase Edge Function)
+- `GEMINI_MODEL` (opsional, default: `gemini-2.0-flash`)
 
-> Catatan: `SUPABASE_SERVICE_ROLE_KEY` **hanya untuk server**. Jangan expose ke browser.
+> Catatan: `SUPABASE_SERVICE_ROLE_KEY` dan `GEMINI_API_KEY` **hanya untuk server**. Jangan expose ke browser.
 
 ---
 
@@ -113,6 +115,7 @@ Buka: `http://localhost:3000`
 
 ### Workspace
 - `POST /api/workspace/guard` (server-side paywall guard)
+- `POST /api/workspace/generate-copy` (pakai `GEMINI_API_KEY`; fallback ke Supabase Edge Function jika key tidak diisi)
 
 ### Payments
 - `POST /api/payments/manual/create`
