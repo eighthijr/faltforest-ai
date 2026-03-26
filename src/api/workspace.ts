@@ -7,6 +7,19 @@ type GenerateCopyInput = {
 };
 
 export async function saveAnswersDraft(input: GenerateCopyInput) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    throw new Error(userError.message);
+  }
+
+  if (!user?.id) {
+    throw new Error('Sesi login tidak ditemukan. Silakan login ulang.');
+  }
+
   const payload = {
     answers: input.answers,
   };
@@ -14,7 +27,7 @@ export async function saveAnswersDraft(input: GenerateCopyInput) {
   const { error } = await supabase
     .from('events')
     .insert({
-      user_id: (await supabase.auth.getUser()).data.user?.id ?? null,
+      user_id: user.id,
       event_name: 'workspace_answers_saved',
       metadata: {
         project_id: input.projectId,
@@ -22,7 +35,8 @@ export async function saveAnswersDraft(input: GenerateCopyInput) {
       },
     });
 
-  if (error) throw new Error(error.message);
+  // Analytics event is best-effort; jangan blokir alur generate jika policy analytics tertutup.
+  if (error && error.code !== '42501') throw new Error(error.message);
 
   const { error: projectError } = await supabase
     .from('projects')
