@@ -7,6 +7,14 @@ import { supabase } from '@/lib/supabaseClient';
 import { WorkspaceChat } from '@/components/workspace';
 import type { Project } from '@/types/project';
 
+function isProjectType(value: string | null): value is Project['type'] {
+  return value === 'free' || value === 'premium';
+}
+
+function isProjectStatus(value: string | null): value is Project['status'] {
+  return value === 'draft' || value === 'ready' || value === 'generated';
+}
+
 export default function WorkspacePage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -17,7 +25,10 @@ export default function WorkspacePage() {
     const loadWorkspaceProject = async () => {
       setLoading(true);
       setError(null);
-      const searchProjectId = new URLSearchParams(window.location.search).get('projectId');
+      const params = new URLSearchParams(window.location.search);
+      const searchProjectId = params.get('projectId');
+      const searchProjectType = params.get('projectType');
+      const searchProjectStatus = params.get('projectStatus');
 
       const { data, error: userError } = await supabase.auth.getUser();
       if (userError) {
@@ -38,7 +49,19 @@ export default function WorkspacePage() {
           ? userProjects.find((project) => project.id === searchProjectId) ?? null
           : null;
 
-        const resolvedProject = preferredProject ?? userProjects[0] ?? null;
+        const fallbackProject =
+          searchProjectId && isProjectType(searchProjectType) && isProjectStatus(searchProjectStatus)
+            ? {
+                id: searchProjectId,
+                user_id: userId,
+                type: searchProjectType,
+                status: searchProjectStatus,
+                generated_html: null,
+                created_at: new Date().toISOString(),
+              }
+            : null;
+
+        const resolvedProject = preferredProject ?? userProjects[0] ?? fallbackProject;
         setProjects(userProjects);
         setSelectedProject(resolvedProject);
       } catch (loadError) {
