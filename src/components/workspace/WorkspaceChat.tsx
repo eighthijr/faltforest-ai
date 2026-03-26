@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useReducer, useState } from 'react';
+import Link from 'next/link';
 import { generateCopyOnce, saveAnswersDraft } from '../../api/workspace';
 import { LogoutButton } from '../auth';
 import type { ProjectType } from '../../types/project';
@@ -11,6 +12,7 @@ import { PaywallModal } from './PaywallModal';
 type WorkspaceChatProps = {
   projectId: string;
   projectType: ProjectType;
+  projectCount?: number;
   initialState?: 'draft' | 'ready' | 'generated';
   onUpgradeClick?: () => void;
 };
@@ -53,7 +55,13 @@ function reducer(state: LocalState, action: LocalAction): LocalState {
   }
 }
 
-export function WorkspaceChat({ projectId, projectType, initialState = 'draft', onUpgradeClick }: WorkspaceChatProps) {
+export function WorkspaceChat({
+  projectId,
+  projectType,
+  projectCount = 1,
+  initialState = 'draft',
+  onUpgradeClick,
+}: WorkspaceChatProps) {
   const [input, setInput] = useState('');
   const [state, dispatch] = useReducer(reducer, {
     projectId,
@@ -162,8 +170,29 @@ export function WorkspaceChat({ projectId, projectType, initialState = 'draft', 
     <section className="mx-auto flex w-full max-w-4xl flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 md:p-6">
       <header className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
         <div>
+          <nav aria-label="Breadcrumb" className="mb-1 text-xs text-slate-500">
+            <Link href="/" className="hover:underline">
+              Landing
+            </Link>{' '}
+            /{' '}
+            <Link href="/dashboard" className="hover:underline">
+              Dashboard
+            </Link>{' '}
+            / <span className="font-semibold text-slate-700">Workspace</span>
+          </nav>
           <h1 className="text-xl font-bold text-slate-900">Workspace Chat</h1>
-          <p className="text-sm text-slate-600">Status project: <strong>{state.state}</strong></p>
+          <p className="text-sm text-slate-600">
+            Status project: <strong>{state.state}</strong> · Project aktif: <span className="font-mono text-xs">{projectId}</span>
+          </p>
+          {projectCount > 1 && (
+            <p className="text-xs text-slate-500">
+              Punya {projectCount} project.{' '}
+              <Link href="/dashboard" className="font-semibold text-indigo-700 hover:underline">
+                Pindah project dari dashboard
+              </Link>
+              .
+            </p>
+          )}
         </div>
         <LogoutButton />
       </header>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useReducer } from 'react';
+import Link from 'next/link';
 import { createProject, listProjects } from '../../api/projects';
 import { LogoutButton } from '../auth';
 import type { Project } from '../../types/project';
@@ -106,7 +107,8 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
       <header className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Dashboard Project</h1>
-          <p className="text-slate-600">Kelola semua project kamu di satu tempat.</p>
+          <p className="text-slate-600">Kelola semua project kamu di satu tempat, lalu lanjutkan kerja di workspace.</p>
+          <p className="mt-1 text-xs text-slate-500">Alur cepat: Buat project → Buka Workspace → Generate Copy.</p>
         </div>
 
         <div className="flex flex-wrap items-start gap-2 md:justify-end">
@@ -118,6 +120,14 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
           >
             {state.creating ? 'Membuat...' : 'Buat Project'}
           </button>
+          {state.projects[0] && (
+            <Link
+              href={`/workspace?projectId=${state.projects[0].id}`}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-700"
+            >
+              Lanjutkan Workspace
+            </Link>
+          )}
           <LogoutButton />
         </div>
       </header>
@@ -140,19 +150,20 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
               <th className="px-4 py-3 font-semibold">Tipe</th>
               <th className="px-4 py-3 font-semibold">Status</th>
               <th className="px-4 py-3 font-semibold">Dibuat</th>
+              <th className="px-4 py-3 font-semibold">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {state.loading ? (
               <tr>
-                <td className="px-4 py-6 text-slate-500" colSpan={4}>
+                <td className="px-4 py-6 text-slate-500" colSpan={5}>
                   Memuat project...
                 </td>
               </tr>
             ) : state.projects.length === 0 ? (
               <tr>
-                <td className="px-4 py-6 text-slate-500" colSpan={4}>
-                  Belum ada project.
+                <td className="px-4 py-6 text-slate-500" colSpan={5}>
+                  Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.
                 </td>
               </tr>
             ) : (
@@ -175,6 +186,11 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
                     {new Date(project.created_at).toLocaleDateString('id-ID', {
                       dateStyle: 'medium',
                     })}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link href={`/workspace?projectId=${project.id}`} className="text-sm font-semibold text-indigo-700 hover:underline">
+                      Buka Workspace
+                    </Link>
                   </td>
                 </tr>
               ))
