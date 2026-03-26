@@ -45,16 +45,48 @@ export async function submitManualQrisProof(input: {
   amount: number;
   proofPath: string;
 }) {
-  const { data, error } = await supabase.rpc('submit_manual_qris_proof', {
+  const rpcPayload = {
     p_user_id: input.userId,
     p_project_id: input.projectId,
     p_reference: input.reference,
     p_amount: input.amount,
     p_proof_path: input.proofPath,
+  };
+  const { data, error } = await supabase.rpc('submit_manual_qris_proof', rpcPayload);
+
+  if (!error) return mapRecord(data);
+
+  const isMissingRpc =
+    error.message.includes('Could not find the function public.submit_manual_qris_proof') ||
+    error.message.includes('schema cache');
+
+  if (!isMissingRpc) throw new Error(error.message);
+
+  const fallbackPayment = await createManualQrisPayment({
+    userId: input.userId,
+    projectId: input.projectId,
+    reference: input.reference,
+    amount: input.amount,
   });
 
-  if (error) throw new Error(error.message);
-  return mapRecord(data);
+  const waitingConfirmationPayment = await markManualWaitingConfirmation({
+    userId: input.userId,
+    reference: input.reference,
+  });
+
+  const { data: updatedPayment, error: updateError } = await supabase
+    .from('payments')
+    .update({ proof_path: input.proofPath })
+    .eq('reference', input.reference)
+    .eq('user_id', input.userId)
+    .select('*')
+    .maybeSingle();
+
+  if (updateError) {
+    return mapRecord(waitingConfirmationPayment ?? fallbackPayment);
+  }
+
+  return mapRecord(updatedPayment ?? waitingConfirmationPayment ?? fallbackPayment);
 }
 
 export async function adminDecideManualPayment(input: {
