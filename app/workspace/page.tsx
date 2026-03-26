@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { listProjects } from '@/api/projects';
 import { supabase } from '@/lib/supabaseClient';
 import { WorkspaceChat } from '@/components/workspace';
@@ -12,11 +13,11 @@ export default function WorkspacePage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   const searchProjectId = useMemo(() => {
-    if (typeof window === 'undefined') return null;
-    return new URLSearchParams(window.location.search).get('projectId');
-  }, []);
+    return searchParams.get('projectId');
+  }, [searchParams]);
 
   useEffect(() => {
     const loadWorkspaceProject = async () => {
@@ -38,13 +39,13 @@ export default function WorkspacePage() {
 
       try {
         const userProjects = await listProjects(userId);
-        setProjects(userProjects);
-
         const preferredProject = searchProjectId
           ? userProjects.find((project) => project.id === searchProjectId) ?? null
           : null;
 
-        setSelectedProject(preferredProject ?? userProjects[0] ?? null);
+        const resolvedProject = preferredProject ?? userProjects[0] ?? null;
+        setProjects(userProjects);
+        setSelectedProject(resolvedProject);
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : 'Gagal memuat project workspace.');
       } finally {
