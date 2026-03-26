@@ -28,6 +28,11 @@
   margin: 0.5rem 0;
 }
 
+.lp-flow-hint {
+  margin-top: 0.5rem;
+  color: #475569;
+}
+
 .lp-badge {
   display: inline-block;
   background: #eff6ff;
