@@ -4,6 +4,7 @@ import {
   createTripayQrisPayment,
   markManualWaitingConfirmation,
   processTripayWebhook,
+  submitManualQrisProof,
   verifyTripayWebhookSignature,
 } from './service';
 import type { TripayWebhookPayload } from './types';
@@ -86,6 +87,35 @@ export async function postManualQrisAlreadyPaid(req: HttpRequest): Promise<HttpR
     const payment = await markManualWaitingConfirmation({
       userId: user.id,
       reference,
+    });
+
+    return ok({ payment });
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Unauthorized') return unauthorized('Unauthorized');
+    return serverError(error);
+  }
+}
+
+export async function postManualQrisSubmitProof(req: HttpRequest): Promise<HttpResponse> {
+  try {
+    const user = requireUser(req);
+    const { projectId, reference, amount, proofPath } = req.body as {
+      projectId?: string;
+      reference?: string;
+      amount?: number;
+      proofPath?: string;
+    };
+
+    if (!projectId || !reference || !amount || !proofPath) {
+      return badRequest('projectId, reference, amount, proofPath wajib diisi.');
+    }
+
+    const payment = await submitManualQrisProof({
+      userId: user.id,
+      projectId,
+      reference,
+      amount,
+      proofPath,
     });
 
     return ok({ payment });

@@ -36,11 +36,11 @@ function PricingPageContent() {
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [manualLoading, setManualLoading] = useState(false);
-  const [confirmManualLoading, setConfirmManualLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'tripay' | 'manual'>('tripay');
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [reference, setReference] = useState<string | null>(null);
-  const [manualReference, setManualReference] = useState<string | null>(null);
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofPreviewUrl, setProofPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
@@ -106,6 +106,14 @@ function PricingPageContent() {
     return () => window.clearInterval(timer);
   }, [userId, selectedProjectId, success]);
 
+  useEffect(() => {
+    return () => {
+      if (proofPreviewUrl) {
+        URL.revokeObjectURL(proofPreviewUrl);
+      }
+    };
+  }, [proofPreviewUrl]);
+
   const startCheckout = async () => {
     if (!selectedProject) {
       setError('Project belum dipilih.');
@@ -156,9 +164,14 @@ function PricingPageContent() {
     }
   };
 
-  const createManualPayment = async () => {
+  const submitManualProof = async () => {
     if (!selectedProject) {
       setError('Project belum dipilih.');
+      return;
+    }
+
+    if (!proofFile) {
+      setError('Upload bukti transfer dulu sebelum kirim verifikasi.');
       return;
     }
 
@@ -174,73 +187,31 @@ function PricingPageContent() {
       if (sessionError) throw new Error(sessionError.message);
       if (!session?.access_token) throw new Error('Sesi login tidak ditemukan. Silakan login ulang.');
 
-      const merchantRef = `MNL-${Date.now()}-${selectedProject.id.slice(0, 6)}`;
-      const response = await fetch('/api/payments/manual/create', {
+      const formData = new FormData();
+      formData.append('projectId', selectedProject.id);
+      formData.append('file', proofFile);
+
+      const response = await fetch('/api/payments/manual/submit-proof', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({
-          projectId: selectedProject.id,
-          reference: merchantRef,
-          amount: PREMIUM_PRICE,
-        }),
+        body: formData,
       });
 
-      const data = (await response.json().catch(() => null)) as { message?: string } | null;
+      const data = (await response.json().catch(() => null)) as { message?: string; reference?: string } | null;
 
       if (!response.ok) {
-        throw new Error(data?.message ?? 'Gagal membuat transaksi manual QRIS.');
+        throw new Error(data?.message ?? 'Gagal kirim bukti transfer QRIS manual.');
       }
 
-      setManualReference(merchantRef);
-      setReference(merchantRef);
-    } catch (manualError) {
-      setError(manualError instanceof Error ? manualError.message : 'Gagal menyiapkan pembayaran manual QRIS.');
+      setReference(data?.reference ?? null);
+      setProofFile(null);
+      setProofPreviewUrl(null);
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Kirim bukti transfer gagal diproses.');
     } finally {
       setManualLoading(false);
-    }
-  };
-
-  const confirmAlreadyPaid = async () => {
-    if (!manualReference) {
-      setError('Reference manual belum tersedia. Buat transaksi manual dulu.');
-      return;
-    }
-
-    setConfirmManualLoading(true);
-    setError(null);
-
-    try {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) throw new Error(sessionError.message);
-      if (!session?.access_token) throw new Error('Sesi login tidak ditemukan. Silakan login ulang.');
-
-      const response = await fetch('/api/payments/manual/already-paid', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          reference: manualReference,
-        }),
-      });
-
-      const data = (await response.json().catch(() => null)) as { message?: string } | null;
-
-      if (!response.ok) {
-        throw new Error(data?.message ?? 'Gagal mengirim konfirmasi pembayaran manual.');
-      }
-    } catch (confirmError) {
-      setError(confirmError instanceof Error ? confirmError.message : 'Konfirmasi pembayaran gagal diproses.');
-    } finally {
-      setConfirmManualLoading(false);
     }
   };
 
@@ -337,7 +308,7 @@ function PricingPageContent() {
             ) : (
               <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
                 <p className="text-sm text-slate-700">
-                  1) Buat reference manual, 2) scan QRIS manual, 3) klik tombol <strong>Saya sudah bayar</strong>.
+                  1) Scan QRIS manual, 2) upload bukti transfer, 3) sistem otomatis kirim untuk verifikasi admin.
                 </p>
                 {MANUAL_QRIS_IMAGE_URL ? (
                   <Image
@@ -353,28 +324,49 @@ function PricingPageContent() {
                     <code>manual-qris/current.png</code>.
                   </p>
                 )}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700" htmlFor="proof-upload">
+                    Upload bukti transfer
+                  </label>
+                  <input
+                    id="proof-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0] ?? null;
+                      setProofFile(file);
+                      if (proofPreviewUrl) {
+                        URL.revokeObjectURL(proofPreviewUrl);
+                      }
+                      setProofPreviewUrl(file ? URL.createObjectURL(file) : null);
+                    }}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  />
+                  {proofPreviewUrl && (
+                    <Image
+                      src={proofPreviewUrl}
+                      alt="Preview bukti transfer"
+                      width={280}
+                      height={280}
+                      className="rounded-lg border border-slate-200 object-cover"
+                      unoptimized
+                    />
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={createManualPayment}
-                    disabled={manualLoading || !selectedProject}
+                    onClick={submitManualProof}
+                    disabled={manualLoading || !selectedProject || !proofFile}
                     className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
                   >
-                    {manualLoading ? 'Menyiapkan transaksi...' : 'Buat Reference QRIS Manual'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={confirmAlreadyPaid}
-                    disabled={confirmManualLoading || !manualReference}
-                    className="rounded-lg border border-indigo-600 px-4 py-2 font-semibold text-indigo-700 disabled:opacity-60"
-                  >
-                    {confirmManualLoading ? 'Mengirim konfirmasi...' : 'Saya sudah bayar'}
+                    {manualLoading ? 'Mengunggah bukti...' : 'Upload Bukti & Kirim Verifikasi'}
                   </button>
                 </div>
-                {manualReference && (
+                {reference && (
                   <p className="text-xs text-slate-600">
-                    Reference manual: <span className="font-mono">{manualReference}</span>. Setelah klik "Saya sudah bayar", status akan
-                    menunggu verifikasi admin.
+                    Reference manual: <span className="font-mono">{reference}</span>. Bukti transfer terkirim dan status sekarang menunggu
+                    verifikasi admin.
                   </p>
                 )}
               </div>

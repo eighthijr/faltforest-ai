@@ -12,9 +12,16 @@ type ManualPayment = {
   updated_at: string;
   project_id: string;
   user_id: string;
+  proof_path: string | null;
 };
 
 const QRIS_BUCKET_NAME = process.env.NEXT_PUBLIC_QRIS_BUCKET || 'payment-assets';
+const SUPABASE_PUBLIC_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+
+function buildProofUrl(path: string | null) {
+  if (!path || !SUPABASE_PUBLIC_URL) return null;
+  return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/${QRIS_BUCKET_NAME}/${path}`;
+}
 
 function formatRupiah(amount: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
@@ -234,30 +241,46 @@ export default function AdminPage() {
         ) : (
           <div className="space-y-3">
             {payments.map((payment) => (
-              <article key={payment.id} className="rounded-lg border border-slate-200 p-4">
-                <p className="text-sm text-slate-600">Reference: <span className="font-mono text-slate-900">{payment.reference}</span></p>
-                <p className="text-sm text-slate-600">Project: <span className="font-mono text-slate-900">{payment.project_id}</span></p>
-                <p className="text-sm text-slate-600">User: <span className="font-mono text-slate-900">{payment.user_id}</span></p>
-                <p className="text-sm text-slate-600">Nominal: <strong>{formatRupiah(payment.amount)}</strong></p>
-                <p className="text-sm text-slate-600">Status: <strong>{payment.status}</strong></p>
+              (() => {
+                const proofUrl = buildProofUrl(payment.proof_path);
 
-                <div className="mt-3 flex gap-2">
-                  <button
-                    onClick={() => handleDecision(payment.reference, true)}
-                    disabled={busyReference === payment.reference}
-                    className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleDecision(payment.reference, false)}
-                    disabled={busyReference === payment.reference}
-                    className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </article>
+                return (
+                  <article key={payment.id} className="rounded-lg border border-slate-200 p-4">
+                    <p className="text-sm text-slate-600">Reference: <span className="font-mono text-slate-900">{payment.reference}</span></p>
+                    <p className="text-sm text-slate-600">Project: <span className="font-mono text-slate-900">{payment.project_id}</span></p>
+                    <p className="text-sm text-slate-600">User: <span className="font-mono text-slate-900">{payment.user_id}</span></p>
+                    <p className="text-sm text-slate-600">Nominal: <strong>{formatRupiah(payment.amount)}</strong></p>
+                    <p className="text-sm text-slate-600">Status: <strong>{payment.status}</strong></p>
+                    {proofUrl && (
+                      <a
+                        href={proofUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-block text-sm font-semibold text-indigo-700 hover:underline"
+                      >
+                        Lihat bukti transfer
+                      </a>
+                    )}
+
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        onClick={() => handleDecision(payment.reference, true)}
+                        disabled={busyReference === payment.reference}
+                        className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleDecision(payment.reference, false)}
+                        disabled={busyReference === payment.reference}
+                        className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </article>
+                );
+              })()
             ))}
           </div>
         )}

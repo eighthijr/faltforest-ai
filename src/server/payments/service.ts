@@ -38,6 +38,25 @@ export async function markManualWaitingConfirmation(input: { userId: string; ref
   return mapRecord(data);
 }
 
+export async function submitManualQrisProof(input: {
+  userId: string;
+  projectId: string;
+  reference: string;
+  amount: number;
+  proofPath: string;
+}) {
+  const { data, error } = await supabase.rpc('submit_manual_qris_proof', {
+    p_user_id: input.userId,
+    p_project_id: input.projectId,
+    p_reference: input.reference,
+    p_amount: input.amount,
+    p_proof_path: input.proofPath,
+  });
+
+  if (error) throw new Error(error.message);
+  return mapRecord(data);
+}
+
 export async function adminDecideManualPayment(input: {
   adminId: string;
   reference: string;
