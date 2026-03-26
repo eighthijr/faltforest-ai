@@ -198,9 +198,14 @@ export default function AdminPage() {
           <h1 className="text-2xl font-bold text-slate-900">Admin Panel Pembayaran</h1>
           <p className="text-sm text-slate-600">Kelola QRIS manual dan approve/reject pembayaran manual user.</p>
         </div>
-        <button onClick={handleLogout} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
-          Logout
-        </button>
+        <div className="flex items-center gap-2">
+          <a href="/admin/analytics" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
+            Analytics
+          </a>
+          <button onClick={handleLogout} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
+            Logout
+          </button>
+        </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
