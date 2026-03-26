@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { listProjects } from '@/api/projects';
@@ -15,14 +15,11 @@ export default function WorkspacePage() {
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
-  const searchProjectId = useMemo(() => {
-    return searchParams.get('projectId');
-  }, [searchParams]);
-
   useEffect(() => {
     const loadWorkspaceProject = async () => {
       setLoading(true);
       setError(null);
+      const searchProjectId = new URLSearchParams(window.location.search).get('projectId');
 
       const { data, error: userError } = await supabase.auth.getUser();
       if (userError) {
@@ -54,7 +51,7 @@ export default function WorkspacePage() {
     };
 
     void loadWorkspaceProject();
-  }, [searchProjectId]);
+  }, []);
 
   if (loading) {
     return <p className="p-4 text-sm text-slate-600">Memuat workspace...</p>;
