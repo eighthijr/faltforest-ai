@@ -35,20 +35,49 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Sesi login tidak ditemukan. Silakan login ulang.' }, { status: 401 });
     }
 
-    const response = await fetch(`${supabaseUrl}/functions/v1/generate-copy`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: supabaseAnonKey,
-        Authorization: authorizationHeader,
-      },
-      body: JSON.stringify(body),
-      cache: 'no-store',
-    });
+    const functionCandidates = ['generate-copy', 'generate_copy'];
 
-    const result = (await response.json().catch(() => null)) as { message?: string; copy?: string } | null;
+    let response: Response | null = null;
+    let result: { message?: string; copy?: string } | null = null;
+
+    for (const functionName of functionCandidates) {
+      response = await fetch(`${supabaseUrl}/functions/v1/${functionName}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: supabaseAnonKey,
+          Authorization: authorizationHeader,
+        },
+        body: JSON.stringify(body),
+        cache: 'no-store',
+      });
+
+      result = (await response.json().catch(() => null)) as { message?: string; copy?: string } | null;
+
+      const functionNotFound =
+        response.status === 404 && result?.message?.toLowerCase().includes('requested function was not found');
+
+      if (!functionNotFound) break;
+    }
+
+    if (!response) {
+      return NextResponse.json({ message: 'Layanan generate copy tidak tersedia saat ini.' }, { status: 503 });
+    }
 
     if (!response.ok) {
+      const functionNotFound =
+        response.status === 404 && result?.message?.toLowerCase().includes('requested function was not found');
+
+      if (functionNotFound) {
+        return NextResponse.json(
+          {
+            message:
+              'Layanan AI belum aktif di server (Edge Function generate-copy belum terpasang). Hubungi admin untuk deploy function.',
+          },
+          { status: 503 },
+        );
+      }
+
       return NextResponse.json(
         { message: result?.message ?? 'Generate copy gagal diproses oleh Edge Function.' },
         { status: response.status },
