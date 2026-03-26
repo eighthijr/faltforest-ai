@@ -1,9 +1,8 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { buildRedirectTo } from './useRedirectTo';
-import '../../styles/auth-modal.css';
 
 type AuthMode = 'login' | 'signup';
 
@@ -18,30 +17,42 @@ export function AuthModal({
   isOpen,
   onClose,
   postAuthRedirect,
-  title = 'Welcome',
+  title = 'Masuk ke akun kamu',
 }: AuthModalProps) {
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [closing, setClosing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  const redirectTo = useMemo(
-    () => buildRedirectTo(postAuthRedirect),
-    [postAuthRedirect],
-  );
+  const redirectTo = useMemo(() => buildRedirectTo(postAuthRedirect), [postAuthRedirect]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const focusable = modalRef.current?.querySelector<HTMLElement>('button, input, a, select, textarea, [tabindex]:not([tabindex="-1"])');
+    focusable?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
-
-  const handleClose = () => {
-    setClosing(true);
-    window.setTimeout(() => {
-      setClosing(false);
-      onClose();
-    }, 180);
-  };
 
   const clearFeedback = () => {
     setMessage(null);
@@ -69,10 +80,7 @@ export function AuthModal({
     setLoading(true);
 
     if (mode === 'login') {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
       if (signInError) {
         setError(signInError.message);
@@ -95,30 +103,42 @@ export function AuthModal({
     if (signUpError) {
       setError(signUpError.message);
     } else {
-      setMessage('Account created. Check your inbox to confirm your email.');
+      setMessage('Akun berhasil dibuat. Cek email kamu untuk konfirmasi.');
     }
 
     setLoading(false);
   };
 
   return (
-    <div className={`auth-modal-backdrop ${closing ? 'is-closing' : 'is-opening'}`} role="dialog" aria-modal="true" aria-label="Authentication Modal">
-      <div className={`auth-modal ${closing ? 'is-closing' : 'is-opening'}`}>
-        <button className="auth-modal-close" onClick={handleClose} type="button" aria-label="Close authentication modal">
+    <div className="fixed inset-0 z-[999] grid place-items-center bg-slate-900/50 p-4" role="dialog" aria-modal="true" aria-label="Modal autentikasi">
+      <div ref={modalRef} className="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
+        <button
+          className="absolute right-3 top-3 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+          onClick={onClose}
+          type="button"
+          aria-label="Tutup modal autentikasi"
+        >
           ×
         </button>
 
-        <h2>{title}</h2>
-        <p className="auth-subtitle">Continue with Google or use your email and password.</p>
+        <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+        <p className="mt-1 text-sm text-slate-600">Lanjutkan dengan Google atau pakai email dan password.</p>
 
-        <button type="button" className="auth-google-btn" onClick={handleGoogleOAuth} disabled={loading}>
-          Continue with Google
+        <button
+          type="button"
+          className="mt-4 w-full rounded-xl bg-slate-900 px-4 py-2.5 font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+          onClick={handleGoogleOAuth}
+          disabled={loading}
+        >
+          Lanjutkan dengan Google
         </button>
 
-        <div className="auth-divider">or</div>
+        <div className="my-3 text-center text-sm text-slate-500">atau</div>
 
-        <form onSubmit={handleEmailAuth} className="auth-form">
-          <label htmlFor="auth-email">Email</label>
+        <form onSubmit={handleEmailAuth} className="grid gap-2">
+          <label htmlFor="auth-email" className="text-sm font-medium text-slate-700">
+            Email
+          </label>
           <input
             id="auth-email"
             type="email"
@@ -126,9 +146,12 @@ export function AuthModal({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="rounded-xl border border-slate-300 px-3 py-2"
           />
 
-          <label htmlFor="auth-password">Password</label>
+          <label htmlFor="auth-password" className="text-sm font-medium text-slate-700">
+            Password
+          </label>
           <input
             id="auth-password"
             type="password"
@@ -137,33 +160,38 @@ export function AuthModal({
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="rounded-xl border border-slate-300 px-3 py-2"
           />
 
-          <button type="submit" className="auth-submit-btn" disabled={loading}>
-            {mode === 'login' ? 'Login' : 'Create account'}
+          <button
+            type="submit"
+            className="mt-1 w-full rounded-xl bg-indigo-600 px-4 py-2.5 font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-60"
+            disabled={loading}
+          >
+            {mode === 'login' ? 'Masuk' : 'Buat akun'}
           </button>
         </form>
 
-        <div className="auth-switch-row">
+        <div className="mt-3 flex items-center gap-1 text-sm text-slate-600">
           {mode === 'login' ? (
             <>
-              <span>Don&apos;t have an account?</span>
-              <button type="button" onClick={() => setMode('signup')} className="auth-link-btn">
-                Sign up
+              <span>Belum punya akun?</span>
+              <button type="button" onClick={() => setMode('signup')} className="font-semibold text-indigo-700 hover:underline">
+                Daftar
               </button>
             </>
           ) : (
             <>
-              <span>Already have an account?</span>
-              <button type="button" onClick={() => setMode('login')} className="auth-link-btn">
-                Login
+              <span>Sudah punya akun?</span>
+              <button type="button" onClick={() => setMode('login')} className="font-semibold text-indigo-700 hover:underline">
+                Masuk
               </button>
             </>
           )}
         </div>
 
-        {message && <p className="auth-success">{message}</p>}
-        {error && <p className="auth-error">{error}</p>}
+        {message && <p className="mt-2 text-sm text-emerald-700">{message}</p>}
+        {error && <p className="mt-2 text-sm text-rose-700">{error}</p>}
       </div>
     </div>
   );
