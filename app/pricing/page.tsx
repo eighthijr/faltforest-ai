@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { listProjects } from '@/api/projects';
 import { supabase } from '@/lib/supabaseClient';
 import type { Project } from '@/types/project';
+import { Spinner, useToast } from '@/components/ui';
 
 const PREMIUM_PRICE = 99000;
 const QRIS_BUCKET_NAME = process.env.NEXT_PUBLIC_QRIS_BUCKET || 'payment-assets';
@@ -25,6 +26,7 @@ function formatRupiah(amount: number) {
 }
 
 function PricingPageContent() {
+  const { pushToast } = useToast();
   const searchParams = useSearchParams();
   const source = searchParams.get('source') ?? 'app';
   const reason = searchParams.get('reason') ?? 'project_limit';
@@ -157,8 +159,11 @@ function PricingPageContent() {
       setReference(merchantRef);
       setCheckoutUrl(data.checkoutUrl);
       window.open(data.checkoutUrl, '_blank', 'noopener,noreferrer');
+      pushToast({ type: 'success', title: 'Checkout dibuat', description: 'Lanjutkan pembayaran di tab baru.' });
     } catch (checkoutError) {
-      setError(checkoutError instanceof Error ? checkoutError.message : 'Checkout gagal diproses.');
+      const message = checkoutError instanceof Error ? checkoutError.message : 'Checkout gagal diproses.';
+      setError(message);
+      pushToast({ type: 'error', title: 'Checkout gagal', description: message });
     } finally {
       setCheckoutLoading(false);
     }
@@ -208,8 +213,11 @@ function PricingPageContent() {
       setReference(data?.reference ?? null);
       setProofFile(null);
       setProofPreviewUrl(null);
+      pushToast({ type: 'success', title: 'Bukti transfer terkirim', description: 'Status pembayaran menunggu verifikasi admin.' });
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Kirim bukti transfer gagal diproses.');
+      const message = submitError instanceof Error ? submitError.message : 'Kirim bukti transfer gagal diproses.';
+      setError(message);
+      pushToast({ type: 'error', title: 'Upload bukti gagal', description: message });
     } finally {
       setManualLoading(false);
     }
@@ -303,7 +311,14 @@ function PricingPageContent() {
                 disabled={checkoutLoading || !selectedProject}
                 className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
               >
-                {checkoutLoading ? 'Membuat checkout...' : 'Bayar Sekarang via QRIS Tripay'}
+                {checkoutLoading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Spinner className="text-white" />
+                    Membuat checkout...
+                  </span>
+                ) : (
+                  'Bayar Sekarang via QRIS Tripay'
+                )}
               </button>
             ) : (
               <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
@@ -360,7 +375,14 @@ function PricingPageContent() {
                     disabled={manualLoading || !selectedProject || !proofFile}
                     className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
                   >
-                    {manualLoading ? 'Mengunggah bukti...' : 'Upload Bukti & Kirim Verifikasi'}
+                    {manualLoading ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Spinner className="text-white" />
+                        Mengunggah bukti...
+                      </span>
+                    ) : (
+                      'Upload Bukti & Kirim Verifikasi'
+                    )}
                   </button>
                 </div>
                 {reference && (
