@@ -65,18 +65,32 @@ export async function generateCopyOnce(input: GenerateCopyInput): Promise<string
     return project.generated_html;
   }
 
-  // Single AI call entry point: invoke backend function exactly once when no generated_html exists.
-  const { data, error } = await supabase.functions.invoke('generate-copy', {
-    body: {
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError) throw new Error(sessionError.message);
+  if (!session?.access_token) throw new Error('Sesi login tidak ditemukan. Silakan login ulang.');
+
+  // Single AI call entry point: invoke backend proxy exactly once when no generated_html exists.
+  const response = await fetch('/api/workspace/generate-copy', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({
       projectId: input.projectId,
       product: input.answers.product,
       target: input.answers.target,
       benefit: input.answers.benefit,
       images: input.answers.images,
-    },
+    }),
   });
 
-  if (error) throw new Error(error.message);
+  const data = (await response.json().catch(() => null)) as { copy?: string; message?: string } | null;
+  if (!response.ok) throw new Error(data?.message ?? 'Gagal menghubungi layanan generate copy.');
 
   const generatedCopy = (data?.copy as string | undefined)?.trim();
   if (!generatedCopy) throw new Error('AI tidak mengembalikan copy yang valid.');
