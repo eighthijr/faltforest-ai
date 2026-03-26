@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { listProjects } from '@/api/projects';
 import { supabase } from '@/lib/supabaseClient';
@@ -19,7 +19,7 @@ function formatRupiah(amount: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
 }
 
-export default function PricingPage() {
+function PricingPageContent() {
   const searchParams = useSearchParams();
   const source = searchParams.get('source') ?? 'app';
   const reason = searchParams.get('reason') ?? 'project_limit';
@@ -252,5 +252,13 @@ export default function PricingPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={<main className="mx-auto w-full max-w-4xl px-4 py-10 text-sm text-slate-600">Memuat halaman pricing...</main>}>
+      <PricingPageContent />
+    </Suspense>
   );
 }
