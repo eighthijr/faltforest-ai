@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useReducer } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createProject, listProjects } from '../../api/projects';
 import { LogoutButton } from '../auth';
 import type { Project } from '../../types/project';
@@ -20,7 +21,7 @@ type DashboardAction =
   | { type: 'LOAD_SUCCESS'; payload: Project[] }
   | { type: 'LOAD_ERROR'; payload: string }
   | { type: 'CREATE_START' }
-  | { type: 'CREATE_SUCCESS'; payload: Project }
+  | { type: 'CREATE_SUCCESS'; payload: Project[] }
   | { type: 'CREATE_ERROR'; payload: string }
   | { type: 'OPEN_UPGRADE' }
   | { type: 'CLOSE_UPGRADE' };
@@ -44,7 +45,7 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
     case 'CREATE_START':
       return { ...state, creating: true, error: null };
     case 'CREATE_SUCCESS':
-      return { ...state, creating: false, projects: [action.payload, ...state.projects] };
+      return { ...state, creating: false, projects: action.payload, error: null };
     case 'CREATE_ERROR':
       return { ...state, creating: false, error: action.payload };
     case 'OPEN_UPGRADE':
@@ -63,6 +64,7 @@ type ProjectDashboardProps = {
 
 export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
+  const router = useRouter();
 
   useEffect(() => {
     const load = async () => {
@@ -79,10 +81,11 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
     void load();
   }, [userId]);
 
-  const hasFreeProject = useMemo(
-    () => state.projects.some((project) => project.type === 'free'),
+  const freeProjectCount = useMemo(
+    () => state.projects.filter((project) => project.type === 'free').length,
     [state.projects],
   );
+  const hasFreeProject = freeProjectCount > 0;
 
   const handleCreateProject = async () => {
     dispatch({ type: 'CREATE_START' });
@@ -99,7 +102,19 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
       return;
     }
 
-    dispatch({ type: 'CREATE_SUCCESS', payload: result.project });
+    try {
+      const refreshedProjects = await listProjects(userId);
+      dispatch({ type: 'CREATE_SUCCESS', payload: refreshedProjects });
+      router.push(`/workspace?projectId=${result.project.id}`);
+    } catch (error) {
+      dispatch({
+        type: 'CREATE_ERROR',
+        payload:
+          error instanceof Error
+            ? `${error.message}. Project berhasil dibuat, tapi list belum sinkron. Coba refresh halaman.`
+            : 'Project berhasil dibuat, tapi list belum sinkron. Coba refresh halaman.',
+      });
+    }
   };
 
   return (
@@ -108,7 +123,10 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Dashboard Project</h1>
           <p className="text-slate-600">Kelola semua project kamu di satu tempat, lalu lanjutkan kerja di workspace.</p>
-          <p className="mt-1 text-xs text-slate-500">Alur cepat: Buat project → Buka Workspace → Generate Copy.</p>
+          <p className="mt-1 text-xs text-slate-500">Alur cepat: Buat project → Otomatis masuk Workspace → Generate Copy.</p>
+          <p className="mt-2 text-xs font-medium text-slate-600">
+            Kuota FREE: {freeProjectCount}/1 terpakai {hasFreeProject ? '• Upgrade untuk tambah project baru.' : '• Masih tersedia 1 project gratis.'}
+          </p>
         </div>
 
         <div className="flex flex-wrap items-start gap-2 md:justify-end">
@@ -134,7 +152,7 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
 
       {hasFreeProject && (
         <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
-          Kamu sudah memakai 1 project FREE. Untuk tambah project, silakan upgrade ke PREMIUM.
+          Kamu sudah memakai project FREE. Untuk tambah project, silakan upgrade ke PREMIUM.
         </p>
       )}
 
