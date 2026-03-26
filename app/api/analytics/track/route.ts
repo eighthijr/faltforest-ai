@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const result = await postTrackEvent({
     body,
-    user: getRequestUser(req),
+    user: await getRequestUser(req),
   });
 
   return toNextResponse(result);

@@ -59,7 +59,7 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
 
 type ProjectDashboardProps = {
   userId: string;
-  onUpgradeClick?: () => void;
+  onUpgradeClick?: (projectId?: string) => void;
 };
 
 export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardProps) {
@@ -227,7 +227,7 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
         onClose={() => dispatch({ type: 'CLOSE_UPGRADE' })}
         onUpgrade={() => {
           dispatch({ type: 'CLOSE_UPGRADE' });
-          onUpgradeClick?.();
+          onUpgradeClick?.(state.projects[0]?.id);
         }}
       />
     </section>
