@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useReducer, useState } from 'react';
 import { generateCopyOnce, saveAnswersDraft } from '../../api/workspace';
+import { LogoutButton } from '../auth';
 import type { ProjectType } from '../../types/project';
 import type { QuestionKey, WorkspaceAnswers, WorkspaceContext, WorkspaceMessage } from '../../types/workspace';
 import { getMissingFields, questionLabels, questionOrder, reduceWorkspace } from '../../workspace/stateMachine';
@@ -159,9 +160,12 @@ export function WorkspaceChat({ projectId, projectType, initialState = 'draft', 
 
   return (
     <section className="mx-auto flex w-full max-w-4xl flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 md:p-6">
-      <header>
-        <h1 className="text-xl font-bold text-slate-900">Workspace Chat</h1>
-        <p className="text-sm text-slate-600">Status project: <strong>{state.state}</strong></p>
+      <header className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900">Workspace Chat</h1>
+          <p className="text-sm text-slate-600">Status project: <strong>{state.state}</strong></p>
+        </div>
+        <LogoutButton />
       </header>
 
       <div className="h-[360px] overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3">
