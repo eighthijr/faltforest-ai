@@ -2,11 +2,9 @@ import { supabase } from '../lib/supabaseClient';
 import type { CreateProjectInput, CreateProjectResult, Project } from '../types/project';
 
 export async function listProjects(userId: string): Promise<Project[]> {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('id, user_id, type, status, generated_html, created_at')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+  const { data, error } = await supabase.rpc('list_projects_for_user', {
+    p_user_id: userId,
+  });
 
   if (error) {
     throw new Error(error.message);
