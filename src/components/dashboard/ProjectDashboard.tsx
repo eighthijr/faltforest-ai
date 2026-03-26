@@ -105,7 +105,12 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
     try {
       const refreshedProjects = await listProjects(userId);
       dispatch({ type: 'CREATE_SUCCESS', payload: refreshedProjects });
-      router.push(`/workspace?projectId=${result.project.id}`);
+      const params = new URLSearchParams({
+        projectId: result.project.id,
+        projectType: result.project.type,
+        projectStatus: result.project.status,
+      });
+      router.push(`/workspace?${params.toString()}`);
     } catch (error) {
       dispatch({
         type: 'CREATE_ERROR',
