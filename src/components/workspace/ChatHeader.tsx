@@ -1,9 +1,13 @@
 import { Circle, Settings2, Trash2 } from 'lucide-react';
 import type { WorkspaceState } from '@/types/workspace';
 
+type ManualPaymentStatus = 'idle' | 'waiting_payment' | 'waiting_admin' | 'approved';
+
 type ChatHeaderProps = {
   projectId: string;
   status: WorkspaceState;
+  manualPaymentStatus?: ManualPaymentStatus;
+  paymentReference?: string;
   onClearChat?: () => void;
 };
 
@@ -13,7 +17,7 @@ const statusConfig: Record<WorkspaceState, { label: string; tone: string }> = {
   generated: { label: 'AI ready for edits', tone: 'text-emerald-700' },
 };
 
-export function ChatHeader({ projectId, status, onClearChat }: ChatHeaderProps) {
+export function ChatHeader({ projectId, status, manualPaymentStatus = 'idle', paymentReference = '', onClearChat }: ChatHeaderProps) {
   const statusMeta = statusConfig[status];
   const shortProjectId = projectId.length > 16 ? `${projectId.slice(0, 6)}...${projectId.slice(-6)}` : projectId;
 
@@ -29,6 +33,11 @@ export function ChatHeader({ projectId, status, onClearChat }: ChatHeaderProps) 
               {statusMeta.label}
             </span>
           </div>
+          {manualPaymentStatus === 'waiting_admin' ? (
+            <p className="mt-2 rounded-lg bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700">
+              Menunggu konfirmasi pembayaran{paymentReference ? ` (${paymentReference})` : ''}. Cek juga di Dashboard / Transactions.
+            </p>
+          ) : null}
         </div>
 
         <div className="flex items-center gap-2">
