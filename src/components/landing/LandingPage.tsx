@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ArrowRight, Bot, CheckCircle2, Clock3, LayoutTemplate, MessageSquareText, Sparkles, Zap } from 'lucide-react';
+import { pricingPlans } from '@/lib/pricing';
 import { landingCopy } from './landingCopy.id';
 import { AuthModal } from '../auth';
 
@@ -82,7 +83,41 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className={`mt-6 ${cardClass}`}>
+
+
+        <section className={`mt-6 ${cardClass}`} id="pricing">
+          <h2 className="text-2xl font-bold">Pricing</h2>
+          <p className="mt-2 text-sm text-slate-600">Mulai dari gratis, upgrade saat butuh download tanpa batas dan revisi lanjutan.</p>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {pricingPlans.map((plan) => (
+              <article
+                key={plan.id}
+                className={`relative rounded-2xl p-4 ${
+                  plan.recommended ? 'border-2 border-indigo-300 bg-indigo-50' : 'border border-slate-200 bg-slate-50'
+                }`}
+              >
+                {plan.recommended && (
+                  <span className="absolute -top-2 right-3 rounded-full bg-indigo-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                    Recommended
+                  </span>
+                )}
+                <h3 className="text-base font-semibold text-slate-900">{plan.name}</h3>
+                <p className="mt-1 text-sm text-slate-600">{plan.priceLabel}</p>
+                <p className="mt-2 text-sm text-slate-600">{plan.description}</p>
+                <ul className="mt-3 space-y-1.5 text-sm text-slate-700">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-indigo-600" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className={`mt-6 ${cardClass}`} id="how-it-works">
           <h2 className="text-2xl font-bold">How it works</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {landingCopy.howItWorks.steps.map((step, index) => (

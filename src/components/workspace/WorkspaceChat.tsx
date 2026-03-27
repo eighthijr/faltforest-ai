@@ -9,10 +9,13 @@ import { getMissingFields, questionLabels, questionOrder, reduceWorkspace } from
 import { ChatBody } from './ChatBody';
 import { ChatHeader } from './ChatHeader';
 import { ChatInput } from './ChatInput';
-import { ModalProvider, useModalManager, type UpgradeReason } from './ModalProvider';
+import { ModalProvider, useModalManager } from './ModalProvider';
 import { PreviewModal } from './PreviewModal';
 import { PricingModal } from './PricingModal';
 import { UpgradeModal } from './UpgradeModal';
+import { PaymentModal } from './PaymentModal';
+import { SuccessModal } from './SuccessModal';
+import { pricingPlans, type PricingPlan } from '@/lib/pricing';
 import { WorkspaceLayout } from './WorkspaceLayout';
 
 type WorkspaceChatProps = {
@@ -21,7 +24,6 @@ type WorkspaceChatProps = {
   projectCount?: number;
   initialState?: 'draft' | 'ready' | 'generated';
   initialGeneratedCopy?: string | null;
-  onUpgradeClick?: (reason: UpgradeReason) => void;
 };
 
 type LocalState = WorkspaceContext & {
@@ -104,11 +106,13 @@ function WorkspaceChatContent({
   projectCount = 1,
   initialState = 'draft',
   initialGeneratedCopy = null,
-  onUpgradeClick,
 }: WorkspaceChatProps) {
   const { pushToast } = useToast();
-  const { activeModal, closeModal, openPreview, openPricing, openUpgrade } = useModalManager();
+  const { activeModal, closeModal, openPreview, openPricing, openUpgrade, openPayment, openSuccess } = useModalManager();
   const [input, setInput] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [premiumUnlocked, setPremiumUnlocked] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [state, dispatch] = useReducer(reducer, {
     projectId,
@@ -253,7 +257,7 @@ function WorkspaceChatContent({
     const trimmed = rawValue.trim();
     if (!trimmed) return;
 
-    if (state.state === 'generated' && state.projectType === 'free') {
+    if (state.state === 'generated' && state.projectType === 'free' && !premiumUnlocked) {
       openUpgrade('chat_after_generated');
       return;
     }
@@ -298,7 +302,7 @@ function WorkspaceChatContent({
   };
 
   const handleDownload = () => {
-    if (state.projectType === 'free') {
+    if (state.projectType === 'free' && !premiumUnlocked) {
       openUpgrade('download');
       return;
     }
@@ -367,7 +371,7 @@ function WorkspaceChatContent({
         open={activeModal.type === 'upgrade'}
         reason={activeModal.type === 'upgrade' ? activeModal.reason : 'download'}
         onClose={closeModal}
-        onUpgrade={() => {
+        onSeePlans={() => {
           if (activeModal.type !== 'upgrade') return;
           openPricing(activeModal.reason);
         }}
@@ -377,9 +381,36 @@ function WorkspaceChatContent({
         open={activeModal.type === 'pricing'}
         reason={activeModal.type === 'pricing' ? activeModal.reason : 'download'}
         onClose={closeModal}
-        onProceedPayment={(reason) => {
+        onChoosePlan={(plan, reason) => {
+          setSelectedPlan(plan);
+          openPayment(reason, plan.id);
+        }}
+      />
+
+      <PaymentModal
+        open={activeModal.type === 'payment'}
+        plan={selectedPlan ?? pricingPlans.find((plan) => plan.id === 'premium') ?? null}
+        onClose={closeModal}
+        processing={processingPayment}
+        onPayNow={() => {
+          if (activeModal.type !== 'payment') return;
+          setProcessingPayment(true);
+          window.setTimeout(() => {
+            setProcessingPayment(false);
+            setPremiumUnlocked(true);
+            openSuccess(activeModal.reason, activeModal.planId);
+            pushToast({ type: 'success', title: 'Payment success', description: 'Premium akses sudah aktif untuk project ini.' });
+          }, 700);
+        }}
+      />
+
+      <SuccessModal
+        open={activeModal.type === 'success'}
+        onClose={closeModal}
+        onContinueWorkspace={closeModal}
+        onDownloadNow={() => {
           closeModal();
-          onUpgradeClick?.(reason);
+          handleDownload();
         }}
       />
     </>

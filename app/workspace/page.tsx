@@ -108,10 +108,6 @@ export default function WorkspacePage() {
         initialState={selectedProject.status}
         initialGeneratedCopy={selectedProject.generated_html}
         projectCount={projects.length}
-        onUpgradeClick={(reason) => {
-          const params = new URLSearchParams({ source: 'workspace', reason, projectId: selectedProject.id });
-          window.location.href = `/pricing?${params.toString()}`;
-        }}
       />
     </DashboardLayout>
   );

@@ -8,7 +8,9 @@ export type ActiveModal =
   | { type: null }
   | { type: 'preview' }
   | { type: 'upgrade'; reason: UpgradeReason }
-  | { type: 'pricing'; reason: UpgradeReason };
+  | { type: 'pricing'; reason: UpgradeReason }
+  | { type: 'payment'; reason: UpgradeReason; planId: 'premium' | 'free' }
+  | { type: 'success'; reason: UpgradeReason; planId: 'premium' | 'free' };
 
 type ModalContextValue = {
   activeModal: ActiveModal;
@@ -16,6 +18,8 @@ type ModalContextValue = {
   openPreview: () => void;
   openUpgrade: (reason: UpgradeReason) => void;
   openPricing: (reason: UpgradeReason) => void;
+  openPayment: (reason: UpgradeReason, planId: 'premium' | 'free') => void;
+  openSuccess: (reason: UpgradeReason, planId: 'premium' | 'free') => void;
 };
 
 const ModalContext = createContext<ModalContextValue | null>(null);
@@ -39,9 +43,17 @@ export function ModalProvider({ children }: { children: ReactNode }) {
     setActiveModal({ type: 'pricing', reason });
   }, []);
 
+  const openPayment = useCallback((reason: UpgradeReason, planId: 'premium' | 'free') => {
+    setActiveModal({ type: 'payment', reason, planId });
+  }, []);
+
+  const openSuccess = useCallback((reason: UpgradeReason, planId: 'premium' | 'free') => {
+    setActiveModal({ type: 'success', reason, planId });
+  }, []);
+
   const value = useMemo(
-    () => ({ activeModal, closeModal, openPreview, openUpgrade, openPricing }),
-    [activeModal, closeModal, openPreview, openUpgrade, openPricing],
+    () => ({ activeModal, closeModal, openPreview, openUpgrade, openPricing, openPayment, openSuccess }),
+    [activeModal, closeModal, openPreview, openUpgrade, openPricing, openPayment, openSuccess],
   );
 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;
