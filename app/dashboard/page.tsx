@@ -8,7 +8,7 @@ function isAdminRole(role: string | null): boolean {
 }
 
 export default function DashboardPage() {
-  const { userId, role, loading, error } = useProtectedRoute('/');
+  const { userId, email, role, loading, error } = useProtectedRoute('/');
 
   if (loading) {
     return <p className="material-page p-6 text-sm text-slate-600">Checking authentication...</p>;
@@ -23,12 +23,13 @@ export default function DashboardPage() {
   }
 
   if (isAdminRole(role)) {
-    return <AdminPaymentsDashboard userId={userId} />;
+    return <AdminPaymentsDashboard userId={userId} userEmail={email} />;
   }
 
   return (
     <ProjectDashboard
       userId={userId}
+      userEmail={email}
       onUpgradeClick={(projectId) => {
         const params = new URLSearchParams({ source: 'dashboard', reason: 'project_limit' });
         if (projectId) params.set('projectId', projectId);

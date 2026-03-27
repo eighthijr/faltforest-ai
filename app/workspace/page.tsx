@@ -18,7 +18,7 @@ function isProjectStatus(value: string | null): value is Project['status'] {
 }
 
 export default function WorkspacePage() {
-  const { userId, loading: authLoading, error: authError } = useProtectedRoute('/');
+  const { userId, email, loading: authLoading, error: authError } = useProtectedRoute('/');
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -82,7 +82,7 @@ export default function WorkspacePage() {
 
   if (!selectedProject) {
     return (
-      <DashboardLayout userId={userId}>
+      <DashboardLayout userId={userId} userEmail={email}>
         <section className="rounded-3xl bg-white p-6 shadow-[0_3px_12px_rgba(15,23,42,0.1)]">
           <h1 className="text-xl font-semibold text-slate-900">Workspace unavailable</h1>
           <p className="mt-2 text-sm text-slate-600">Buat project dulu dari dashboard untuk membuka chatroom AI.</p>
@@ -95,7 +95,7 @@ export default function WorkspacePage() {
   }
 
   return (
-    <DashboardLayout userId={userId}>
+    <DashboardLayout userId={userId} userEmail={email} workspaceProjects={projects} activeProjectId={selectedProject.id}>
       {error && (
         <p className="mb-4 inline-flex items-center gap-2 rounded-2xl bg-amber-50 px-4 py-2 text-sm text-amber-700">
           <AlertCircle className="h-4 w-4" />

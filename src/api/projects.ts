@@ -40,3 +40,26 @@ export async function createProject(input: CreateProjectInput): Promise<CreatePr
 
   return { ok: true, project: data as Project };
 }
+
+export async function deleteProject(input: { userId: string; projectId: string }): Promise<void> {
+  const { error } = await supabase.rpc('delete_project_atomic', {
+    p_user_id: input.userId,
+    p_project_id: input.projectId,
+  });
+
+  if (!error) return;
+
+  if (error.message.includes('PROJECT_DELETE_BLOCKED_ACTIVE_PAYMENT')) {
+    throw new Error('Project tidak bisa dihapus karena pembayaran masih pending/waiting confirmation.');
+  }
+
+  if (error.message.includes('FORBIDDEN')) {
+    throw new Error('Project bukan milik akun kamu.');
+  }
+
+  if (error.message.includes('PROJECT_NOT_FOUND')) {
+    throw new Error('Project sudah tidak ditemukan.');
+  }
+
+  throw new Error(error.message);
+}

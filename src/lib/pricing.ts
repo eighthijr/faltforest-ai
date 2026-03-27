@@ -13,7 +13,7 @@ export const premiumPlan: PricingPlan = {
   name: 'PREMIUM',
   priceLabel: 'Rp99.000 / project',
   description: 'Untuk workflow penuh tanpa batasan paywall.',
-  features: ['Unlimited download HTML', 'Continue chat revision', 'Priority support'],
+  features: ['Unlimited download HTML', 'Continue chat revision (fair use)', 'Priority support'],
   ctaLabel: 'Upgrade Now',
   recommended: true,
 };

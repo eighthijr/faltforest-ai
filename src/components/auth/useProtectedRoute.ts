@@ -7,6 +7,7 @@ import { resolveUserRole } from '@/lib/admin';
 
 type ProtectedRouteState = {
   userId: string | null;
+  email: string | null;
   role: string | null;
   loading: boolean;
   error: string | null;
@@ -25,6 +26,7 @@ export function useProtectedRoute(redirectTo: string = DEFAULT_REDIRECT): Protec
   const router = useRouter();
   const [state, setState] = useState<ProtectedRouteState>({
     userId: null,
+    email: null,
     role: null,
     loading: true,
     error: null,
@@ -40,7 +42,7 @@ export function useProtectedRoute(redirectTo: string = DEFAULT_REDIRECT): Protec
       if (!mounted) return;
 
       if (error) {
-        setState({ userId: null, role: null, loading: false, error: error.message });
+        setState({ userId: null, email: null, role: null, loading: false, error: error.message });
         return;
       }
 
@@ -49,7 +51,7 @@ export function useProtectedRoute(redirectTo: string = DEFAULT_REDIRECT): Protec
       if (!userId) {
         const params = new URLSearchParams({ from: pathname });
         router.replace(`${redirectTo}?${params.toString()}`);
-        setState({ userId: null, role: null, loading: false, error: null });
+        setState({ userId: null, email: null, role: null, loading: false, error: null });
         return;
       }
 
@@ -58,7 +60,7 @@ export function useProtectedRoute(redirectTo: string = DEFAULT_REDIRECT): Protec
         data.user?.email ?? null,
       );
 
-      setState({ userId, role, loading: false, error: null });
+      setState({ userId, email: data.user?.email ?? null, role, loading: false, error: null });
     };
 
     void verify();
