@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
+import { resolveUserRole } from '@/lib/admin';
 
 type RequestUser = { id: string; role?: string };
 
@@ -23,9 +24,16 @@ export async function getRequestUser(req: NextRequest): Promise<RequestUser | un
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data.user?.id) return undefined;
 
+<<<<<<< codex/integrate-admin-login-with-user-login-2zfg0b
+  const appRole = resolveUserRole(
+    normalizeRole(data.user.user_metadata?.role) ?? normalizeRole(data.user.app_metadata?.role),
+    data.user.email ?? null,
+  );
+=======
   const appRole = normalizeRole(data.user.user_metadata?.role) ?? normalizeRole(data.user.app_metadata?.role);
+>>>>>>> main
 
-  return { id: data.user.id, role: appRole };
+  return { id: data.user.id, role: appRole ?? undefined };
 }
 
 export function toNextResponse(result: { status: number; body: unknown }) {
