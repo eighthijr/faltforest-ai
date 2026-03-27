@@ -2,6 +2,7 @@
 
 import { AdminPaymentsDashboard, ProjectDashboard } from '@/components/dashboard';
 import { useProtectedRoute } from '@/components/auth';
+import { Spinner } from '@/components/ui';
 
 function isAdminRole(role: string | null): boolean {
   return typeof role === 'string' && role.toLowerCase() === 'admin';
@@ -11,7 +12,13 @@ export default function DashboardPage() {
   const { userId, email, role, loading, error } = useProtectedRoute('/');
 
   if (loading) {
-    return <p className="material-page p-6 text-sm text-slate-600">Checking authentication...</p>;
+    return (
+      <main className="material-page flex min-h-screen items-center justify-center p-6">
+        <div className="material-surface flex h-20 w-20 items-center justify-center rounded-full">
+          <Spinner size="lg" className="text-indigo-600" />
+        </div>
+      </main>
+    );
   }
 
   if (error) {
