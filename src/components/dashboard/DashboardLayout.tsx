@@ -5,11 +5,15 @@ import { usePathname } from 'next/navigation';
 import { BarChart3, Clock3, CreditCard, LayoutDashboard, Menu, MessageSquareText, ShieldCheck, User } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { DashboardSidebar, type SidebarNavItem } from './DashboardSidebar';
+import type { Project } from '@/types/project';
 
 type DashboardLayoutProps = {
   children: ReactNode;
   userId: string;
+  userEmail?: string | null;
   mode?: 'user' | 'admin';
+  workspaceProjects?: Project[];
+  activeProjectId?: string | null;
 };
 
 const userNav: Array<Omit<SidebarNavItem, 'active'>> = [
@@ -34,7 +38,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function DashboardLayout({ children, userId, mode = 'user' }: DashboardLayoutProps) {
+export function DashboardLayout({ children, userId, userEmail, mode = 'user', workspaceProjects = [], activeProjectId = null }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -56,8 +60,12 @@ export function DashboardLayout({ children, userId, mode = 'user' }: DashboardLa
         navItems={navItems}
         title={mode === 'admin' ? 'Faltforest Admin' : 'Faltforest AI'}
         subtitle={mode === 'admin' ? 'Control panel' : 'Landing page generator'}
-        profileLabel={userId}
+        profileLabel={userEmail ?? userId}
+        profileSubLabel={userEmail ? userId : undefined}
         onSignOut={handleSignOut}
+        workspaceProjects={workspaceProjects}
+        activeProjectId={activeProjectId}
+        showWorkspaceProjects={pathname === '/workspace'}
       />
 
       <div className="min-h-screen lg:pl-72">

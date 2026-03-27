@@ -38,9 +38,10 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 
 type AdminPaymentsDashboardProps = {
   userId: string;
+  userEmail?: string | null;
 };
 
-export function AdminPaymentsDashboard({ userId }: AdminPaymentsDashboardProps) {
+export function AdminPaymentsDashboard({ userId, userEmail }: AdminPaymentsDashboardProps) {
   const [payments, setPayments] = useState<ManualPayment[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
   const [busyReference, setBusyReference] = useState<string | null>(null);
@@ -121,7 +122,7 @@ export function AdminPaymentsDashboard({ userId }: AdminPaymentsDashboardProps) 
   };
 
   return (
-    <DashboardLayout userId={userId} mode="admin">
+    <DashboardLayout userId={userId} userEmail={userEmail} mode="admin">
       <section className="space-y-4">
         <article className="rounded-3xl bg-white p-6 shadow-[0_4px_16px_rgba(15,23,42,0.1)]">
           <h1 className="text-2xl font-semibold">Admin Panel Pembayaran</h1>

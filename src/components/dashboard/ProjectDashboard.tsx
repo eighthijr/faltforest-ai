@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createProject, listProjects } from '../../api/projects';
+import { createProject, deleteProject, listProjects } from '../../api/projects';
 import { listPaymentHistory, type PaymentStatus } from '@/api/payments';
 import { Spinner, useToast } from '../ui';
 import type { Project } from '../../types/project';
 import { DashboardLayout } from './DashboardLayout';
 import { DashboardCard } from './DashboardCard';
 import { UpgradeModal } from './UpgradeModal';
+import { DeleteProjectModal } from './DeleteProjectModal';
 
 type DashboardState = {
   loading: boolean;
@@ -61,10 +62,11 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
 
 type ProjectDashboardProps = {
   userId: string;
+  userEmail?: string | null;
   onUpgradeClick?: (projectId?: string) => void;
 };
 
-export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardProps) {
+export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectDashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
   const router = useRouter();
   const { pushToast } = useToast();
@@ -101,6 +103,8 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
   );
   const hasFreeProject = freeProjectCount > 0;
   const [projectPaymentStatus, setProjectPaymentStatus] = useState<Record<string, PaymentStatus>>({});
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [deletingProject, setDeletingProject] = useState(false);
 
   const handleCreateProject = async () => {
     dispatch({ type: 'CREATE_START' });
@@ -139,8 +143,29 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
     }
   };
 
+  const handleDeleteProject = async () => {
+    if (!projectToDelete) return;
+    setDeletingProject(true);
+
+    try {
+      await deleteProject({ userId, projectId: projectToDelete.id });
+      const refreshedProjects = await listProjects(userId);
+      dispatch({ type: 'LOAD_SUCCESS', payload: refreshedProjects });
+      pushToast({ type: 'success', title: 'Project dihapus', description: 'Project berhasil dihapus dari dashboard.' });
+      setProjectToDelete(null);
+    } catch (error) {
+      pushToast({
+        type: 'error',
+        title: 'Gagal hapus project',
+        description: error instanceof Error ? error.message : 'Silakan coba lagi.',
+      });
+    } finally {
+      setDeletingProject(false);
+    }
+  };
+
   return (
-    <DashboardLayout userId={userId}>
+    <DashboardLayout userId={userId} userEmail={userEmail}>
       <section className="space-y-6">
         <header className="rounded-3xl bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.08),0_8px_24px_rgba(15,23,42,0.08)] md:p-6">
           <p className="text-sm text-slate-500">Dashboard / Overview</p>
@@ -186,11 +211,24 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
         ) : (
           <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {state.projects.map((project) => (
-              <DashboardCard key={project.id} project={project} paymentStatus={projectPaymentStatus[project.id] ?? null} />
+              <DashboardCard
+                key={project.id}
+                project={project}
+                paymentStatus={projectPaymentStatus[project.id] ?? null}
+                onDelete={(selected) => setProjectToDelete(selected)}
+              />
             ))}
           </section>
         )}
       </section>
+
+      <DeleteProjectModal
+        open={Boolean(projectToDelete)}
+        projectId={projectToDelete?.id ?? null}
+        deleting={deletingProject}
+        onClose={() => setProjectToDelete(null)}
+        onConfirm={handleDeleteProject}
+      />
 
       <UpgradeModal
         open={state.showUpgradeModal}

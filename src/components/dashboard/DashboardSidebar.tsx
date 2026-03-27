@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, MoreHorizontal } from 'lucide-react';
+import { ArrowLeft, FolderKanban, LogOut, MoreHorizontal } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import type { Project } from '@/types/project';
 
 type SidebarNavItem = {
   href: string;
@@ -18,7 +19,11 @@ type DashboardSidebarProps = {
   title?: string;
   subtitle?: string;
   profileLabel: string;
+  profileSubLabel?: string;
   onSignOut?: () => void;
+  workspaceProjects?: Project[];
+  activeProjectId?: string | null;
+  showWorkspaceProjects?: boolean;
 };
 
 export type { SidebarNavItem };
@@ -30,8 +35,20 @@ export function DashboardSidebar({
   title = 'Faltforest AI',
   subtitle = 'Workspace',
   profileLabel,
+  profileSubLabel,
   onSignOut,
+  workspaceProjects = [],
+  activeProjectId = null,
+  showWorkspaceProjects = false,
 }: DashboardSidebarProps) {
+  const initials =
+    profileLabel
+      .split(/[\s@._-]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('') || 'U';
+
   return (
     <>
       <button
@@ -54,33 +71,68 @@ export function DashboardSidebar({
             <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
           </div>
 
-          <nav className="space-y-1.5" aria-label="Main navigation">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
-                    item.active
-                      ? 'bg-indigo-600 text-white shadow-[0_4px_14px_rgba(79,70,229,0.35)]'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
+          {showWorkspaceProjects ? (
+            <section className="space-y-3" aria-label="Workspace project list">
+              <Link
+                href="/dashboard"
+                onClick={onClose}
+                className="inline-flex items-center gap-1 rounded-xl px-2 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Menu utama
+              </Link>
+
+              <div className="space-y-1.5">
+                {workspaceProjects.map((project) => (
+                  <Link
+                    key={project.id}
+                    href={`/workspace?projectId=${project.id}`}
+                    onClick={onClose}
+                    className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
+                      activeProjectId === project.id
+                        ? 'bg-indigo-600 text-white shadow-[0_4px_14px_rgba(79,70,229,0.35)]'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    <FolderKanban className="h-5 w-5 shrink-0" />
+                    <span className="truncate">Project #{project.id.slice(0, 8)}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ) : (
+            <nav className="space-y-1.5" aria-label="Main navigation">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onClose}
+                    className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
+                      item.active
+                        ? 'bg-indigo-600 text-white shadow-[0_4px_14px_rgba(79,70,229,0.35)]'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
         </div>
 
         <div className="rounded-2xl bg-slate-100 p-3">
           <div className="flex items-center justify-between gap-3">
-            <div>
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">{initials}</div>
+              <div className="min-w-0">
               <p className="text-xs text-slate-500">Signed in as</p>
               <p className="max-w-[170px] truncate text-sm font-medium text-slate-800">{profileLabel}</p>
+              {profileSubLabel ? <p className="truncate text-xs text-slate-500">{profileSubLabel}</p> : null}
+              </div>
             </div>
             <MoreHorizontal className="h-4 w-4 text-slate-500" />
           </div>

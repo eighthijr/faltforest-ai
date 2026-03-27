@@ -288,25 +288,6 @@ function WorkspaceChatContent({
   const answeredCount = questionOrder.length - missingFields.length;
   const progressLabel =
     state.state === 'generated' ? 'Step 4 of 4 • Result ready' : `Step ${Math.min(answeredCount + 1, 4)} of 4 • Collecting brief`;
-  const quickReplies = useMemo(() => {
-    if (state.state === 'draft') {
-      const templates: Record<QuestionKey, string> = {
-        product: 'Produk saya adalah ...',
-        target: 'Target market saya ...',
-        benefit: 'Benefit utamanya ...',
-        images: 'Aset gambar yang tersedia ...',
-      };
-
-      return missingFields.slice(0, 3).map((field) => templates[field]);
-    }
-
-    if (state.state === 'generated') {
-      return ['Tolong perbaiki headline', 'Bikin versi lebih santai', 'Tambahkan CTA lebih kuat'];
-    }
-
-    return [];
-  }, [missingFields, state.state]);
-
   const runAutoGeneration = async (answers: WorkspaceAnswers) => {
     try {
       dispatch({ type: 'SET_LOADING', value: true });
@@ -391,6 +372,22 @@ function WorkspaceChatContent({
       } else {
         void runAutoGeneration(updatedAnswers);
       }
+      setInput('');
+      return;
+    }
+
+    if (state.state === 'generated') {
+      dispatch({
+        type: 'ADD_MESSAGE',
+        value: {
+          id: uid(),
+          role: 'system',
+          content:
+            'Revisi kamu sudah dicatat ✅ Untuk versi ini, AI chat lanjutan masih dalam peningkatan. Kamu bisa preview/download hasil terbaru yang sudah tergenerate.',
+        },
+      });
+      setInput('');
+      return;
     }
 
     setInput('');
@@ -402,6 +399,15 @@ function WorkspaceChatContent({
   };
 
   const handleDownload = () => {
+    if (manualPaymentStatus === 'waiting_admin') {
+      pushToast({
+        type: 'info',
+        title: 'Menunggu verifikasi admin',
+        description: 'Download akan aktif setelah pembayaran premium disetujui.',
+      });
+      return;
+    }
+
     if (state.projectType === 'free' && !premiumUnlocked) {
       openUpgrade('download');
       return;
@@ -451,12 +457,8 @@ function WorkspaceChatContent({
             value={input}
             onChange={setInput}
             onSubmit={submitAnswer}
-            onQuickReply={(value) => {
-              setInput(value);
-              submitText(value);
-            }}
-            quickReplies={quickReplies}
             disabled={state.loading}
+            loading={state.loading}
             placeholder="Type your prompt or answer..."
           />
         }
@@ -467,6 +469,7 @@ function WorkspaceChatContent({
         html={state.generatedCopy}
         onClose={closeModal}
         onDownload={handleDownload}
+        downloadDisabled={manualPaymentStatus === 'waiting_admin'}
       />
 
       <UpgradeModal

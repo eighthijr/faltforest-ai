@@ -1,11 +1,16 @@
-import Link from 'next/link';
-import { Activity, BadgeCheck, CalendarClock, CircleCheck, CircleDashed, Clock3, Crown, FlaskConical, Hash } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Activity, BadgeCheck, CalendarClock, CircleCheck, CircleDashed, Clock3, Crown, FlaskConical, Hash, Trash2 } from 'lucide-react';
 import type { PaymentStatus } from '@/api/payments';
 import type { Project } from '@/types/project';
+import { Spinner } from '../ui';
 
 type DashboardCardProps = {
   project: Project;
   paymentStatus?: PaymentStatus | null;
+  onDelete?: (project: Project) => void;
 };
 
 const statusMap: Record<Project['status'], { label: string; tone: string; icon: typeof CircleCheck }> = {
@@ -14,7 +19,9 @@ const statusMap: Record<Project['status'], { label: string; tone: string; icon: 
   generated: { label: 'Generated', tone: 'bg-emerald-50 text-emerald-700', icon: CircleCheck },
 };
 
-export function DashboardCard({ project, paymentStatus = null }: DashboardCardProps) {
+export function DashboardCard({ project, paymentStatus = null, onDelete }: DashboardCardProps) {
+  const router = useRouter();
+  const [redirecting, setRedirecting] = useState(false);
   const createdDate = new Date(project.created_at).toLocaleDateString('id-ID', { dateStyle: 'medium' });
   const status = statusMap[project.status];
   const StatusIcon = status.icon;
@@ -65,12 +72,35 @@ export function DashboardCard({ project, paymentStatus = null }: DashboardCardPr
         ) : null}
       </dl>
 
-      <Link
-        href={`/workspace?projectId=${project.id}`}
-        className="mt-5 inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(79,70,229,0.32)] transition hover:bg-indigo-500"
-      >
-        Open Workspace
-      </Link>
+      <div className="mt-5 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setRedirecting(true);
+            router.push(`/workspace?projectId=${project.id}`);
+          }}
+          className="inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(79,70,229,0.32)] transition hover:bg-indigo-500"
+        >
+          Open Workspace
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete?.(project)}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
+        >
+          <Trash2 className="h-4 w-4" />
+          Delete
+        </button>
+      </div>
+
+      {redirecting ? (
+        <div className="fixed inset-0 z-[120] grid place-items-center bg-slate-950/45">
+          <div className="rounded-2xl bg-white px-5 py-4 text-center shadow-2xl">
+            <Spinner size="md" className="mx-auto text-indigo-600" />
+            <p className="mt-2 text-sm font-semibold text-slate-800">Mengarahkan ke workspace...</p>
+          </div>
+        </div>
+      ) : null}
     </article>
   );
 }
