@@ -62,3 +62,6 @@ export const ImagePlus = (props: IconProps) => <BaseIcon {...props}><rect x="3" 
 export const RefreshCcw = (props: IconProps) => <BaseIcon {...props}><path d="M3 12a9 9 0 0 1 15-6" /><path d="M18 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6" /><path d="M6 21v-5h5" /></BaseIcon>;
 export const FolderKanban = (props: IconProps) => <BaseIcon {...props}><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" /><rect x="7" y="11" width="4" height="4" rx="1" /><rect x="13" y="11" width="4" height="2" rx="1" /></BaseIcon>;
 export const Mail = (props: IconProps) => <BaseIcon {...props}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></BaseIcon>;
+export const Lock = (props: IconProps) => <BaseIcon {...props}><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></BaseIcon>;
+export const FileUp = (props: IconProps) => <BaseIcon {...props}><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z" /><path d="M14 2v5h5" /><path d="m12 18 0-6" /><path d="m9.5 14.5 2.5-2.5 2.5 2.5" /></BaseIcon>;
+export const LoaderCircle = (props: IconProps) => <BaseIcon {...props}><path d="M21 12a9 9 0 1 1-9-9" /></BaseIcon>;
