@@ -39,7 +39,7 @@ export function ModalShell({ open, onClose, title, children, size = 'md', closeO
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -49,7 +49,7 @@ export function ModalShell({ open, onClose, title, children, size = 'md', closeO
         }
       }}
     >
-      <div className={`w-full ${sizeClass[size]} rounded-3xl bg-white p-6 shadow-2xl animate-modal-in`}>
+      <div className={`my-4 w-full ${sizeClass[size]} max-h-[calc(100vh-2rem)] overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl animate-modal-in`}>
         <h2 id={titleId} className="sr-only">
           {title}
         </h2>
