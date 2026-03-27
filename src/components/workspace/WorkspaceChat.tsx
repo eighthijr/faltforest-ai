@@ -430,6 +430,8 @@ function WorkspaceChatContent({
           <ChatHeader
             projectId={projectId}
             status={state.state}
+            manualPaymentStatus={manualPaymentStatus}
+            paymentReference={paymentReference}
             onClearChat={() => dispatch({ type: 'CLEAR_MESSAGES', value: [initialGreeting()] })}
           />
         }
@@ -525,6 +527,7 @@ function WorkspaceChatContent({
               title: 'Pending approval',
               description: 'Pembayaran kamu sedang menunggu verifikasi admin.',
             });
+            closeModal();
           } catch (error) {
             pushToast({
               type: 'error',
