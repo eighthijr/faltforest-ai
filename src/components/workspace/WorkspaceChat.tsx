@@ -321,6 +321,7 @@ export function WorkspaceChat({
           <ChatHeader
             projectId={projectId}
             status={state.state}
+            onClearChat={() => dispatch({ type: 'CLEAR_MESSAGES', value: [initialGreeting()] })}
           />
         }
         body={
@@ -345,7 +346,7 @@ export function WorkspaceChat({
             }}
             quickReplies={quickReplies}
             disabled={state.loading}
-            placeholder="Ketik jawaban kamu..."
+            placeholder="Type your prompt or answer..."
           />
         }
       />

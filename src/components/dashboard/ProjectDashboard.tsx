@@ -6,7 +6,7 @@ import { createProject, listProjects } from '../../api/projects';
 import { Spinner, useToast } from '../ui';
 import type { Project } from '../../types/project';
 import { DashboardLayout } from './DashboardLayout';
-import { ProjectCard } from './ProjectCard';
+import { DashboardCard } from './DashboardCard';
 import { UpgradeModal } from './UpgradeModal';
 
 type DashboardState = {
@@ -135,9 +135,9 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
           <p className="text-sm text-slate-500">Dashboard / Overview</p>
           <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">Production Dashboard</h1>
-              <p className="mt-2 text-sm text-slate-600">Kelola project dalam tata letak Material 3 yang bersih dengan hierarchy dan ruang yang konsisten.</p>
-              <p className="mt-2 text-sm text-slate-500">Kuota FREE: {freeProjectCount}/1 · {hasFreeProject ? 'Upgrade untuk tambah project baru.' : 'Masih tersedia 1 project gratis.'}</p>
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">Dashboard</h1>
+              <p className="mt-2 text-sm text-slate-600">Kelola project, lanjutkan workspace, dan pantau status generate secara real-time.</p>
+              <p className="mt-2 text-sm text-slate-500">Free plan: {freeProjectCount}/1 project · {hasFreeProject ? 'Upgrade untuk project tambahan.' : 'Siap mulai project pertama kamu.'}</p>
             </div>
 
             <button
@@ -149,10 +149,10 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
               {state.creating ? (
                 <span className="inline-flex items-center gap-2">
                   <Spinner className="text-white" />
-                  Membuat...
+                  Creating...
                 </span>
               ) : (
-                'Buat Project'
+                'Create Project'
               )}
             </button>
           </div>
@@ -160,7 +160,7 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
 
         {hasFreeProject && (
           <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700 shadow-[0_1px_2px_rgba(146,64,14,0.12)]">
-            Kamu sudah memakai project FREE. Upgrade ke PREMIUM untuk menambah project baru.
+            You already used your free project quota. Upgrade to unlock more projects.
           </p>
         )}
 
@@ -170,12 +170,12 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
           <p className="rounded-2xl bg-white px-4 py-8 text-sm text-slate-500 shadow-[0_1px_2px_rgba(15,23,42,0.08),0_8px_24px_rgba(15,23,42,0.08)]">Memuat project...</p>
         ) : state.projects.length === 0 ? (
           <p className="rounded-2xl bg-white px-4 py-8 text-sm text-slate-500 shadow-[0_1px_2px_rgba(15,23,42,0.08),0_8px_24px_rgba(15,23,42,0.08)]">
-            Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.
+            Belum ada project. Klik &quot;Create Project&quot; untuk mulai workflow.
           </p>
         ) : (
           <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {state.projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <DashboardCard key={project.id} project={project} />
             ))}
           </section>
         )}

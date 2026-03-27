@@ -8,8 +8,8 @@ type WorkspaceLayoutProps = {
 
 export function WorkspaceLayout({ header, body, input }: WorkspaceLayoutProps) {
   return (
-    <section className="material-page box-border h-[100dvh] w-full overflow-hidden p-2 md:p-4">
-      <div className="material-surface mx-auto flex h-full w-full max-w-[1120px] min-h-0 flex-col overflow-hidden">
+    <section className="h-[calc(100dvh-96px)] overflow-hidden rounded-3xl bg-white shadow-[0_4px_18px_rgba(15,23,42,0.12)]">
+      <div className="flex h-full min-h-0 flex-col">
         {header}
         {body}
         {input}
