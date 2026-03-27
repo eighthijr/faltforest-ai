@@ -53,16 +53,10 @@ export function useProtectedRoute(redirectTo: string = DEFAULT_REDIRECT): Protec
         return;
       }
 
-<<<<<<< codex/integrate-admin-login-with-user-login-2zfg0b
       const role = resolveUserRole(
         normalizeRole(data.user?.user_metadata?.role) ?? normalizeRole(data.user?.app_metadata?.role),
         data.user?.email ?? null,
       );
-=======
-      const role =
-        normalizeRole(data.user?.user_metadata?.role) ??
-        normalizeRole(data.user?.app_metadata?.role);
->>>>>>> main
 
       setState({ userId, role, loading: false, error: null });
     };
