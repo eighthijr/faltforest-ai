@@ -1,4 +1,4 @@
-# Faltforest AI (Next.js + Supabase + Vercel)
+# FLATFOREST AI (Next.js + Supabase + Vercel)
 
 Aplikasi SaaS untuk:
 - landing page conversion

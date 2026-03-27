@@ -20,6 +20,7 @@ const userNav: Array<Omit<SidebarNavItem, 'active'>> = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/workspace', label: 'Workspace', icon: MessageSquareText },
   { href: '/pricing', label: 'Pricing', icon: CreditCard },
+  { href: '/support', label: 'Support', icon: MessageSquareText },
   { href: '/dashboard/payment-history', label: 'Payment History', icon: Clock3 },
   { href: '/profile', label: 'Profile', icon: User },
 ];
@@ -29,6 +30,7 @@ const adminNav: Array<Omit<SidebarNavItem, 'active'>> = [
   { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/workspace', label: 'Workspace', icon: MessageSquareText },
   { href: '/pricing', label: 'Pricing', icon: CreditCard },
+  { href: '/support', label: 'Support', icon: MessageSquareText },
   { href: '/dashboard/payment-history', label: 'Payment History', icon: Clock3 },
   { href: '/profile', label: 'Profile', icon: User },
 ];
@@ -58,10 +60,9 @@ export function DashboardLayout({ children, userId, userEmail, mode = 'user', wo
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         navItems={navItems}
-        title={mode === 'admin' ? 'Faltforest Admin' : 'Faltforest AI'}
+        title={mode === 'admin' ? 'FLATFOREST Admin' : 'FLATFOREST AI'}
         subtitle={mode === 'admin' ? 'Control panel' : 'Landing page generator'}
         profileLabel={userEmail ?? userId}
-        profileSubLabel={userEmail ? userId : undefined}
         onSignOut={handleSignOut}
         workspaceProjects={workspaceProjects}
         activeProjectId={activeProjectId}

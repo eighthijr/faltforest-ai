@@ -16,7 +16,7 @@ export function ChatMessage({ message, onAction }: ChatMessageProps) {
   const cta = !isUser ? message.cta : undefined;
 
   return (
-    <article className={`flex w-full gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <article className={`animate-chat-message flex w-full gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
         <span className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-indigo-600 shadow-[0_2px_8px_rgba(15,23,42,0.15)]">
           <Bot className="h-4 w-4" />
