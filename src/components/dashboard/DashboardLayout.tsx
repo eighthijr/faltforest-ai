@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { BarChart3, Clock3, CreditCard, LayoutDashboard, Menu, MessageSquareText, ShieldCheck, User } from 'lucide-react';
+import { BarChart3, CreditCard, LayoutDashboard, Menu, MessageSquareText, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { DashboardSidebar, type SidebarNavItem } from './DashboardSidebar';
 import type { Project } from '@/types/project';
@@ -20,9 +20,6 @@ const userNav: Array<Omit<SidebarNavItem, 'active'>> = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/workspace', label: 'Workspace', icon: MessageSquareText },
   { href: '/pricing', label: 'Pricing', icon: CreditCard },
-  { href: '/support', label: 'Support', icon: MessageSquareText },
-  { href: '/dashboard/payment-history', label: 'Payment History', icon: Clock3 },
-  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 const adminNav: Array<Omit<SidebarNavItem, 'active'>> = [
@@ -30,9 +27,6 @@ const adminNav: Array<Omit<SidebarNavItem, 'active'>> = [
   { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/workspace', label: 'Workspace', icon: MessageSquareText },
   { href: '/pricing', label: 'Pricing', icon: CreditCard },
-  { href: '/support', label: 'Support', icon: MessageSquareText },
-  { href: '/dashboard/payment-history', label: 'Payment History', icon: Clock3 },
-  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 function isActive(pathname: string, href: string) {

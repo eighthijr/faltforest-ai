@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, FolderKanban, LogOut, MoreHorizontal } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, FolderKanban, LogOut, MessageSquareText, MoreHorizontal, UserCircle2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Project } from '@/types/project';
 
@@ -41,6 +42,21 @@ export function DashboardSidebar({
   activeProjectId = null,
   showWorkspaceProjects = false,
 }: DashboardSidebarProps) {
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!profileMenuRef.current) return;
+      if (event.target instanceof Node && !profileMenuRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const initials =
     profileLabel
       .split(/[\s@._-]+/)
@@ -125,8 +141,12 @@ export function DashboardSidebar({
           )}
         </div>
 
-        <div className="rounded-2xl bg-slate-100 p-3">
-          <div className="flex items-center justify-between gap-3">
+        <div className="relative rounded-2xl bg-slate-100 p-3" ref={profileMenuRef}>
+          <button
+            type="button"
+            onClick={() => setProfileMenuOpen((prev) => !prev)}
+            className="flex w-full items-center justify-between gap-3 rounded-xl px-1 py-1.5 text-left transition hover:bg-slate-200/60"
+          >
             <div className="flex min-w-0 items-center gap-2">
               <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">{initials}</div>
               <div className="min-w-0">
@@ -135,18 +155,40 @@ export function DashboardSidebar({
                 {profileSubLabel ? <p className="truncate text-xs text-slate-500">{profileSubLabel}</p> : null}
               </div>
             </div>
-            <MoreHorizontal className="h-4 w-4 text-slate-500" />
-          </div>
-          {onSignOut ? (
-            <button
-              type="button"
-              onClick={onSignOut}
-              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-[0_1px_3px_rgba(15,23,42,0.08)] transition hover:bg-slate-50"
-            >
-              <LogOut className="h-4 w-4" />
-              Keluar
-            </button>
+            <MoreHorizontal className={`h-4 w-4 text-slate-500 transition-transform ${profileMenuOpen ? 'rotate-90' : ''}`} />
+          </button>
+
+          {profileMenuOpen ? (
+            <div className="absolute bottom-[calc(100%+0.6rem)] left-0 right-0 z-50 rounded-xl border border-slate-200 bg-white p-1.5 shadow-[0_8px_24px_rgba(15,23,42,0.16)]">
+              <Link
+                href="/profile"
+                onClick={onClose}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              >
+                <UserCircle2 className="h-4 w-4" />
+                Profil
+              </Link>
+              <Link
+                href="/support"
+                onClick={onClose}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              >
+                <MessageSquareText className="h-4 w-4" />
+                Help (Support)
+              </Link>
+              {onSignOut ? (
+                <button
+                  type="button"
+                  onClick={onSignOut}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              ) : null}
+            </div>
           ) : null}
+
         </div>
       </aside>
     </>
