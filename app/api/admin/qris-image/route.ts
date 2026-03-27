@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminCookieName, verifySession } from '@/server/admin/auth';
+import { getRequestUser } from '@/server/next/http';
 import { getSupabaseAdmin } from '@/server/supabaseAdmin';
 
 const QRIS_PATH = 'manual-qris/current.png';
 const QRIS_BUCKET = process.env.NEXT_PUBLIC_QRIS_BUCKET || 'payment-assets';
 
-function requireAdminSession(req: NextRequest) {
-  const token = req.cookies.get(getAdminCookieName())?.value;
-  const session = verifySession(token);
-
-  if (!session) {
+async function requireAdminUser(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user || user.role !== 'admin') {
     throw new Error('UNAUTHORIZED');
   }
 
-  return session;
+  return user;
 }
 
 function buildPublicUrl() {
@@ -24,7 +22,7 @@ function buildPublicUrl() {
 
 export async function GET(req: NextRequest) {
   try {
-    requireAdminSession(req);
+    await requireAdminUser(req);
     return NextResponse.json({ imageUrl: buildPublicUrl() });
   } catch {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -33,7 +31,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    requireAdminSession(req);
+    await requireAdminUser(req);
 
     const formData = await req.formData();
     const file = formData.get('file');
