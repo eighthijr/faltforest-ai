@@ -4,3 +4,5 @@ export { DashboardCard } from './DashboardCard';
 export { ProjectCard } from './ProjectCard';
 export { ProjectDashboard } from './ProjectDashboard';
 export { UpgradeModal } from './UpgradeModal';
+export { AdminPaymentsDashboard } from './AdminPaymentsDashboard';
+export { AdminAnalyticsDashboard } from './AdminAnalyticsDashboard';

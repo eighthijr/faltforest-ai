@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminCookieName, getAdminActorId, verifySession } from '@/server/admin/auth';
+import { getRequestUser } from '@/server/next/http';
 import { getDashboard } from '@/server/analytics/routes';
 
-function requireAdminSession(req: NextRequest) {
-  const token = req.cookies.get(getAdminCookieName())?.value;
-  const session = verifySession(token);
-  if (!session) throw new Error('UNAUTHORIZED');
+async function requireAdminUser(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user || user.role !== 'admin') throw new Error('UNAUTHORIZED');
+  return user;
 }
 
 export async function GET(req: NextRequest) {
   try {
-    requireAdminSession(req);
+    const admin = await requireAdminUser(req);
 
     const result = await getDashboard({
       query: {
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         to: req.nextUrl.searchParams.get('to') ?? undefined,
       },
       user: {
-        id: getAdminActorId(),
+        id: admin.id,
         role: 'admin',
       },
     });

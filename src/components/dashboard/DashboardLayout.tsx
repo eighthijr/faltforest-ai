@@ -20,9 +20,11 @@ const userNav: Array<Omit<SidebarNavItem, 'active'>> = [
 ];
 
 const adminNav: Array<Omit<SidebarNavItem, 'active'>> = [
-  { href: '/admin', label: 'Payments', icon: ShieldCheck },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/dashboard', label: 'User App', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Payments', icon: ShieldCheck },
+  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/workspace', label: 'Workspace', icon: MessageSquareText },
+  { href: '/pricing', label: 'Pricing', icon: CreditCard },
+  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -40,12 +42,6 @@ export function DashboardLayout({ children, userId, mode = 'user' }: DashboardLa
   }, [mode, pathname]);
 
   const handleSignOut = async () => {
-    if (mode === 'admin') {
-      await fetch('/api/admin/logout', { method: 'POST' });
-      window.location.replace('/admin');
-      return;
-    }
-
     await supabase.auth.signOut();
     window.location.replace('/');
   };
