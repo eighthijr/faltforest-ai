@@ -3,7 +3,10 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { DashboardSidebar, type SidebarNavItem } from './DashboardSidebar';
+<<<<<<< codex/refactor-dashboard-layout-and-project-list-ui-trwp6t
 import { IconDashboard, IconMenu, IconPricing, IconProfile, IconWorkspace } from './icons';
+=======
+>>>>>>> main
 
 type DashboardLayoutProps = {
   children: ReactNode;
@@ -11,10 +14,17 @@ type DashboardLayoutProps = {
 };
 
 const baseNavItems: Array<Omit<SidebarNavItem, 'active'>> = [
+<<<<<<< codex/refactor-dashboard-layout-and-project-list-ui-trwp6t
   { href: '/dashboard', label: 'Overview', icon: IconDashboard },
   { href: '/workspace', label: 'Workspace', icon: IconWorkspace },
   { href: '/pricing', label: 'Pricing', icon: IconPricing },
   { href: '/profile', label: 'Profile', icon: IconProfile },
+=======
+  { href: '/dashboard', label: 'Overview' },
+  { href: '/workspace', label: 'Workspace' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/profile', label: 'Profile' },
+>>>>>>> main
 ];
 
 function isActive(pathname: string, href: string) {
@@ -43,7 +53,11 @@ export function DashboardLayout({ children, userId }: DashboardLayoutProps) {
             aria-label="Toggle sidebar"
             className="inline-flex items-center justify-center rounded-xl bg-white p-3 text-slate-700 shadow-[0_1px_3px_rgba(15,23,42,0.08),0_8px_16px_rgba(15,23,42,0.08)] transition hover:bg-slate-50"
           >
+<<<<<<< codex/refactor-dashboard-layout-and-project-list-ui-trwp6t
             <IconMenu className="h-5 w-5" />
+=======
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+>>>>>>> main
           </button>
         </header>
 
