@@ -3,20 +3,29 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
+import { resolveUserRole } from '@/lib/admin';
 
 type ProtectedRouteState = {
   userId: string | null;
+  role: string | null;
   loading: boolean;
   error: string | null;
 };
 
 const DEFAULT_REDIRECT = '/';
 
+function normalizeRole(input: unknown): string | null {
+  if (typeof input !== 'string') return null;
+  const value = input.trim();
+  return value ? value : null;
+}
+
 export function useProtectedRoute(redirectTo: string = DEFAULT_REDIRECT): ProtectedRouteState {
   const pathname = usePathname();
   const router = useRouter();
   const [state, setState] = useState<ProtectedRouteState>({
     userId: null,
+    role: null,
     loading: true,
     error: null,
   });
@@ -31,7 +40,7 @@ export function useProtectedRoute(redirectTo: string = DEFAULT_REDIRECT): Protec
       if (!mounted) return;
 
       if (error) {
-        setState({ userId: null, loading: false, error: error.message });
+        setState({ userId: null, role: null, loading: false, error: error.message });
         return;
       }
 
@@ -40,11 +49,16 @@ export function useProtectedRoute(redirectTo: string = DEFAULT_REDIRECT): Protec
       if (!userId) {
         const params = new URLSearchParams({ from: pathname });
         router.replace(`${redirectTo}?${params.toString()}`);
-        setState({ userId: null, loading: false, error: null });
+        setState({ userId: null, role: null, loading: false, error: null });
         return;
       }
 
-      setState({ userId, loading: false, error: null });
+      const role = resolveUserRole(
+        normalizeRole(data.user?.user_metadata?.role) ?? normalizeRole(data.user?.app_metadata?.role),
+        data.user?.email ?? null,
+      );
+
+      setState({ userId, role, loading: false, error: null });
     };
 
     void verify();

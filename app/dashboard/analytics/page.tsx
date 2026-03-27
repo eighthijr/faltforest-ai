@@ -1,13 +1,13 @@
 'use client';
 
-import { AdminPaymentsDashboard, ProjectDashboard } from '@/components/dashboard';
+import { AdminAnalyticsDashboard } from '@/components/dashboard';
 import { useProtectedRoute } from '@/components/auth';
 
 function isAdminRole(role: string | null): boolean {
   return typeof role === 'string' && role.toLowerCase() === 'admin';
 }
 
-export default function DashboardPage() {
+export default function DashboardAnalyticsPage() {
   const { userId, role, loading, error } = useProtectedRoute('/');
 
   if (loading) {
@@ -22,18 +22,9 @@ export default function DashboardPage() {
     return <p className="material-page p-6 text-sm text-slate-600">Redirecting...</p>;
   }
 
-  if (isAdminRole(role)) {
-    return <AdminPaymentsDashboard userId={userId} />;
+  if (!isAdminRole(role)) {
+    return <main className="px-4 py-10 text-sm text-rose-700">Akses ditolak. Halaman ini khusus admin.</main>;
   }
 
-  return (
-    <ProjectDashboard
-      userId={userId}
-      onUpgradeClick={(projectId) => {
-        const params = new URLSearchParams({ source: 'dashboard', reason: 'project_limit' });
-        if (projectId) params.set('projectId', projectId);
-        window.location.href = `/pricing?${params.toString()}`;
-      }}
-    />
-  );
+  return <AdminAnalyticsDashboard userId={userId} />;
 }

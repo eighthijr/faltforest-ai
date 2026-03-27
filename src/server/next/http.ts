@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
+import { resolveUserRole } from '@/lib/admin';
 
 type RequestUser = { id: string; role?: string };
+
+function normalizeRole(input: unknown): string | undefined {
+  if (typeof input !== 'string') return undefined;
+  const value = input.trim();
+  return value || undefined;
+}
 
 export async function getRequestUser(req: NextRequest): Promise<RequestUser | undefined> {
   const headerId = req.headers.get('x-user-id') ?? undefined;
@@ -17,10 +24,12 @@ export async function getRequestUser(req: NextRequest): Promise<RequestUser | un
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data.user?.id) return undefined;
 
-  const metadataRole = data.user.user_metadata?.role;
-  const appRole = typeof metadataRole === 'string' ? metadataRole : undefined;
+  const appRole = resolveUserRole(
+    normalizeRole(data.user.user_metadata?.role) ?? normalizeRole(data.user.app_metadata?.role),
+    data.user.email ?? null,
+  );
 
-  return { id: data.user.id, role: appRole };
+  return { id: data.user.id, role: appRole ?? undefined };
 }
 
 export function toNextResponse(result: { status: number; body: unknown }) {

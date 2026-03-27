@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { isAdminEmail } from '@/lib/admin';
 import { buildRedirectTo } from './useRedirectTo';
 
 type AuthMode = 'login' | 'signup';
@@ -80,12 +81,13 @@ export function AuthModal({
     setLoading(true);
 
     if (mode === 'login') {
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
       if (signInError) {
         setError(signInError.message);
       } else {
-        window.location.assign(postAuthRedirect);
+        const destination = isAdminEmail(data.user?.email ?? email) ? '/dashboard' : postAuthRedirect;
+        window.location.assign(destination);
       }
 
       setLoading(false);

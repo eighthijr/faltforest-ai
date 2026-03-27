@@ -1,21 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminActorId, getAdminCookieName, verifySession } from '@/server/admin/auth';
+import { getRequestUser } from '@/server/next/http';
 import { getSupabaseAdmin } from '@/server/supabaseAdmin';
 
-function requireAdminSession(req: NextRequest) {
-  const token = req.cookies.get(getAdminCookieName())?.value;
-  const session = verifySession(token);
-
-  if (!session) {
+async function requireAdminUser(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user || user.role !== 'admin') {
     throw new Error('UNAUTHORIZED');
   }
 
-  return session;
+  return user;
 }
 
 export async function GET(req: NextRequest) {
   try {
-    requireAdminSession(req);
+    await requireAdminUser(req);
 
     const supabaseAdmin = getSupabaseAdmin();
     const withProofResult = await supabaseAdmin
@@ -69,7 +67,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    requireAdminSession(req);
+    const admin = await requireAdminUser(req);
 
     const body = (await req.json().catch(() => null)) as { reference?: string; approve?: boolean } | null;
 
@@ -79,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin();
     const { data, error } = await supabaseAdmin.rpc('admin_decide_manual_payment', {
-      p_admin_id: getAdminActorId(),
+      p_admin_id: admin.id,
       p_reference: body.reference,
       p_approve: body.approve,
     });
