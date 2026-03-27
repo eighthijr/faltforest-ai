@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { BarChart3, CreditCard, LayoutDashboard, Menu, MessageSquareText, ShieldCheck, User } from 'lucide-react';
+import { BarChart3, CreditCard, History, LayoutDashboard, Menu, MessageSquareText, ShieldCheck, User } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { DashboardSidebar, type SidebarNavItem } from './DashboardSidebar';
 
@@ -16,6 +16,7 @@ const userNav: Array<Omit<SidebarNavItem, 'active'>> = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/workspace', label: 'Workspace', icon: MessageSquareText },
   { href: '/pricing', label: 'Pricing', icon: CreditCard },
+  { href: '/dashboard/payment-history', label: 'Payment History', icon: History },
   { href: '/profile', label: 'Profile', icon: User },
 ];
 
@@ -24,6 +25,7 @@ const adminNav: Array<Omit<SidebarNavItem, 'active'>> = [
   { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/workspace', label: 'Workspace', icon: MessageSquareText },
   { href: '/pricing', label: 'Pricing', icon: CreditCard },
+  { href: '/dashboard/payment-history', label: 'Payment History', icon: History },
   { href: '/profile', label: 'Profile', icon: User },
 ];
 

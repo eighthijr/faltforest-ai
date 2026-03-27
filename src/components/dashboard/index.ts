@@ -6,3 +6,5 @@ export { ProjectDashboard } from './ProjectDashboard';
 export { UpgradeModal } from './UpgradeModal';
 export { AdminPaymentsDashboard } from './AdminPaymentsDashboard';
 export { AdminAnalyticsDashboard } from './AdminAnalyticsDashboard';
+
+export { PaymentHistoryDashboard } from './PaymentHistoryDashboard';
