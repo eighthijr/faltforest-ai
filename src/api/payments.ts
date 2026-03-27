@@ -1,3 +1,5 @@
+import { supabase } from '@/lib/supabaseClient';
+
 export type PaymentStatus = 'pending' | 'waiting_confirmation' | 'success' | 'rejected';
 export type PaymentGateway = 'manual_qris' | 'tripay_qris';
 
@@ -12,8 +14,18 @@ export type PaymentHistoryItem = {
   confirmed_at: string | null;
 };
 
+async function getAuthHeader(): Promise<Record<string, string>> {
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error || !data.session?.access_token) {
+    throw new Error('Sesi login tidak ditemukan. Silakan login ulang.');
+  }
+
+  return { Authorization: `Bearer ${data.session.access_token}` };
+}
+
 export async function listPaymentHistory(): Promise<PaymentHistoryItem[]> {
-  const response = await fetch('/api/payments/history', { cache: 'no-store' });
+  const response = await fetch('/api/payments/history', { cache: 'no-store', headers: await getAuthHeader() });
   const payload = (await response.json().catch(() => null)) as { payments?: PaymentHistoryItem[]; message?: string } | null;
 
   if (!response.ok) {
@@ -24,7 +36,7 @@ export async function listPaymentHistory(): Promise<PaymentHistoryItem[]> {
 }
 
 export async function fetchManualQrisImageUrl(): Promise<string> {
-  const response = await fetch('/api/payments/manual/qris-image', { cache: 'no-store' });
+  const response = await fetch('/api/payments/manual/qris-image', { cache: 'no-store', headers: await getAuthHeader() });
   const payload = (await response.json().catch(() => null)) as { imageUrl?: string; message?: string } | null;
 
   if (!response.ok) {
@@ -41,6 +53,7 @@ export async function submitManualPaymentProof(input: { projectId: string; file:
 
   const response = await fetch('/api/payments/manual/submit-proof', {
     method: 'POST',
+    headers: await getAuthHeader(),
     body: formData,
   });
 
@@ -54,9 +67,11 @@ export async function submitManualPaymentProof(input: { projectId: string; file:
 }
 
 export async function confirmManualAlreadyPaid(input: { projectId: string; amount: number; reference: string }) {
+  const authHeader = await getAuthHeader();
+
   const createResponse = await fetch('/api/payments/manual/create', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...authHeader, 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
   });
 
@@ -68,7 +83,7 @@ export async function confirmManualAlreadyPaid(input: { projectId: string; amoun
 
   const markResponse = await fetch('/api/payments/manual/already-paid', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...authHeader, 'Content-Type': 'application/json' },
     body: JSON.stringify({ reference: input.reference }),
   });
 
