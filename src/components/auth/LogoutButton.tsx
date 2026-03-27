@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { IconLogout } from '@/components/dashboard/icons';
 
 type LogoutButtonProps = {
   className?: string;
@@ -32,9 +33,10 @@ export function LogoutButton({ className }: LogoutButtonProps) {
         type="button"
         onClick={handleLogout}
         disabled={loading}
-        className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? 'Keluar...' : 'Keluar'}
+        <IconLogout className="h-4 w-4" />
+        <span>{loading ? 'Keluar...' : 'Keluar'}</span>
       </button>
       {error && <p className="mt-1 text-xs text-rose-600">Gagal logout: {error}</p>}
     </div>
