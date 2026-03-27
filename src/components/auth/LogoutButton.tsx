@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { LogOut } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
-import { IconLogout } from '@/components/dashboard/icons';
 
 type LogoutButtonProps = {
   className?: string;
@@ -33,9 +33,9 @@ export function LogoutButton({ className }: LogoutButtonProps) {
         type="button"
         onClick={handleLogout}
         disabled={loading}
-        className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-[0_1px_3px_rgba(15,23,42,0.08)] transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        <IconLogout className="h-4 w-4" />
+        <LogOut className="h-4 w-4" />
         <span>{loading ? 'Keluar...' : 'Keluar'}</span>
       </button>
       {error && <p className="mt-1 text-xs text-rose-600">Gagal logout: {error}</p>}

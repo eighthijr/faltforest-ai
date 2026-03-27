@@ -1,5 +1,5 @@
-import { Bot, UserCircle2 } from 'lucide-react';
-import type { WorkspaceMessage } from '../../types/workspace';
+import { Bot, User } from 'lucide-react';
+import type { WorkspaceMessage } from '@/types/workspace';
 
 type ChatMessageProps = {
   message: WorkspaceMessage;
@@ -16,27 +16,22 @@ export function ChatMessage({ message, onAction }: ChatMessageProps) {
   const cta = !isUser ? message.cta : undefined;
 
   return (
-    <article className={`animate-chat-message flex w-full gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <article className={`flex w-full gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
-        <span className="mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
-          <Bot className="size-4" />
+        <span className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-indigo-600 shadow-[0_2px_8px_rgba(15,23,42,0.15)]">
+          <Bot className="h-4 w-4" />
         </span>
       )}
       <div
-        className={`max-w-[82%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-[0_1px_2px_rgba(15,23,42,0.05)] ${
-          isUser
-            ? 'bg-indigo-600 text-white'
-            : 'bg-slate-100 text-slate-800'
+        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-[0_2px_8px_rgba(15,23,42,0.12)] ${
+          isUser ? 'bg-indigo-600 text-white' : 'bg-white text-slate-800'
         }`}
       >
         {blocks.map((block, index) => {
           const isCode = index % 2 === 1;
           if (isCode) {
             return (
-              <pre
-                key={`${message.id}-code-${index}`}
-                className="mt-2 overflow-x-auto rounded-xl bg-slate-900/95 p-3 font-mono text-xs text-slate-100"
-              >
+              <pre key={`${message.id}-code-${index}`} className="mt-2 overflow-x-auto rounded-xl bg-slate-900 p-3 font-mono text-xs text-slate-100">
                 <code>{block}</code>
               </pre>
             );
@@ -52,15 +47,15 @@ export function ChatMessage({ message, onAction }: ChatMessageProps) {
           <button
             type="button"
             onClick={() => onAction?.(cta.action)}
-            className="mt-3 inline-flex items-center rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
+            className="mt-3 inline-flex items-center rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white"
           >
             {cta.label}
           </button>
         ) : null}
       </div>
       {isUser && (
-        <span className="mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-white shadow-sm">
-          <UserCircle2 className="size-4" />
+        <span className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-white shadow-[0_2px_8px_rgba(15,23,42,0.15)]">
+          <User className="h-4 w-4" />
         </span>
       )}
     </article>

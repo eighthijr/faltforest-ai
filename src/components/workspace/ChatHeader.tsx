@@ -1,64 +1,47 @@
-import Link from 'next/link';
-import { ArrowLeft, ChevronRight, Circle } from 'lucide-react';
-import type { WorkspaceState } from '../../types/workspace';
+import { Circle, Settings2, Trash2 } from 'lucide-react';
+import type { WorkspaceState } from '@/types/workspace';
 
 type ChatHeaderProps = {
   projectId: string;
   status: WorkspaceState;
+  onClearChat?: () => void;
 };
 
-const statusConfig: Record<WorkspaceState, { label: string; tone: string; badge: string }> = {
-  draft: {
-    label: 'Collecting brief',
-    tone: 'text-amber-800',
-    badge: 'border-amber-200 bg-amber-50',
-  },
-  ready: {
-    label: 'Generating',
-    tone: 'text-violet-800',
-    badge: 'border-violet-200 bg-violet-50',
-  },
-  generated: {
-    label: 'Ready',
-    tone: 'text-emerald-800',
-    badge: 'border-emerald-200 bg-emerald-50',
-  },
+const statusConfig: Record<WorkspaceState, { label: string; tone: string }> = {
+  draft: { label: 'AI collecting brief', tone: 'text-amber-700' },
+  ready: { label: 'AI generating result', tone: 'text-violet-700' },
+  generated: { label: 'AI ready for edits', tone: 'text-emerald-700' },
 };
 
-export function ChatHeader({ projectId, status }: ChatHeaderProps) {
+export function ChatHeader({ projectId, status, onClearChat }: ChatHeaderProps) {
   const statusMeta = statusConfig[status];
-  const shortProjectId = projectId.length > 18 ? `${projectId.slice(0, 8)}...${projectId.slice(-6)}` : projectId;
+  const shortProjectId = projectId.length > 16 ? `${projectId.slice(0, 6)}...${projectId.slice(-6)}` : projectId;
 
   return (
-    <header className="z-10 shrink-0 border-b border-slate-200/80 bg-white/95 px-4 py-3 shadow-[0_1px_3px_rgba(15,23,42,0.08)] backdrop-blur md:px-6">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-1 text-xs text-slate-500 md:mb-0.5">
-            <Link href="/dashboard" className="font-medium transition hover:text-indigo-600 hover:underline">
-              Dashboard
-            </Link>
-            <ChevronRight className="size-3.5" />
-            <span className="font-medium text-slate-700">Workspace</span>
-          </div>
-          <div className="mt-1 flex flex-wrap items-center gap-2.5">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-indigo-700"
-              title="Back to dashboard"
-            >
-              <ArrowLeft className="size-3.5" />
-              Back to Dashboard
-            </Link>
-            <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-[11px] text-slate-600">
-              {shortProjectId}
-            </span>
-            <span
-              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${statusMeta.tone} ${statusMeta.badge}`}
-            >
-              <Circle className="size-3 fill-current" />
+    <header className="sticky top-0 z-10 border-b border-slate-200 bg-white px-4 py-3 md:px-6">
+      <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-slate-900">Project Workspace</p>
+          <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
+            <span className="rounded-full bg-slate-100 px-2 py-1 font-mono">{shortProjectId}</span>
+            <span className={`inline-flex items-center gap-1.5 font-semibold ${statusMeta.tone}`}>
+              <Circle className="h-3 w-3 fill-current" />
               {statusMeta.label}
             </span>
           </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button type="button" className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition hover:bg-slate-200">
+            <Settings2 className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onClearChat}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition hover:bg-slate-200"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </header>

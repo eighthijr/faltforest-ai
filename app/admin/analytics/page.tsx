@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { DashboardLayout } from '@/components/dashboard';
 
 type DailyMetric = {
   metric_date: string;
@@ -30,9 +30,10 @@ function toDateInputValue(date: Date): string {
 }
 
 function rangeToIso(fromDate: string, toDate: string) {
-  const from = new Date(`${fromDate}T00:00:00.000Z`).toISOString();
-  const to = new Date(`${toDate}T23:59:59.999Z`).toISOString();
-  return { from, to };
+  return {
+    from: new Date(`${fromDate}T00:00:00.000Z`).toISOString(),
+    to: new Date(`${toDate}T23:59:59.999Z`).toISOString(),
+  };
 }
 
 function formatPercent(value: number) {
@@ -43,10 +44,8 @@ export default function AdminAnalyticsPage() {
   const today = useMemo(() => new Date(), []);
   const [fromDate, setFromDate] = useState(toDateInputValue(new Date(today.getTime() - 29 * 24 * 60 * 60 * 1000)));
   const [toDate, setToDate] = useState(toDateInputValue(today));
-
   const [checking, setChecking] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dashboard, setDashboard] = useState<AnalyticsDashboard | null>(null);
@@ -61,189 +60,85 @@ export default function AdminAnalyticsPage() {
   const loadAnalytics = async () => {
     setLoading(true);
     setError(null);
-
     const { from, to } = rangeToIso(fromDate, toDate);
-    const response = await fetch(`/api/admin/analytics?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, {
-      cache: 'no-store',
-    });
-
+    const response = await fetch(`/api/admin/analytics?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, { cache: 'no-store' });
     const data = (await response.json().catch(() => null)) as AnalyticsDashboard | { message?: string } | null;
-
     if (!response.ok) {
       setError((data as { message?: string } | null)?.message ?? 'Gagal memuat analytics.');
       setLoading(false);
       return;
     }
-
     setDashboard(data as AnalyticsDashboard);
     setLoading(false);
   };
 
-  useEffect(() => {
-    void loadSession();
-  }, []);
-
-  useEffect(() => {
-    if (!authenticated) return;
-    void loadAnalytics();
-  }, [authenticated]);
+  useEffect(() => { void loadSession(); }, []);
+  useEffect(() => { if (authenticated) void loadAnalytics(); }, [authenticated]);
 
   const totals = useMemo(() => {
     const metrics = dashboard?.dailyMetrics ?? [];
     return metrics.reduce(
-      (acc, item) => {
-        acc.pageView += item.page_view;
-        acc.ctaClick += item.cta_click;
-        acc.loginSuccess += item.login_success;
-        acc.projectCreated += item.project_created;
-        acc.generationCompleted += item.generation_completed;
-        acc.paymentSuccess += item.payment_success;
-        return acc;
-      },
-      {
-        pageView: 0,
-        ctaClick: 0,
-        loginSuccess: 0,
-        projectCreated: 0,
-        generationCompleted: 0,
-        paymentSuccess: 0,
-      },
+      (acc, item) => ({
+        pageView: acc.pageView + item.page_view,
+        projectCreated: acc.projectCreated + item.project_created,
+        paymentSuccess: acc.paymentSuccess + item.payment_success,
+      }),
+      { pageView: 0, projectCreated: 0, paymentSuccess: 0 },
     );
   }, [dashboard]);
 
-  if (checking) {
-    return <main className="mx-auto max-w-5xl px-4 py-10 text-sm text-slate-600">Memuat halaman analytics...</main>;
-  }
-
-  if (!authenticated) {
-    return (
-      <main className="mx-auto max-w-2xl px-4 py-10">
-        <section className="material-surface p-6">
-          <h1 className="text-xl font-bold text-slate-900">Session Admin Diperlukan</h1>
-          <p className="mt-2 text-sm text-slate-600">Silakan login lewat halaman admin dulu, lalu kembali ke analytics.</p>
-          <Link href="/admin" className="mt-4 inline-flex rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)]">
-            Ke Admin Login
-          </Link>
-        </section>
-      </main>
-    );
-  }
+  if (checking) return <main className="px-4 py-10 text-sm text-slate-600">Memuat halaman analytics...</main>;
+  if (!authenticated) return <main className="px-4 py-10 text-sm text-rose-700">Session admin diperlukan. Login dulu di /admin.</main>;
 
   return (
-    <main className="material-page mx-auto max-w-6xl space-y-6 px-4 py-10">
-      <section className="flex flex-wrap items-center justify-between gap-3 material-surface p-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Admin Analytics</h1>
-          <p className="text-sm text-slate-600">Lihat ringkasan metrics harian dan funnel konversi event.</p>
-        </div>
-        <Link href="/admin" className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
-          Kembali ke Admin
-        </Link>
-      </section>
-
-      <section className="material-surface p-6">
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="text-sm text-slate-700">
-            Dari
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(event) => setFromDate(event.target.value)}
-              className="mt-1 block rounded-lg border border-slate-300 px-3 py-2"
-            />
-          </label>
-          <label className="text-sm text-slate-700">
-            Sampai
-            <input
-              type="date"
-              value={toDate}
-              onChange={(event) => setToDate(event.target.value)}
-              className="mt-1 block rounded-lg border border-slate-300 px-3 py-2"
-            />
-          </label>
-          <button onClick={loadAnalytics} disabled={loading} className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)] disabled:opacity-60">
-            {loading ? 'Memuat...' : 'Refresh Analytics'}
-          </button>
-        </div>
-        {error && <p className="mt-3 rounded-lg bg-rose-50 p-2 text-sm text-rose-700">{error}</p>}
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <article className="material-surface p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Total Users</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{dashboard?.totalUsers ?? 0}</p>
-        </article>
-        <article className="material-surface p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Page View</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{totals.pageView}</p>
-        </article>
-        <article className="material-surface p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Project Created</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{totals.projectCreated}</p>
-        </article>
-        <article className="material-surface p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Payment Success</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{totals.paymentSuccess}</p>
-        </article>
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-2">
-        <section className="material-surface p-6">
-          <h2 className="text-lg font-semibold text-slate-900">Funnel</h2>
-          <div className="mt-3 overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="text-left text-slate-500">
-                  <th className="py-2">Step</th>
-                  <th className="py-2">Users</th>
-                  <th className="py-2">Conversion</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(dashboard?.funnel ?? []).map((item) => (
-                  <tr key={item.step} className="border-t border-slate-100">
-                    <td className="py-2 font-medium text-slate-800">{item.step}</td>
-                    <td className="py-2 text-slate-700">{item.users}</td>
-                    <td className="py-2 text-slate-700">{formatPercent(item.conversion_from_prev)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <DashboardLayout userId="admin" mode="admin">
+      <section className="space-y-4">
+        <article className="rounded-3xl bg-white p-6 shadow-[0_4px_16px_rgba(15,23,42,0.1)]">
+          <h1 className="text-2xl font-semibold">Admin Analytics</h1>
+          <p className="text-sm text-slate-600">Ringkasan metrik harian dan funnel konversi.</p>
+          <div className="mt-4 flex flex-wrap items-end gap-2">
+            <label className="text-sm">Dari<input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="ml-2 rounded-xl bg-slate-100 px-3 py-2" /></label>
+            <label className="text-sm">Sampai<input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="ml-2 rounded-xl bg-slate-100 px-3 py-2" /></label>
+            <button onClick={loadAnalytics} disabled={loading} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">{loading ? 'Memuat...' : 'Refresh'}</button>
           </div>
+          {error && <p className="mt-2 text-sm text-rose-700">{error}</p>}
+        </article>
+
+        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <article className="rounded-2xl bg-white p-4 shadow-[0_3px_12px_rgba(15,23,42,0.1)]"><p className="text-xs text-slate-500">Total Users</p><p className="text-2xl font-semibold">{dashboard?.totalUsers ?? 0}</p></article>
+          <article className="rounded-2xl bg-white p-4 shadow-[0_3px_12px_rgba(15,23,42,0.1)]"><p className="text-xs text-slate-500">Page View</p><p className="text-2xl font-semibold">{totals.pageView}</p></article>
+          <article className="rounded-2xl bg-white p-4 shadow-[0_3px_12px_rgba(15,23,42,0.1)]"><p className="text-xs text-slate-500">Projects</p><p className="text-2xl font-semibold">{totals.projectCreated}</p></article>
+          <article className="rounded-2xl bg-white p-4 shadow-[0_3px_12px_rgba(15,23,42,0.1)]"><p className="text-xs text-slate-500">Payments</p><p className="text-2xl font-semibold">{totals.paymentSuccess}</p></article>
         </section>
 
-        <section className="material-surface p-6">
-          <h2 className="text-lg font-semibold text-slate-900">Daily Metrics</h2>
-          <div className="mt-3 max-h-[420px] overflow-auto">
-            <table className="min-w-full text-sm">
-              <thead className="sticky top-0 bg-white">
-                <tr className="text-left text-slate-500">
-                  <th className="py-2 pr-2">Tanggal</th>
-                  <th className="py-2 pr-2">PV</th>
-                  <th className="py-2 pr-2">CTA</th>
-                  <th className="py-2 pr-2">Login</th>
-                  <th className="py-2 pr-2">Project</th>
-                  <th className="py-2 pr-2">Generate</th>
-                  <th className="py-2">Paid</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(dashboard?.dailyMetrics ?? []).map((item) => (
-                  <tr key={item.metric_date} className="border-t border-slate-100">
-                    <td className="py-2 pr-2 text-slate-800">{item.metric_date.slice(0, 10)}</td>
-                    <td className="py-2 pr-2 text-slate-700">{item.page_view}</td>
-                    <td className="py-2 pr-2 text-slate-700">{item.cta_click}</td>
-                    <td className="py-2 pr-2 text-slate-700">{item.login_success}</td>
-                    <td className="py-2 pr-2 text-slate-700">{item.project_created}</td>
-                    <td className="py-2 pr-2 text-slate-700">{item.generation_completed}</td>
-                    <td className="py-2 text-slate-700">{item.payment_success}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <section className="grid gap-4 lg:grid-cols-2">
+          <article className="rounded-3xl bg-white p-6 shadow-[0_4px_16px_rgba(15,23,42,0.1)]">
+            <h2 className="text-lg font-semibold">Funnel</h2>
+            <div className="mt-3 space-y-2">
+              {(dashboard?.funnel ?? []).map((item) => (
+                <div key={item.step} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-sm">
+                  <span>{item.step}</span>
+                  <span>{item.users} ({formatPercent(item.conversion_from_prev)})</span>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className="rounded-3xl bg-white p-6 shadow-[0_4px_16px_rgba(15,23,42,0.1)]">
+            <h2 className="text-lg font-semibold">Daily metrics</h2>
+            <div className="mt-3 max-h-[420px] overflow-auto">
+              <table className="min-w-full text-sm">
+                <thead className="sticky top-0 bg-white text-slate-500"><tr><th className="py-2 text-left">Date</th><th className="py-2 text-left">PV</th><th className="py-2 text-left">CTA</th><th className="py-2 text-left">Project</th><th className="py-2 text-left">Paid</th></tr></thead>
+                <tbody>
+                  {(dashboard?.dailyMetrics ?? []).map((item) => (
+                    <tr key={item.metric_date} className="border-t border-slate-100"><td className="py-2">{item.metric_date.slice(0,10)}</td><td>{item.page_view}</td><td>{item.cta_click}</td><td>{item.project_created}</td><td>{item.payment_success}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </article>
         </section>
       </section>
-    </main>
+    </DashboardLayout>
   );
 }

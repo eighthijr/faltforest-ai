@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { AlertCircle } from 'lucide-react';
 import { listProjects } from '@/api/projects';
-import { supabase } from '@/lib/supabaseClient';
 import { WorkspaceChat } from '@/components/workspace';
+import { DashboardLayout } from '@/components/dashboard';
+import { useProtectedRoute } from '@/components/auth';
 import type { Project } from '@/types/project';
 
 function isProjectType(value: string | null): value is Project['type'] {
@@ -16,6 +18,7 @@ function isProjectStatus(value: string | null): value is Project['status'] {
 }
 
 export default function WorkspacePage() {
+  const { userId, loading: authLoading, error: authError } = useProtectedRoute('/');
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,28 +26,18 @@ export default function WorkspacePage() {
 
   useEffect(() => {
     const loadWorkspaceProject = async () => {
+      if (!userId) return;
+
       setLoading(true);
       setError(null);
-      const params = new URLSearchParams(window.location.search);
-      const searchProjectId = params.get('projectId');
-      const searchProjectType = params.get('projectType');
-      const searchProjectStatus = params.get('projectStatus');
-
-      const { data, error: userError } = await supabase.auth.getUser();
-      if (userError) {
-        setError(userError.message);
-        setLoading(false);
-        return;
-      }
-
-      const userId = data.user?.id;
-      if (!userId) {
-        window.location.replace('/');
-        return;
-      }
 
       try {
+        const params = new URLSearchParams(window.location.search);
+        const searchProjectId = params.get('projectId');
+        const searchProjectType = params.get('projectType');
+        const searchProjectStatus = params.get('projectStatus');
         const userProjects = await listProjects(userId);
+
         const preferredProject = searchProjectId
           ? userProjects.find((project) => project.id === searchProjectId) ?? null
           : null;
@@ -62,6 +55,11 @@ export default function WorkspacePage() {
             : null;
 
         const resolvedProject = preferredProject ?? userProjects[0] ?? fallbackProject;
+
+        if (searchProjectId && !preferredProject) {
+          setError('Project tidak ditemukan atau kamu tidak punya akses.');
+        }
+
         setProjects(userProjects);
         setSelectedProject(resolvedProject);
       } catch (loadError) {
@@ -72,45 +70,49 @@ export default function WorkspacePage() {
     };
 
     void loadWorkspaceProject();
-  }, []);
+  }, [userId]);
 
-  if (loading) {
-    return <p className="material-page p-4 text-sm text-slate-600">Memuat workspace...</p>;
+  if (authLoading || loading) {
+    return <p className="material-page p-6 text-sm text-slate-600">Checking workspace access...</p>;
   }
 
-  if (error) {
-    return <p className="material-page p-4 text-sm text-rose-700">Gagal memuat workspace: {error}</p>;
+  if (authError || !userId) {
+    return <p className="material-page p-6 text-sm text-rose-700">{authError ?? 'Session tidak ditemukan.'}</p>;
   }
 
   if (!selectedProject) {
     return (
-      <section className="material-surface mx-auto mt-6 w-full max-w-3xl p-6">
-        <h1 className="text-xl font-bold text-slate-900">Belum ada project</h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Supaya bisa pakai workspace, buat project dulu dari dashboard.
-        </p>
-        <Link href="/dashboard" className="mt-4 inline-flex rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">
-          Buka Dashboard
-        </Link>
-      </section>
+      <DashboardLayout userId={userId}>
+        <section className="rounded-3xl bg-white p-6 shadow-[0_3px_12px_rgba(15,23,42,0.1)]">
+          <h1 className="text-xl font-semibold text-slate-900">Workspace unavailable</h1>
+          <p className="mt-2 text-sm text-slate-600">Buat project dulu dari dashboard untuk membuka chatroom AI.</p>
+          <Link href="/dashboard" className="mt-4 inline-flex rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">
+            Open Dashboard
+          </Link>
+        </section>
+      </DashboardLayout>
     );
   }
 
   return (
-    <WorkspaceChat
-      projectId={selectedProject.id}
-      projectType={selectedProject.type}
-      initialState={selectedProject.status}
-      initialGeneratedCopy={selectedProject.generated_html}
-      projectCount={projects.length}
-      onUpgradeClick={(reason) => {
-        const params = new URLSearchParams({
-          source: 'workspace',
-          reason,
-          projectId: selectedProject.id,
-        });
-        window.location.href = `/pricing?${params.toString()}`;
-      }}
-    />
+    <DashboardLayout userId={userId}>
+      {error && (
+        <p className="mb-4 inline-flex items-center gap-2 rounded-2xl bg-amber-50 px-4 py-2 text-sm text-amber-700">
+          <AlertCircle className="h-4 w-4" />
+          {error}
+        </p>
+      )}
+      <WorkspaceChat
+        projectId={selectedProject.id}
+        projectType={selectedProject.type}
+        initialState={selectedProject.status}
+        initialGeneratedCopy={selectedProject.generated_html}
+        projectCount={projects.length}
+        onUpgradeClick={(reason) => {
+          const params = new URLSearchParams({ source: 'workspace', reason, projectId: selectedProject.id });
+          window.location.href = `/pricing?${params.toString()}`;
+        }}
+      />
+    </DashboardLayout>
   );
 }
