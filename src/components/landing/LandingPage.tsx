@@ -73,7 +73,7 @@ export function LandingPage() {
         </section>
 
         <section className={`mt-6 ${cardClass}`}>
-          <h2 className="text-2xl font-bold">Why teams use Faltforest</h2>
+          <h2 className="text-2xl font-bold">Why teams use FLATFOREST</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {landingCopy.solution.points.map((point) => (
               <article key={point} className="rounded-2xl bg-slate-50 p-4">

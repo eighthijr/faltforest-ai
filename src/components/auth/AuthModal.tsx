@@ -149,7 +149,7 @@ export function AuthModal({
 
   return (
     <div
-      className={`fixed inset-0 z-[999] grid place-items-center bg-slate-900/50 p-4 transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`}
+      className={`fixed inset-0 z-[999] grid place-items-center bg-slate-900/55 p-4 backdrop-blur-[2px] transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`}
       role="dialog"
       aria-modal="true"
       aria-label="Modal autentikasi"
@@ -163,7 +163,7 @@ export function AuthModal({
       ) : (
       <div
         ref={modalRef}
-        className={`relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl transition-transform duration-200 ${closing ? 'scale-95' : 'scale-100'}`}
+        className={`animate-modal-in relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl transition-transform duration-200 ${closing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}
       >
         <button
           className="absolute right-3 top-3 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800"

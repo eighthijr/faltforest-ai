@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useReducer, useState } from 'react';
 import { confirmManualAlreadyPaid, fetchManualQrisImageUrl, listPaymentHistory, submitManualPaymentProof } from '@/api/payments';
-import { generateCopyOnce, saveAnswersDraft } from '../../api/workspace';
+import { generateCopyOnce, generateRevisionCopy, saveAnswersDraft } from '../../api/workspace';
 import { useToast } from '../ui';
 import type { ProjectType } from '../../types/project';
 import type { QuestionKey, WorkspaceAnswers, WorkspaceContext, WorkspaceMessage } from '../../types/workspace';
@@ -126,6 +126,7 @@ function WorkspaceChatContent({
   const [paymentReference, setPaymentReference] = useState('');
   const [qrisImageUrl, setQrisImageUrl] = useState('');
   const [hydrated, setHydrated] = useState(false);
+  const [generatingSeconds, setGeneratingSeconds] = useState(0);
   const [state, dispatch] = useReducer(reducer, {
     projectId,
     projectType,
@@ -282,6 +283,21 @@ function WorkspaceChatContent({
     };
   }, [manualPaymentStatus, openSuccess, paymentReference, premiumUnlocked, pushToast]);
 
+  useEffect(() => {
+    if (!state.loading) {
+      setGeneratingSeconds(0);
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setGeneratingSeconds((prev) => prev + 1);
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [state.loading]);
+
   const missingFields = useMemo(() => getMissingFields(state), [state]);
   const nextQuestionKey = missingFields[0] as QuestionKey | undefined;
   const nextQuestion = nextQuestionKey ? questionLabels[nextQuestionKey] : null;
@@ -377,15 +393,57 @@ function WorkspaceChatContent({
     }
 
     if (state.state === 'generated') {
-      dispatch({
-        type: 'ADD_MESSAGE',
-        value: {
-          id: uid(),
-          role: 'system',
-          content:
-            'Revisi kamu sudah dicatat ✅ Untuk versi ini, AI chat lanjutan masih dalam peningkatan. Kamu bisa preview/download hasil terbaru yang sudah tergenerate.',
-        },
-      });
+      if (!premiumUnlocked) {
+        openUpgrade('chat_after_generated');
+        return;
+      }
+
+      void (async () => {
+        try {
+          dispatch({ type: 'SET_LOADING', value: true });
+          dispatch({
+            type: 'ADD_MESSAGE',
+            value: {
+              id: uid(),
+              role: 'system',
+              content: 'Permintaan revisi diterima. AI sedang menyusun versi terbaru...',
+            },
+          });
+
+          const revisedCopy = await generateRevisionCopy({
+            projectId: state.projectId,
+            answers: {
+              ...state.answers,
+              benefit: `${state.answers.benefit}\nRevisi user premium: ${trimmed}`,
+            },
+          });
+
+          dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_SUCCEEDED', copy: revisedCopy } });
+          dispatch({
+            type: 'ADD_MESSAGE',
+            value: {
+              id: uid(),
+              role: 'system',
+              content: 'Revisi premium selesai ✅ Preview sudah diperbarui dengan versi terbaru.',
+              cta: { label: 'Preview Result', action: 'preview' },
+            },
+          });
+          pushToast({ type: 'success', title: 'Revisi selesai', description: 'Versi landing page terbaru siap dipreview.' });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Gagal memproses revisi premium.';
+          dispatch({
+            type: 'ADD_MESSAGE',
+            value: {
+              id: uid(),
+              role: 'system',
+              content: `Revisi gagal diproses. ${errorMessage}`,
+            },
+          });
+          pushToast({ type: 'error', title: 'Revisi gagal', description: errorMessage });
+        } finally {
+          dispatch({ type: 'SET_LOADING', value: false });
+        }
+      })();
       setInput('');
       return;
     }
@@ -425,6 +483,8 @@ function WorkspaceChatContent({
   const helperText =
     state.state === 'draft' && nextQuestion
       ? `Pertanyaan berikutnya: ${nextQuestion}`
+      : state.state === 'generated' && !premiumUnlocked
+        ? 'Mode revisi dan chat lanjutan dikunci untuk user free. Upgrade premium untuk membuka fitur ini.'
       : projectCount > 1
         ? `Kamu punya ${projectCount} project. Pindah project bisa dilakukan dari Dashboard.`
         : null;
@@ -447,6 +507,7 @@ function WorkspaceChatContent({
             helperText={helperText}
             progressLabel={progressLabel}
             isGenerating={state.loading}
+            generatingSeconds={generatingSeconds}
             onMessageAction={(action) => {
               if (action === 'preview') openPreview();
             }}
@@ -459,7 +520,16 @@ function WorkspaceChatContent({
             onSubmit={submitAnswer}
             disabled={state.loading}
             loading={state.loading}
-            placeholder="Type your prompt or answer..."
+            locked={state.state === 'generated' && !premiumUnlocked}
+            waitingConfirmation={manualPaymentStatus === 'waiting_admin'}
+            onLockedClick={() => openUpgrade('chat_after_generated')}
+            placeholder={
+              state.state === 'generated' && !premiumUnlocked
+                ? 'Upgrade premium untuk chat revisi'
+                : manualPaymentStatus === 'waiting_admin'
+                  ? 'Menunggu konfirmasi pembayaran premium...'
+                  : 'Type your prompt or answer...'
+            }
           />
         }
       />
@@ -470,6 +540,7 @@ function WorkspaceChatContent({
         onClose={closeModal}
         onDownload={handleDownload}
         downloadDisabled={manualPaymentStatus === 'waiting_admin'}
+        downloadLocked={state.projectType === 'free' && !premiumUnlocked}
       />
 
       <UpgradeModal

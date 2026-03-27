@@ -1,6 +1,6 @@
 export const landingCopy = {
   navbar: {
-    logo: 'Flatforest AI',
+    logo: 'FLATFOREST AI',
     menu: [
       { label: 'How it works', href: '#how-it-works' },
       { label: 'Pricing', href: '#pricing' },
@@ -27,9 +27,9 @@ export const landingCopy = {
     emotion: 'Kalau halaman jualan nggak “ngomong” dengan jelas, calon pembeli gampang skip.',
   },
   solution: {
-    title: 'Flatforest AI bantu kamu bikin halaman yang lebih “jualan”',
+    title: 'FLATFOREST AI bantu kamu bikin halaman yang lebih “jualan”',
     body:
-      'Flatforest AI nyusun isi landing page yang fokus ke hal paling penting: bikin orang paham, percaya, lalu beli.',
+      'FLATFOREST AI nyusun isi landing page yang fokus ke hal paling penting: bikin orang paham, percaya, lalu beli.',
     points: [
       'Judul yang langsung nangkep perhatian.',
       'Kalimat manfaat produk yang gampang dipahami.',
@@ -53,7 +53,7 @@ export const landingCopy = {
     cta: 'Lihat contoh hasilnya',
   },
   benefits: {
-    title: 'Kenapa seller suka pakai Flatforest AI?',
+    title: 'Kenapa seller suka pakai FLATFOREST AI?',
     items: [
       'Bikin landing page jauh lebih cepat.',
       'Nggak perlu mikir dari nol.',
@@ -105,7 +105,7 @@ export const landingCopy = {
     note: 'Gratis mulai • Tanpa coding • Bisa langsung dipakai',
   },
   footer: {
-    brand: 'Flatforest AI',
+    brand: 'FLATFOREST AI',
     tagline: 'Landing page pintar buat bantu jualan lebih lancar.',
     productLinks: [
       { label: 'How it works', href: '#how-it-works' },

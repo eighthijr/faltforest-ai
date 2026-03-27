@@ -32,7 +32,7 @@ export function DashboardSidebar({
   isOpen,
   onClose,
   navItems,
-  title = 'Faltforest AI',
+  title = 'FLATFOREST AI',
   subtitle = 'Workspace',
   profileLabel,
   profileSubLabel,
@@ -81,6 +81,7 @@ export function DashboardSidebar({
                 <ArrowLeft className="h-4 w-4" />
                 Menu utama
               </Link>
+              <p className="px-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">List Project</p>
 
               <div className="space-y-1.5">
                 {workspaceProjects.map((project) => (

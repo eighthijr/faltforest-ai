@@ -7,10 +7,11 @@ type ChatBodyProps = {
   helperText?: string | null;
   progressLabel?: string | null;
   isGenerating?: boolean;
+  generatingSeconds?: number;
   onMessageAction?: (action: NonNullable<WorkspaceMessage['cta']>['action']) => void;
 };
 
-export function ChatBody({ messages, helperText, progressLabel, isGenerating = false, onMessageAction }: ChatBodyProps) {
+export function ChatBody({ messages, helperText, progressLabel, isGenerating = false, generatingSeconds = 0, onMessageAction }: ChatBodyProps) {
   const showOnboarding = messages.length <= 1;
 
   return (
@@ -35,8 +36,13 @@ export function ChatBody({ messages, helperText, progressLabel, isGenerating = f
         ))}
 
         {isGenerating ? (
-          <p className="inline-flex items-center gap-2 self-start rounded-2xl bg-white px-3 py-2 text-xs text-slate-600 shadow-[0_1px_4px_rgba(15,23,42,0.12)]">
+          <p className="inline-flex animate-pulse items-center gap-2 self-start rounded-2xl bg-white px-3 py-2 text-xs text-slate-600 shadow-[0_1px_4px_rgba(15,23,42,0.12)]">
             <Bot className="h-4 w-4" />AI is thinking...
+          </p>
+        ) : null}
+        {isGenerating ? (
+          <p className="self-start rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-700">
+            Generating landing page • {Math.max(0, generatingSeconds)}s
           </p>
         ) : null}
 

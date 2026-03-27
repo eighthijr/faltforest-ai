@@ -355,7 +355,7 @@ function PricingPageContent() {
                 {MANUAL_QRIS_IMAGE_URL ? (
                   <Image
                     src={MANUAL_QRIS_IMAGE_URL}
-                    alt="QRIS Manual Faltforest AI"
+                    alt="QRIS Manual FLATFOREST AI"
                     width={280}
                     height={280}
                     className="rounded-lg border border-slate-200"

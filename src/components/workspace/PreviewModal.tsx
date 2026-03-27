@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react';
+import { Download, Lock } from 'lucide-react';
 import { ModalShell } from './ModalShell';
 
 type PreviewModalProps = {
@@ -7,9 +7,10 @@ type PreviewModalProps = {
   onClose: () => void;
   onDownload: () => void;
   downloadDisabled?: boolean;
+  downloadLocked?: boolean;
 };
 
-export function PreviewModal({ open, html, onClose, onDownload, downloadDisabled = false }: PreviewModalProps) {
+export function PreviewModal({ open, html, onClose, onDownload, downloadDisabled = false, downloadLocked = false }: PreviewModalProps) {
   return (
     <ModalShell open={open} onClose={onClose} title="Landing page preview" size="xl">
       <div className="-m-6 flex h-full max-h-[94vh] min-h-[78vh] flex-col overflow-hidden rounded-3xl bg-white">
@@ -24,7 +25,18 @@ export function PreviewModal({ open, html, onClose, onDownload, downloadDisabled
         </div>
 
         <div className="min-h-0 flex-1 bg-slate-100 p-2 md:p-3">
-          <iframe title="Generated landing page preview" srcDoc={html ?? ''} className="h-full w-full rounded-2xl border border-slate-200 bg-white" />
+          {html ? (
+            <iframe
+              title="Generated landing page preview"
+              srcDoc={html}
+              sandbox="allow-same-origin"
+              className="h-full w-full rounded-2xl border border-slate-200 bg-white"
+            />
+          ) : (
+            <div className="flex h-full min-h-[360px] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500">
+              Preview belum tersedia. Selesaikan generate dulu untuk melihat hasil landing page.
+            </div>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-200 px-6 py-4">
@@ -41,8 +53,8 @@ export function PreviewModal({ open, html, onClose, onDownload, downloadDisabled
             disabled={downloadDisabled}
             className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Download className="size-4" />
-            {downloadDisabled ? 'Menunggu approval admin' : 'Download'}
+            {downloadLocked ? <Lock className="size-4" /> : <Download className="size-4" />}
+            {downloadDisabled ? 'Menunggu approval admin' : downloadLocked ? 'Upgrade untuk download' : 'Download'}
           </button>
         </div>
       </div>

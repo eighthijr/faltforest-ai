@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
 import { listProjects } from '@/api/projects';
 import { WorkspaceChat } from '@/components/workspace';
@@ -18,6 +19,8 @@ function isProjectStatus(value: string | null): value is Project['status'] {
 }
 
 export default function WorkspacePage() {
+  const searchParams = useSearchParams();
+  const searchKey = searchParams.toString();
   const { userId, email, loading: authLoading, error: authError } = useProtectedRoute('/');
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -32,10 +35,9 @@ export default function WorkspacePage() {
       setError(null);
 
       try {
-        const params = new URLSearchParams(window.location.search);
-        const searchProjectId = params.get('projectId');
-        const searchProjectType = params.get('projectType');
-        const searchProjectStatus = params.get('projectStatus');
+        const searchProjectId = searchParams.get('projectId');
+        const searchProjectType = searchParams.get('projectType');
+        const searchProjectStatus = searchParams.get('projectStatus');
         const userProjects = await listProjects(userId);
 
         const preferredProject = searchProjectId
@@ -70,7 +72,7 @@ export default function WorkspacePage() {
     };
 
     void loadWorkspaceProject();
-  }, [userId]);
+  }, [searchKey, userId]);
 
   if (authLoading || loading) {
     return <p className="material-page p-6 text-sm text-slate-600">Checking workspace access...</p>;
