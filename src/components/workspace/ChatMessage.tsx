@@ -14,17 +14,17 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const blocks = parseBlocks(message.content);
 
   return (
-    <article className={`flex w-full gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <article className={`animate-chat-message flex w-full gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
-        <span className="mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">
+        <span className="mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
           <Bot className="size-4" />
         </span>
       )}
       <div
-        className={`max-w-[70%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-[0_1px_2px_rgba(15,23,42,0.05)] ${
+        className={`max-w-[82%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-[0_1px_2px_rgba(15,23,42,0.05)] ${
           isUser
             ? 'bg-indigo-600 text-white'
-            : 'border border-slate-200/80 bg-slate-50 text-slate-700'
+            : 'bg-slate-100 text-slate-800'
         }`}
       >
         {blocks.map((block, index) => {
@@ -48,7 +48,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         })}
       </div>
       {isUser && (
-        <span className="mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-700">
+        <span className="mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-white shadow-sm">
           <UserCircle2 className="size-4" />
         </span>
       )}

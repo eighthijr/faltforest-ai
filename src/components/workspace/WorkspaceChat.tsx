@@ -59,7 +59,8 @@ const emptyAnswers: WorkspaceAnswers = {
 const initialGreeting = (): WorkspaceMessage => ({
   id: uid(),
   role: 'system',
-  content: 'Halo! Saya akan tanya 4 hal dulu untuk membuat landing page siap pakai buat jualanmu.',
+  content:
+    'Halo! 👋 Saya siap bantu kamu bikin landing page. Jawab singkat 4 hal utama, lalu klik Generate untuk hasil pertama.',
 });
 
 function reducer(state: LocalState, action: LocalAction): LocalState {
@@ -173,23 +174,41 @@ export function WorkspaceChat({
   const missingFields = useMemo(() => getMissingFields(state), [state]);
   const nextQuestionKey = missingFields[0] as QuestionKey | undefined;
   const nextQuestion = nextQuestionKey ? questionLabels[nextQuestionKey] : null;
+  const quickReplies = useMemo(() => {
+    if (state.state === 'draft') {
+      const templates: Record<QuestionKey, string> = {
+        product: 'Produk saya adalah ...',
+        target: 'Target market saya ...',
+        benefit: 'Benefit utamanya ...',
+        images: 'Aset gambar yang tersedia ...',
+      };
 
-  const submitAnswer = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!input.trim()) return;
+      return missingFields.slice(0, 3).map((field) => templates[field]);
+    }
+
+    if (state.state === 'generated') {
+      return ['Tolong perbaiki headline', 'Bikin versi lebih santai', 'Tambahkan CTA lebih kuat'];
+    }
+
+    return [];
+  }, [missingFields, state.state]);
+
+  const submitText = (rawValue: string) => {
+    const trimmed = rawValue.trim();
+    if (!trimmed) return;
 
     if (state.state === 'generated' && state.projectType === 'free') {
       dispatch({ type: 'SET_PAYWALL', value: 'chat_after_generated' });
       return;
     }
 
-    dispatch({ type: 'ADD_MESSAGE', value: { id: uid(), role: 'user', content: input.trim() } });
+    dispatch({ type: 'ADD_MESSAGE', value: { id: uid(), role: 'user', content: trimmed } });
 
     if (state.state === 'draft') {
       const key = nextQuestionKey;
       if (!key) return;
 
-      dispatch({ type: 'APPLY_EVENT', event: { type: 'ANSWER_SUBMITTED', key, value: input.trim() } });
+      dispatch({ type: 'APPLY_EVENT', event: { type: 'ANSWER_SUBMITTED', key, value: trimmed } });
 
       const currentMissing = questionOrder.filter((question) => {
         if (question === key) return false;
@@ -205,6 +224,11 @@ export function WorkspaceChat({
     }
 
     setInput('');
+  };
+
+  const submitAnswer = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    submitText(input);
   };
 
   const handleGenerate = async () => {
@@ -293,6 +317,11 @@ export function WorkspaceChat({
             value={input}
             onChange={setInput}
             onSubmit={submitAnswer}
+            onQuickReply={(value) => {
+              setInput(value);
+              submitText(value);
+            }}
+            quickReplies={quickReplies}
             disabled={state.loading}
             placeholder="Ketik jawaban kamu..."
           />
