@@ -115,3 +115,20 @@ export function SendHorizonal(props: IconProps) {
     </BaseIcon>
   );
 }
+
+export function ArrowLeft(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M19 12H5" />
+      <path d="m12 19-7-7 7-7" />
+    </BaseIcon>
+  );
+}
+
+export function ChevronRight(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="m9 6 6 6-6 6" />
+    </BaseIcon>
+  );
+}

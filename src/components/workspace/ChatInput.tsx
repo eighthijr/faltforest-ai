@@ -19,7 +19,7 @@ export function ChatInput({ value, disabled = false, placeholder, onChange, onSu
   };
 
   return (
-    <footer className="sticky bottom-0 border-t border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur md:px-6 md:py-4">
+    <footer className="shrink-0 border-t border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur md:px-6 md:py-4">
       <form onSubmit={onSubmit} className="mx-auto flex w-full max-w-5xl items-end gap-2 md:gap-3">
         <button
           type="button"
