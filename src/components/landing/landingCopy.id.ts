@@ -3,7 +3,7 @@ export const landingCopy = {
     logo: 'Flatforest AI',
     menu: [
       { label: 'How it works', href: '#how-it-works' },
-      { label: 'Pricing', href: '/pricing' },
+      { label: 'Pricing', href: '#pricing' },
     ],
     login: 'Login',
     cta: 'Coba Gratis',
@@ -109,7 +109,7 @@ export const landingCopy = {
     tagline: 'Landing page pintar buat bantu jualan lebih lancar.',
     productLinks: [
       { label: 'How it works', href: '#how-it-works' },
-      { label: 'Pricing', href: '/pricing' },
+      { label: 'Pricing', href: '#pricing' },
       { label: 'Login', href: '#login' },
     ],
     support: 'support@flatforest.ai',

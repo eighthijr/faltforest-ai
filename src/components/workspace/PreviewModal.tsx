@@ -1,4 +1,5 @@
 import { Download } from 'lucide-react';
+import { ModalShell } from './ModalShell';
 
 type PreviewModalProps = {
   open: boolean;
@@ -8,11 +9,9 @@ type PreviewModalProps = {
 };
 
 export function PreviewModal({ open, html, onClose, onDownload }: PreviewModalProps) {
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 px-3 py-6 backdrop-blur-sm md:px-6" role="dialog" aria-modal="true">
-      <div className="animate-modal-in flex h-full max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl bg-white p-0 shadow-2xl">
+    <ModalShell open={open} onClose={onClose} title="Landing page preview" size="xl">
+      <div className="-m-6 flex h-full max-h-[92vh] min-h-[70vh] flex-col overflow-hidden rounded-3xl bg-white">
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div>
             <p className="text-base font-semibold text-slate-900">Landing page preview</p>
@@ -45,6 +44,6 @@ export function PreviewModal({ open, html, onClose, onDownload }: PreviewModalPr
           </button>
         </div>
       </div>
-    </div>
+    </ModalShell>
   );
 }
