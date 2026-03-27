@@ -63,6 +63,8 @@ type ProjectDashboardProps = {
   onUpgradeClick?: (projectId?: string) => void;
 };
 
+const navItems = ['Overview', 'Deployments', 'Logs', 'Analytics', 'Domains'];
+
 export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
   const router = useRouter();
@@ -132,145 +134,173 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
   };
 
   return (
-    <section className="mx-auto w-full max-w-5xl p-4 md:p-6">
-      <header className="material-surface mb-6 flex flex-col gap-3 p-5 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Dashboard Project</h1>
-          <p className="text-slate-600">Kelola semua project kamu di satu tempat, lalu lanjutkan kerja di workspace.</p>
-          <p className="mt-1 text-xs text-slate-500">Alur cepat: Buat project → Otomatis masuk Workspace → Generate Copy.</p>
-          <p className="mt-2 text-xs font-medium text-slate-600">
-            Kuota FREE: {freeProjectCount}/1 terpakai {hasFreeProject ? '• Upgrade untuk tambah project baru.' : '• Masih tersedia 1 project gratis.'}
-          </p>
-        </div>
+    <section className="material-dark-page mx-auto min-h-screen w-full max-w-[1440px] p-3 text-slate-100 md:p-6">
+      <div className="grid gap-4 xl:grid-cols-[260px_minmax(0,1fr)]">
+        <aside className="material-dark-surface hidden p-4 xl:block">
+          <div className="mb-5 flex items-center justify-between border-b border-slate-800 pb-4">
+            <div>
+              <p className="text-sm font-semibold">faltforest-ai</p>
+              <p className="text-xs text-slate-400">Hobby Workspace</p>
+            </div>
+            <span className="material-dark-chip">Live</span>
+          </div>
+          <div className="space-y-1">
+            {navItems.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={`w-full rounded-xl px-3 py-2 text-left text-sm transition ${
+                  item === 'Overview' ? 'bg-slate-800 font-semibold text-white' : 'text-slate-300 hover:bg-slate-900'
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </aside>
 
-        <div className="flex flex-wrap items-start gap-2 md:justify-end">
-          <button
-            type="button"
-            onClick={handleCreateProject}
-            disabled={state.creating}
-            className="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)] disabled:opacity-60"
-          >
-            {state.creating ? (
-              <span className="inline-flex items-center gap-2">
-                <Spinner className="text-white" />
-                Membuat...
-              </span>
-            ) : (
-              'Buat Project'
-            )}
-          </button>
-          {state.projects[0] && (
-            <Link
-              href={`/workspace?projectId=${state.projects[0].id}`}
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-700"
-            >
-              Lanjutkan Workspace
-            </Link>
-          )}
-          <LogoutButton />
-        </div>
-      </header>
-
-      {hasFreeProject && (
-        <p className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
-          Kamu sudah memakai project FREE. Untuk tambah project, silakan upgrade ke PREMIUM.
-        </p>
-      )}
-
-      {state.error && (
-        <p className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{state.error}</p>
-      )}
-
-      <div className="space-y-3 md:hidden">
-        {state.loading ? (
-          <p className="material-surface px-4 py-6 text-sm text-slate-500">Memuat project...</p>
-        ) : state.projects.length === 0 ? (
-          <p className="material-surface px-4 py-6 text-sm text-slate-500">
-            Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.
-          </p>
-        ) : (
-          state.projects.map((project) => (
-            <article key={project.id} className="material-surface p-4">
-              <p className="text-xs text-slate-500">Project ID</p>
-              <p className="mt-1 break-all font-mono text-xs text-slate-700">{project.id}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span
-                  className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    project.type === 'premium' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700'
-                  }`}
-                >
-                  {project.type === 'premium' ? 'PREMIUM' : 'FREE'}
-                </span>
-                <span className="text-xs capitalize text-slate-600">{project.status}</span>
-                <span className="text-xs text-slate-500">
-                  {new Date(project.created_at).toLocaleDateString('id-ID', {
-                    dateStyle: 'medium',
-                  })}
-                </span>
+        <div className="space-y-4">
+          <header className="material-dark-surface p-4 md:p-5">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+              <span>Dashboard</span>
+              <span>/</span>
+              <span className="text-slate-200">Overview</span>
+            </div>
+            <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight text-white">Production Dashboard</h1>
+                <p className="mt-1 text-sm text-slate-400">Layout baru mengikuti gaya panel modern dengan prinsip Material: hierarchy, spacing, dan focus action.</p>
+                <p className="mt-2 text-xs text-slate-500">Kuota FREE: {freeProjectCount}/1 · {hasFreeProject ? 'Upgrade untuk tambah project baru.' : 'Masih tersedia 1 project gratis.'}</p>
               </div>
-              <Link href={`/workspace?projectId=${project.id}`} className="mt-3 inline-flex text-sm font-semibold text-indigo-700 hover:underline">
-                Buka Workspace
-              </Link>
-            </article>
-          ))
-        )}
-      </div>
 
-      <div className="material-surface hidden overflow-x-auto md:block">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-slate-50 text-slate-500">
-            <tr>
-              <th className="px-4 py-3 font-semibold">Project ID</th>
-              <th className="px-4 py-3 font-semibold">Tipe</th>
-              <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">Dibuat</th>
-              <th className="px-4 py-3 font-semibold">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {state.loading ? (
-              <tr>
-                <td className="px-4 py-6 text-slate-500" colSpan={5}>
-                  Memuat project...
-                </td>
-              </tr>
-            ) : state.projects.length === 0 ? (
-              <tr>
-                <td className="px-4 py-6 text-slate-500" colSpan={5}>
-                  Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.
-                </td>
-              </tr>
-            ) : (
-              state.projects.map((project) => (
-                <tr key={project.id} className="border-t border-slate-200">
-                  <td className="px-4 py-3 font-mono text-xs text-slate-700">{project.id}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        project.type === 'premium'
-                          ? 'bg-indigo-100 text-indigo-700'
-                          : 'bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      {project.type === 'premium' ? 'PREMIUM' : 'FREE'}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleCreateProject}
+                  disabled={state.creating}
+                  className="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(79,70,229,0.35)] disabled:opacity-60"
+                >
+                  {state.creating ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Spinner className="text-white" />
+                      Membuat...
                     </span>
-                  </td>
-                  <td className="px-4 py-3 capitalize text-slate-700">{project.status}</td>
-                  <td className="px-4 py-3 text-slate-700">
-                    {new Date(project.created_at).toLocaleDateString('id-ID', {
-                      dateStyle: 'medium',
-                    })}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link href={`/workspace?projectId=${project.id}`} className="text-sm font-semibold text-indigo-700 hover:underline">
+                  ) : (
+                    'Buat Project'
+                  )}
+                </button>
+                {state.projects[0] && (
+                  <Link href={`/workspace?projectId=${state.projects[0].id}`} className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-200">
+                    Lanjutkan Workspace
+                  </Link>
+                )}
+                <LogoutButton />
+              </div>
+            </div>
+          </header>
+
+          {hasFreeProject && (
+            <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+              Kamu sudah memakai project FREE. Upgrade ke PREMIUM untuk menambah project baru.
+            </p>
+          )}
+
+          {state.error && <p className="rounded-xl border border-rose-500/40 bg-rose-500/10 p-3 text-sm text-rose-200">{state.error}</p>}
+
+          <article className="material-dark-surface overflow-hidden">
+            <div className="border-b border-slate-800 px-4 py-3">
+              <h2 className="font-medium text-slate-100">Project Workspace</h2>
+            </div>
+
+            <div className="space-y-3 p-4 md:hidden">
+              {state.loading ? (
+                <p className="rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-6 text-sm text-slate-400">Memuat project...</p>
+              ) : state.projects.length === 0 ? (
+                <p className="rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-6 text-sm text-slate-400">Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.</p>
+              ) : (
+                state.projects.map((project) => (
+                  <article key={project.id} className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
+                    <p className="text-[11px] uppercase tracking-wide text-slate-500">Project ID</p>
+                    <p className="mt-1 break-all font-mono text-xs text-slate-300">{project.id}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 font-semibold ${
+                          project.type === 'premium' ? 'bg-indigo-500/20 text-indigo-200' : 'bg-slate-700 text-slate-200'
+                        }`}
+                      >
+                        {project.type === 'premium' ? 'PREMIUM' : 'FREE'}
+                      </span>
+                      <span className="capitalize text-slate-400">{project.status}</span>
+                      <span className="text-slate-500">
+                        {new Date(project.created_at).toLocaleDateString('id-ID', {
+                          dateStyle: 'medium',
+                        })}
+                      </span>
+                    </div>
+                    <Link href={`/workspace?projectId=${project.id}`} className="mt-3 inline-flex text-sm font-semibold text-indigo-300 hover:text-indigo-200">
                       Buka Workspace
                     </Link>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                  </article>
+                ))
+              )}
+            </div>
+
+            <div className="hidden overflow-x-auto md:block">
+              <table className="min-w-full text-left text-sm text-slate-300">
+                <thead className="bg-slate-900/70 text-xs uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Project ID</th>
+                    <th className="px-4 py-3 font-medium">Tipe</th>
+                    <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-4 py-3 font-medium">Dibuat</th>
+                    <th className="px-4 py-3 font-medium">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {state.loading ? (
+                    <tr>
+                      <td className="px-4 py-6 text-slate-400" colSpan={5}>
+                        Memuat project...
+                      </td>
+                    </tr>
+                  ) : state.projects.length === 0 ? (
+                    <tr>
+                      <td className="px-4 py-6 text-slate-400" colSpan={5}>
+                        Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.
+                      </td>
+                    </tr>
+                  ) : (
+                    state.projects.map((project) => (
+                      <tr key={project.id} className="border-t border-slate-800/90">
+                        <td className="px-4 py-3 font-mono text-xs text-slate-300">{project.id}</td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+                              project.type === 'premium' ? 'bg-indigo-500/20 text-indigo-200' : 'bg-slate-700 text-slate-200'
+                            }`}
+                          >
+                            {project.type === 'premium' ? 'PREMIUM' : 'FREE'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 capitalize text-slate-300">{project.status}</td>
+                        <td className="px-4 py-3 text-slate-400">
+                          {new Date(project.created_at).toLocaleDateString('id-ID', {
+                            dateStyle: 'medium',
+                          })}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Link href={`/workspace?projectId=${project.id}`} className="text-sm font-semibold text-indigo-300 hover:text-indigo-200">
+                            Buka Workspace
+                          </Link>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </div>
       </div>
 
       <UpgradeModal
