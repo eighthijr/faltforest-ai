@@ -53,6 +53,8 @@ const emptyAnswers: WorkspaceAnswers = {
   images: '',
 };
 
+const quickNav = ['Overview', 'Messages', 'Preview', 'Deploy'];
+
 function reducer(state: LocalState, action: LocalAction): LocalState {
   switch (action.type) {
     case 'SET_LOADING':
@@ -258,126 +260,172 @@ export function WorkspaceChat({
   };
 
   return (
-    <section className="material-surface mx-auto flex w-full max-w-4xl flex-col gap-4 p-4 md:p-6">
-      <header className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-        <div>
-          <nav aria-label="Breadcrumb" className="mb-1 text-xs text-slate-500">
-            <Link href="/" className="hover:underline">
-              Landing
-            </Link>{' '}
-            /{' '}
-            <Link href="/dashboard" className="hover:underline">
-              Dashboard
-            </Link>{' '}
-            / <span className="font-semibold text-slate-700">Workspace</span>
-          </nav>
-          <h1 className="text-xl font-bold text-slate-900">Landing Page Builder</h1>
-          <p className="text-sm text-slate-600">
-            Status project: <strong>{state.state}</strong> · Project aktif: <span className="font-mono text-xs">{projectId}</span>
-          </p>
-          <div className="mt-2 max-w-md">
-            <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
-              <span>Progress brief</span>
-              <span>
-                {completedCount}/{questionOrder.length} ({progressPercent}%)
-              </span>
-            </div>
-            <div className="h-2 w-full rounded-full bg-slate-200">
-              <div className="h-2 rounded-full bg-indigo-600 transition-all" style={{ width: `${progressPercent}%` }} />
-            </div>
+    <section className="material-dark-page mx-auto min-h-screen w-full max-w-[1440px] p-3 text-slate-100 md:p-6">
+      <div className="grid gap-4 2xl:grid-cols-[260px_minmax(0,1fr)]">
+        <aside className="material-dark-surface hidden p-4 2xl:block">
+          <div className="mb-5 border-b border-slate-800 pb-4">
+            <p className="text-sm font-semibold text-white">Workspace</p>
+            <p className="text-xs text-slate-400">Project Builder</p>
           </div>
-          {projectCount > 1 && (
-            <p className="text-xs text-slate-500">
-              Punya {projectCount} project.{' '}
-              <Link href="/dashboard" className="font-semibold text-indigo-700 hover:underline">
-                Pindah project dari dashboard
-              </Link>
-              .
-            </p>
+          <div className="space-y-1">
+            {quickNav.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={`w-full rounded-xl px-3 py-2 text-left text-sm transition ${
+                  item === 'Messages' ? 'bg-slate-800 font-semibold text-white' : 'text-slate-300 hover:bg-slate-900'
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <div className="space-y-4">
+          <header className="material-dark-surface p-4 md:p-5">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div>
+                <nav aria-label="Breadcrumb" className="mb-1 text-xs text-slate-500">
+                  <Link href="/" className="hover:text-slate-300">
+                    Landing
+                  </Link>{' '}
+                  /{' '}
+                  <Link href="/dashboard" className="hover:text-slate-300">
+                    Dashboard
+                  </Link>{' '}
+                  / <span className="font-semibold text-slate-300">Workspace</span>
+                </nav>
+                <h1 className="text-2xl font-semibold tracking-tight text-white">Landing Page Workspace</h1>
+                <p className="mt-1 text-sm text-slate-400">
+                  Status project: <strong className="text-slate-200">{state.state}</strong> · Project aktif:{' '}
+                  <span className="font-mono text-xs text-slate-300">{projectId}</span>
+                </p>
+                <div className="mt-3 max-w-md">
+                  <div className="mb-1 flex items-center justify-between text-xs text-slate-400">
+                    <span>Progress brief</span>
+                    <span>
+                      {completedCount}/{questionOrder.length} ({progressPercent}%)
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-slate-800">
+                    <div className="h-2 rounded-full bg-indigo-500 transition-all" style={{ width: `${progressPercent}%` }} />
+                  </div>
+                </div>
+                {projectCount > 1 && (
+                  <p className="mt-2 text-xs text-slate-500">
+                    Punya {projectCount} project.{' '}
+                    <Link href="/dashboard" className="font-semibold text-indigo-300 hover:text-indigo-200">
+                      Pindah project dari dashboard
+                    </Link>
+                    .
+                  </p>
+                )}
+              </div>
+              <LogoutButton />
+            </div>
+          </header>
+
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+            <article className="material-dark-surface p-3 md:p-4">
+              <h2 className="mb-3 text-sm font-medium text-slate-300">Assistant Chat</h2>
+              <div className="h-[420px] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/80 p-3">
+                {state.messages.map((msg) => (
+                  <div key={msg.id} className={`mb-2 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
+                        msg.role === 'user'
+                          ? 'bg-indigo-500 text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)]'
+                          : 'border border-slate-800 bg-slate-900 text-slate-300'
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
+                  </div>
+                ))}
+
+                {state.state === 'draft' && nextQuestion && (
+                  <p className="mt-3 rounded-lg border border-indigo-500/30 bg-indigo-500/10 p-2 text-sm text-indigo-200">
+                    Pertanyaan berikutnya: {nextQuestion}
+                  </p>
+                )}
+              </div>
+
+              <form onSubmit={submitAnswer} className="mt-3 flex flex-col gap-2 sm:flex-row">
+                <input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ketik jawaban kamu..."
+                  className="flex-1 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
+                  disabled={state.loading}
+                />
+                <button
+                  type="submit"
+                  className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-900 disabled:opacity-60"
+                  disabled={state.loading}
+                >
+                  Kirim
+                </button>
+              </form>
+            </article>
+
+            <article className="material-dark-surface p-4">
+              <h2 className="text-sm font-medium text-slate-300">Actions</h2>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleGenerate}
+                  disabled={state.loading || state.state === 'generated'}
+                  className="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                >
+                  {state.loading ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Spinner className="text-white" />
+                      Memproses...
+                    </span>
+                  ) : state.generationError ? (
+                    'Ulangi Generate'
+                  ) : (
+                    'Generate Landing Page'
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  disabled={state.state !== 'generated'}
+                  className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 disabled:opacity-50"
+                >
+                  Download
+                </button>
+              </div>
+
+              {state.generationError && !state.generatedCopy && (
+                <div className="mt-3 rounded-xl border border-rose-500/40 bg-rose-500/10 p-3 text-sm text-rose-200">
+                  <p>Generate landing page gagal: {state.generationError}</p>
+                  <p className="mt-1">Klik tombol &quot;Ulangi Generate&quot; untuk mencoba lagi.</p>
+                </div>
+              )}
+
+              <div className="mt-4 rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-sm text-slate-400">
+                <p className="font-medium text-slate-300">Workflow hint</p>
+                <p className="mt-1">Isi 4 pertanyaan sampai progress 100%, lalu klik Generate. Untuk project free, fitur premium akan memunculkan paywall.</p>
+              </div>
+            </article>
+          </div>
+
+          {state.generatedCopy && (
+            <article className="material-dark-surface p-4">
+              <h2 className="mb-3 font-medium text-slate-100">Preview Landing Page</h2>
+              <iframe
+                title="Landing page preview"
+                className="h-[560px] w-full rounded-xl border border-slate-800 bg-white"
+                srcDoc={state.generatedCopy}
+                sandbox="allow-same-origin"
+              />
+            </article>
           )}
         </div>
-        <LogoutButton />
-      </header>
-
-      <div className="h-[360px] overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50/90 p-3">
-        {state.messages.map((msg) => (
-          <div key={msg.id} className={`mb-2 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div
-              className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
-                msg.role === 'user'
-                  ? 'rounded-2xl bg-indigo-600 text-white shadow-[0_6px_16px_rgba(79,70,229,0.35)]'
-                  : 'rounded-2xl bg-white text-slate-700 shadow-sm'
-              }`}
-            >
-              {msg.content}
-            </div>
-          </div>
-        ))}
-
-        {state.state === 'draft' && nextQuestion && (
-          <p className="mt-3 rounded-lg bg-indigo-50 p-2 text-sm text-indigo-700">Pertanyaan berikutnya: {nextQuestion}</p>
-        )}
-      </div>
-
-      {state.generatedCopy && (
-        <article className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-          <h2 className="mb-3 font-semibold text-emerald-800">Preview Landing Page</h2>
-          <iframe
-            title="Landing page preview"
-            className="h-[560px] w-full rounded-lg border border-emerald-100 bg-white"
-            srcDoc={state.generatedCopy}
-            sandbox="allow-same-origin"
-          />
-        </article>
-      )}
-
-      {state.generationError && !state.generatedCopy && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
-          <p>Generate landing page gagal: {state.generationError}</p>
-          <p className="mt-1">Klik tombol &quot;Ulangi Generate&quot; untuk mencoba lagi.</p>
-        </div>
-      )}
-
-      <form onSubmit={submitAnswer} className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ketik jawaban kamu..."
-          className="flex-1 rounded-lg border border-slate-300 px-3 py-2"
-          disabled={state.loading}
-        />
-        <button type="submit" className="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white" disabled={state.loading}>
-          Kirim
-        </button>
-      </form>
-
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={handleGenerate}
-          disabled={state.loading || state.state === 'generated'}
-          className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
-        >
-          {state.loading ? (
-            <span className="inline-flex items-center gap-2">
-              <Spinner className="text-white" />
-              Memproses...
-            </span>
-          ) : state.generationError ? (
-            'Ulangi Generate'
-          ) : (
-            'Generate Landing Page'
-          )}
-        </button>
-
-        <button
-          type="button"
-          onClick={handleDownload}
-          disabled={state.state !== 'generated'}
-          className="rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-700 disabled:opacity-60"
-        >
-          Download
-        </button>
       </div>
 
       <PaywallModal
