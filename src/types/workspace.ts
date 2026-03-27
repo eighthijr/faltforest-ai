@@ -10,6 +10,10 @@ export type WorkspaceMessage = {
   id: string;
   role: 'system' | 'user';
   content: string;
+  cta?: {
+    label: string;
+    action: 'preview';
+  };
 };
 
 export type WorkspaceContext = {

@@ -10,6 +10,7 @@ import { ChatBody } from './ChatBody';
 import { ChatHeader } from './ChatHeader';
 import { ChatInput } from './ChatInput';
 import { PaywallModal } from './PaywallModal';
+import { PreviewModal } from './PreviewModal';
 import { WorkspaceLayout } from './WorkspaceLayout';
 
 type WorkspaceChatProps = {
@@ -60,7 +61,7 @@ const initialGreeting = (): WorkspaceMessage => ({
   id: uid(),
   role: 'system',
   content:
-    'Halo! 👋 Saya siap bantu kamu bikin landing page. Jawab singkat 4 hal utama, lalu klik Generate untuk hasil pertama.',
+    'Halo! 👋 Saya akan pandu kamu langkah demi langkah. Cukup balas chat ini, nanti saya generate otomatis saat data cukup.\n\nStep 1: Apa produk yang kamu jual?',
 });
 
 function reducer(state: LocalState, action: LocalAction): LocalState {
@@ -102,6 +103,7 @@ export function WorkspaceChat({
   const { pushToast } = useToast();
   const [input, setInput] = useState('');
   const [hydrated, setHydrated] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [state, dispatch] = useReducer(reducer, {
     projectId,
     projectType,
@@ -174,6 +176,9 @@ export function WorkspaceChat({
   const missingFields = useMemo(() => getMissingFields(state), [state]);
   const nextQuestionKey = missingFields[0] as QuestionKey | undefined;
   const nextQuestion = nextQuestionKey ? questionLabels[nextQuestionKey] : null;
+  const answeredCount = questionOrder.length - missingFields.length;
+  const progressLabel =
+    state.state === 'generated' ? 'Step 4 of 4 • Result ready' : `Step ${Math.min(answeredCount + 1, 4)} of 4 • Collecting brief`;
   const quickReplies = useMemo(() => {
     if (state.state === 'draft') {
       const templates: Record<QuestionKey, string> = {
@@ -193,6 +198,52 @@ export function WorkspaceChat({
     return [];
   }, [missingFields, state.state]);
 
+  const runAutoGeneration = async (answers: WorkspaceAnswers) => {
+    try {
+      dispatch({ type: 'SET_LOADING', value: true });
+      dispatch({ type: 'SET_ERROR', value: null });
+      dispatch({
+        type: 'ADD_MESSAGE',
+        value: {
+          id: uid(),
+          role: 'system',
+          content: 'Great, I have everything I need. Generating your landing page now...',
+        },
+      });
+
+      await saveAnswersDraft({ projectId: state.projectId, answers });
+      dispatch({ type: 'APPLY_EVENT', event: { type: 'COLLECTION_COMPLETED' } });
+
+      const copy = await generateCopyOnce({ projectId: state.projectId, answers });
+      dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_SUCCEEDED', copy } });
+      dispatch({
+        type: 'ADD_MESSAGE',
+        value: {
+          id: uid(),
+          role: 'system',
+          content: 'Landing page selesai dibuat ✅\nRingkasan: struktur hero, benefit, CTA, dan social proof sudah disusun.',
+          cta: { label: 'Preview Result', action: 'preview' },
+        },
+      });
+      pushToast({ type: 'success', title: 'Generate berhasil', description: 'Landing page draft sudah siap.' });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Gagal generate landing page.';
+      dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_FAILED' } });
+      dispatch({ type: 'SET_ERROR', value: errorMessage });
+      dispatch({
+        type: 'ADD_MESSAGE',
+        value: {
+          id: uid(),
+          role: 'system',
+          content: `Proses generate gagal. ${errorMessage}`,
+        },
+      });
+      pushToast({ type: 'error', title: 'Generate gagal', description: errorMessage });
+    } finally {
+      dispatch({ type: 'SET_LOADING', value: false });
+    }
+  };
+
   const submitText = (rawValue: string) => {
     const trimmed = rawValue.trim();
     if (!trimmed) return;
@@ -209,17 +260,27 @@ export function WorkspaceChat({
       if (!key) return;
 
       dispatch({ type: 'APPLY_EVENT', event: { type: 'ANSWER_SUBMITTED', key, value: trimmed } });
+      const updatedAnswers: WorkspaceAnswers = {
+        ...state.answers,
+        [key]: trimmed,
+      };
 
       const currentMissing = questionOrder.filter((question) => {
         if (question === key) return false;
-        return !state.answers[question]?.trim();
+        return !updatedAnswers[question]?.trim();
       });
 
       if (currentMissing.length > 0) {
         dispatch({
           type: 'ADD_MESSAGE',
-          value: { id: uid(), role: 'system', content: questionLabels[currentMissing[0]] },
+          value: {
+            id: uid(),
+            role: 'system',
+            content: `Step ${answeredCount + 1} selesai. ${questionLabels[currentMissing[0]]}`,
+          },
         });
+      } else {
+        void runAutoGeneration(updatedAnswers);
       }
     }
 
@@ -229,44 +290,6 @@ export function WorkspaceChat({
   const submitAnswer = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     submitText(input);
-  };
-
-  const handleGenerate = async () => {
-    const missing = getMissingFields(state);
-    if (missing.length > 0) {
-      dispatch({
-        type: 'ADD_MESSAGE',
-        value: { id: uid(), role: 'system', content: `Data belum lengkap: ${missing.join(', ')}` },
-      });
-      return;
-    }
-
-    try {
-      dispatch({ type: 'SET_LOADING', value: true });
-      dispatch({ type: 'SET_ERROR', value: null });
-      await saveAnswersDraft({ projectId: state.projectId, answers: state.answers });
-      dispatch({ type: 'APPLY_EVENT', event: { type: 'COLLECTION_COMPLETED' } });
-
-      const copy = await generateCopyOnce({ projectId: state.projectId, answers: state.answers });
-      dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_SUCCEEDED', copy } });
-      dispatch({ type: 'ADD_MESSAGE', value: { id: uid(), role: 'system', content: 'Landing page selesai dibuat ✅' } });
-      pushToast({ type: 'success', title: 'Generate berhasil', description: 'Landing page draft sudah siap.' });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Gagal generate landing page.';
-      dispatch({ type: 'APPLY_EVENT', event: { type: 'GENERATION_FAILED' } });
-      dispatch({ type: 'SET_ERROR', value: errorMessage });
-      dispatch({
-        type: 'ADD_MESSAGE',
-        value: {
-          id: uid(),
-          role: 'system',
-          content: errorMessage,
-        },
-      });
-      pushToast({ type: 'error', title: 'Generate gagal', description: errorMessage });
-    } finally {
-      dispatch({ type: 'SET_LOADING', value: false });
-    }
   };
 
   const handleDownload = () => {
@@ -284,11 +307,6 @@ export function WorkspaceChat({
     URL.revokeObjectURL(url);
   };
 
-  const handleClear = () => {
-    dispatch({ type: 'CLEAR_MESSAGES', value: [initialGreeting()] });
-    pushToast({ type: 'success', title: 'Chat dibersihkan', description: 'Riwayat percakapan telah dihapus.' });
-  };
-
   const helperText =
     state.state === 'draft' && nextQuestion
       ? `Pertanyaan berikutnya: ${nextQuestion}`
@@ -303,15 +321,19 @@ export function WorkspaceChat({
           <ChatHeader
             projectId={projectId}
             status={state.state}
-            loading={state.loading}
-            canGenerate={state.state !== 'generated'}
-            canDownload={state.state === 'generated'}
-            onGenerate={handleGenerate}
-            onDownload={handleDownload}
-            onClear={handleClear}
           />
         }
-        body={<ChatBody messages={state.messages} helperText={helperText} />}
+        body={
+          <ChatBody
+            messages={state.messages}
+            helperText={helperText}
+            progressLabel={progressLabel}
+            isGenerating={state.loading}
+            onMessageAction={(action) => {
+              if (action === 'preview') setPreviewOpen(true);
+            }}
+          />
+        }
         input={
           <ChatInput
             value={input}
@@ -337,6 +359,13 @@ export function WorkspaceChat({
           dispatch({ type: 'SET_PAYWALL', value: null });
           onUpgradeClick?.(reason);
         }}
+      />
+
+      <PreviewModal
+        open={previewOpen}
+        html={state.generatedCopy}
+        onClose={() => setPreviewOpen(false)}
+        onDownload={handleDownload}
       />
     </>
   );

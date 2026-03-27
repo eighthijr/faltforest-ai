@@ -5,3 +5,4 @@ export { ChatBody } from './ChatBody';
 export { ChatMessage } from './ChatMessage';
 export { ChatInput } from './ChatInput';
 export { PaywallModal } from './PaywallModal';
+export { PreviewModal } from './PreviewModal';

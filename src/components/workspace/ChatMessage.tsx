@@ -3,15 +3,17 @@ import type { WorkspaceMessage } from '../../types/workspace';
 
 type ChatMessageProps = {
   message: WorkspaceMessage;
+  onAction?: (action: NonNullable<WorkspaceMessage['cta']>['action']) => void;
 };
 
 function parseBlocks(content: string) {
   return content.split(/```([\s\S]*?)```/g);
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({ message, onAction }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const blocks = parseBlocks(message.content);
+  const cta = !isUser ? message.cta : undefined;
 
   return (
     <article className={`animate-chat-message flex w-full gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -46,6 +48,15 @@ export function ChatMessage({ message }: ChatMessageProps) {
             </p>
           );
         })}
+        {cta ? (
+          <button
+            type="button"
+            onClick={() => onAction?.(cta.action)}
+            className="mt-3 inline-flex items-center rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
+          >
+            {cta.label}
+          </button>
+        ) : null}
       </div>
       {isUser && (
         <span className="mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-white shadow-sm">
