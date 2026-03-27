@@ -53,9 +53,9 @@ export function DashboardSidebar({
     <>
       <button
         type="button"
-        aria-label="Close sidebar"
+        aria-label="Tutup sidebar"
         onClick={onClose}
-        className={`fixed inset-0 z-30 bg-slate-950/30 transition-opacity duration-200 lg:hidden ${
+        className={`fixed inset-0 z-30 bg-slate-950/45 backdrop-blur-[1px] transition-opacity duration-200 lg:hidden ${
           isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
         }`}
       />
@@ -79,7 +79,7 @@ export function DashboardSidebar({
                 className="inline-flex items-center gap-1 rounded-xl px-2 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Menu utama
+                Kembali ke menu utama
               </Link>
               <p className="px-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">List Project</p>
 
@@ -130,9 +130,9 @@ export function DashboardSidebar({
             <div className="flex min-w-0 items-center gap-2">
               <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">{initials}</div>
               <div className="min-w-0">
-              <p className="text-xs text-slate-500">Signed in as</p>
-              <p className="max-w-[170px] truncate text-sm font-medium text-slate-800">{profileLabel}</p>
-              {profileSubLabel ? <p className="truncate text-xs text-slate-500">{profileSubLabel}</p> : null}
+                <p className="text-xs text-slate-500">Masuk sebagai</p>
+                <p className="max-w-[170px] truncate text-sm font-medium text-slate-800">{profileLabel}</p>
+                {profileSubLabel ? <p className="truncate text-xs text-slate-500">{profileSubLabel}</p> : null}
               </div>
             </div>
             <MoreHorizontal className="h-4 w-4 text-slate-500" />
@@ -144,7 +144,7 @@ export function DashboardSidebar({
               className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-[0_1px_3px_rgba(15,23,42,0.08)] transition hover:bg-slate-50"
             >
               <LogOut className="h-4 w-4" />
-              Sign out
+              Keluar
             </button>
           ) : null}
         </div>

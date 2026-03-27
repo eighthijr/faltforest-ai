@@ -263,7 +263,7 @@ function WorkspaceChatContent({
           setManualPaymentStatus('approved');
           window.clearInterval(timer);
           openSuccess('download', 'qris_static_manual');
-          pushToast({ type: 'success', title: 'Upgrade successful', description: 'Pembayaran disetujui admin. Premium sudah aktif.' });
+          pushToast({ type: 'success', title: 'Upgrade berhasil', description: 'Pembayaran disetujui admin. Premium sudah aktif.' });
           return;
         }
 
@@ -303,7 +303,7 @@ function WorkspaceChatContent({
   const nextQuestion = nextQuestionKey ? questionLabels[nextQuestionKey] : null;
   const answeredCount = questionOrder.length - missingFields.length;
   const progressLabel =
-    state.state === 'generated' ? 'Step 4 of 4 • Result ready' : `Step ${Math.min(answeredCount + 1, 4)} of 4 • Collecting brief`;
+    state.state === 'generated' ? 'Step 4 dari 4 • Hasil siap' : `Step ${Math.min(answeredCount + 1, 4)} dari 4 • Mengumpulkan brief`;
   const runAutoGeneration = async (answers: WorkspaceAnswers) => {
     try {
       dispatch({ type: 'SET_LOADING', value: true });
@@ -313,7 +313,7 @@ function WorkspaceChatContent({
         value: {
           id: uid(),
           role: 'system',
-          content: 'Great, I have everything I need. Generating your landing page now...',
+          content: 'Siap, datanya sudah lengkap. Sekarang saya generate landing page kamu...',
         },
       });
 
