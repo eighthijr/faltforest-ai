@@ -3,23 +3,24 @@
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 export type UpgradeReason = 'download' | 'chat_after_generated';
+export type PaymentMethod = 'tripay_qris_auto' | 'qris_static_manual';
 
 export type ActiveModal =
   | { type: null }
   | { type: 'preview' }
   | { type: 'upgrade'; reason: UpgradeReason }
-  | { type: 'pricing'; reason: UpgradeReason }
-  | { type: 'payment'; reason: UpgradeReason; planId: 'premium' | 'free' }
-  | { type: 'success'; reason: UpgradeReason; planId: 'premium' | 'free' };
+  | { type: 'payment-method'; reason: UpgradeReason }
+  | { type: 'payment'; reason: UpgradeReason; method: PaymentMethod }
+  | { type: 'success'; reason: UpgradeReason; method: PaymentMethod };
 
 type ModalContextValue = {
   activeModal: ActiveModal;
   closeModal: () => void;
   openPreview: () => void;
   openUpgrade: (reason: UpgradeReason) => void;
-  openPricing: (reason: UpgradeReason) => void;
-  openPayment: (reason: UpgradeReason, planId: 'premium' | 'free') => void;
-  openSuccess: (reason: UpgradeReason, planId: 'premium' | 'free') => void;
+  openPaymentMethod: (reason: UpgradeReason) => void;
+  openPayment: (reason: UpgradeReason, method: PaymentMethod) => void;
+  openSuccess: (reason: UpgradeReason, method: PaymentMethod) => void;
 };
 
 const ModalContext = createContext<ModalContextValue | null>(null);
@@ -39,21 +40,21 @@ export function ModalProvider({ children }: { children: ReactNode }) {
     setActiveModal({ type: 'upgrade', reason });
   }, []);
 
-  const openPricing = useCallback((reason: UpgradeReason) => {
-    setActiveModal({ type: 'pricing', reason });
+  const openPaymentMethod = useCallback((reason: UpgradeReason) => {
+    setActiveModal({ type: 'payment-method', reason });
   }, []);
 
-  const openPayment = useCallback((reason: UpgradeReason, planId: 'premium' | 'free') => {
-    setActiveModal({ type: 'payment', reason, planId });
+  const openPayment = useCallback((reason: UpgradeReason, method: PaymentMethod) => {
+    setActiveModal({ type: 'payment', reason, method });
   }, []);
 
-  const openSuccess = useCallback((reason: UpgradeReason, planId: 'premium' | 'free') => {
-    setActiveModal({ type: 'success', reason, planId });
+  const openSuccess = useCallback((reason: UpgradeReason, method: PaymentMethod) => {
+    setActiveModal({ type: 'success', reason, method });
   }, []);
 
   const value = useMemo(
-    () => ({ activeModal, closeModal, openPreview, openUpgrade, openPricing, openPayment, openSuccess }),
-    [activeModal, closeModal, openPreview, openUpgrade, openPricing, openPayment, openSuccess],
+    () => ({ activeModal, closeModal, openPreview, openUpgrade, openPaymentMethod, openPayment, openSuccess }),
+    [activeModal, closeModal, openPreview, openUpgrade, openPaymentMethod, openPayment, openSuccess],
   );
 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;

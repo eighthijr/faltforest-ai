@@ -11,11 +11,10 @@ import { ChatHeader } from './ChatHeader';
 import { ChatInput } from './ChatInput';
 import { ModalProvider, useModalManager } from './ModalProvider';
 import { PreviewModal } from './PreviewModal';
-import { PricingModal } from './PricingModal';
+import { PaymentMethodModal } from './PaymentMethodModal';
 import { UpgradeModal } from './UpgradeModal';
 import { PaymentModal } from './PaymentModal';
 import { SuccessModal } from './SuccessModal';
-import { pricingPlans, type PricingPlan } from '@/lib/pricing';
 import { WorkspaceLayout } from './WorkspaceLayout';
 
 type WorkspaceChatProps = {
@@ -108,9 +107,9 @@ function WorkspaceChatContent({
   initialGeneratedCopy = null,
 }: WorkspaceChatProps) {
   const { pushToast } = useToast();
-  const { activeModal, closeModal, openPreview, openPricing, openUpgrade, openPayment, openSuccess } = useModalManager();
+  const { activeModal, closeModal, openPreview, openPaymentMethod, openUpgrade, openPayment, openSuccess } = useModalManager();
   const [input, setInput] = useState('');
-  const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'tripay_qris_auto' | 'qris_static_manual'>('tripay_qris_auto');
   const [processingPayment, setProcessingPayment] = useState(false);
   const [premiumUnlocked, setPremiumUnlocked] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -371,35 +370,36 @@ function WorkspaceChatContent({
         open={activeModal.type === 'upgrade'}
         reason={activeModal.type === 'upgrade' ? activeModal.reason : 'download'}
         onClose={closeModal}
-        onSeePlans={() => {
+        onUpgradeNow={() => {
           if (activeModal.type !== 'upgrade') return;
-          openPricing(activeModal.reason);
+          openPaymentMethod(activeModal.reason);
         }}
       />
 
-      <PricingModal
-        open={activeModal.type === 'pricing'}
-        reason={activeModal.type === 'pricing' ? activeModal.reason : 'download'}
+      <PaymentMethodModal
+        open={activeModal.type === 'payment-method'}
+        reason={activeModal.type === 'payment-method' ? activeModal.reason : 'download'}
+        selectedMethod={selectedPaymentMethod}
         onClose={closeModal}
-        onChoosePlan={(plan, reason) => {
-          setSelectedPlan(plan);
-          openPayment(reason, plan.id);
+        onSelectMethod={(method, reason) => {
+          setSelectedPaymentMethod(method);
+          openPayment(reason, method);
         }}
       />
 
       <PaymentModal
         open={activeModal.type === 'payment'}
-        plan={selectedPlan ?? pricingPlans.find((plan) => plan.id === 'premium') ?? null}
+        method={activeModal.type === 'payment' ? activeModal.method : selectedPaymentMethod}
         onClose={closeModal}
         processing={processingPayment}
-        onPayNow={() => {
+        onMarkPaid={() => {
           if (activeModal.type !== 'payment') return;
           setProcessingPayment(true);
           window.setTimeout(() => {
             setProcessingPayment(false);
             setPremiumUnlocked(true);
-            openSuccess(activeModal.reason, activeModal.planId);
-            pushToast({ type: 'success', title: 'Payment success', description: 'Premium akses sudah aktif untuk project ini.' });
+            openSuccess(activeModal.reason, activeModal.method);
+            pushToast({ type: 'success', title: 'Upgrade successful', description: 'Premium access is now active for this project.' });
           }, 700);
         }}
       />

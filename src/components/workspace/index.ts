@@ -7,6 +7,6 @@ export { ChatInput } from './ChatInput';
 export { ModalProvider, useModalManager } from './ModalProvider';
 export { PreviewModal } from './PreviewModal';
 export { UpgradeModal } from './UpgradeModal';
-export { PricingModal } from './PricingModal';
+export { PaymentMethodModal } from './PaymentMethodModal';
 export { PaymentModal } from './PaymentModal';
 export { SuccessModal } from './SuccessModal';
