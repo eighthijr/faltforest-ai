@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useReducer, useState } from 'react';
+import { confirmManualAlreadyPaid, fetchManualQrisImageUrl, listPaymentHistory, submitManualPaymentProof } from '@/api/payments';
 import { generateCopyOnce, saveAnswersDraft } from '../../api/workspace';
 import { useToast } from '../ui';
 import type { ProjectType } from '../../types/project';
@@ -16,6 +17,10 @@ import { UpgradeModal } from './UpgradeModal';
 import { PaymentModal } from './PaymentModal';
 import { SuccessModal } from './SuccessModal';
 import { WorkspaceLayout } from './WorkspaceLayout';
+
+const PREMIUM_AMOUNT = 99000;
+
+type ManualPaymentStatus = 'idle' | 'waiting_payment' | 'waiting_admin' | 'approved';
 
 type WorkspaceChatProps = {
   projectId: string;
@@ -49,6 +54,10 @@ function storageKey(projectId: string) {
 
 function isWorkspaceState(value: unknown): value is WorkspaceContext['state'] {
   return value === 'draft' || value === 'ready' || value === 'generated';
+}
+
+function createManualReference(projectId: string) {
+  return `MNL-${Date.now()}-${projectId.slice(0, 6)}`;
 }
 
 const emptyAnswers: WorkspaceAnswers = {
@@ -109,9 +118,13 @@ function WorkspaceChatContent({
   const { pushToast } = useToast();
   const { activeModal, closeModal, openPreview, openPaymentMethod, openUpgrade, openPayment, openSuccess } = useModalManager();
   const [input, setInput] = useState('');
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'tripay_qris_auto' | 'qris_static_manual'>('tripay_qris_auto');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'tripay_qris_auto' | 'qris_static_manual'>('qris_static_manual');
   const [processingPayment, setProcessingPayment] = useState(false);
-  const [premiumUnlocked, setPremiumUnlocked] = useState(false);
+  const [premiumUnlocked, setPremiumUnlocked] = useState(projectType === 'premium');
+  const [manualPaymentStatus, setManualPaymentStatus] = useState<ManualPaymentStatus>('waiting_payment');
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [paymentReference, setPaymentReference] = useState('');
+  const [qrisImageUrl, setQrisImageUrl] = useState('');
   const [hydrated, setHydrated] = useState(false);
   const [state, dispatch] = useReducer(reducer, {
     projectId,
@@ -180,6 +193,94 @@ function WorkspaceChatContent({
       }),
     );
   }, [hydrated, projectId, state]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const syncPaymentState = async () => {
+      try {
+        const payments = await listPaymentHistory();
+        const projectPayments = payments.filter((payment) => payment.project_id === projectId);
+        const latest = projectPayments[0];
+
+        if (!latest || !mounted) return;
+
+        if (latest.status === 'success') {
+          setPremiumUnlocked(true);
+          setManualPaymentStatus('approved');
+          return;
+        }
+
+        if (latest.gateway === 'manual_qris' && (latest.status === 'pending' || latest.status === 'waiting_confirmation')) {
+          setManualPaymentStatus('waiting_admin');
+          setPaymentReference(latest.reference);
+        }
+      } catch {
+        // no-op
+      }
+    };
+
+    void syncPaymentState();
+
+    return () => {
+      mounted = false;
+    };
+  }, [projectId]);
+
+  useEffect(() => {
+    if (activeModal.type !== 'payment' || activeModal.method !== 'qris_static_manual') return;
+
+    let mounted = true;
+    const loadQris = async () => {
+      try {
+        const url = await fetchManualQrisImageUrl();
+        if (mounted) setQrisImageUrl(url);
+      } catch {
+        if (mounted) setQrisImageUrl('');
+      }
+    };
+
+    void loadQris();
+
+    return () => {
+      mounted = false;
+    };
+  }, [activeModal]);
+
+  useEffect(() => {
+    if (!paymentReference || manualPaymentStatus !== 'waiting_admin' || premiumUnlocked) return;
+
+    const timer = window.setInterval(async () => {
+      try {
+        const payments = await listPaymentHistory();
+        const matchedPayment = payments.find((payment) => payment.reference === paymentReference);
+
+        if (!matchedPayment) return;
+
+        if (matchedPayment.status === 'success') {
+          setPremiumUnlocked(true);
+          setManualPaymentStatus('approved');
+          window.clearInterval(timer);
+          openSuccess('download', 'qris_static_manual');
+          pushToast({ type: 'success', title: 'Upgrade successful', description: 'Pembayaran disetujui admin. Premium sudah aktif.' });
+          return;
+        }
+
+        if (matchedPayment.status === 'rejected') {
+          setManualPaymentStatus('waiting_payment');
+          setPaymentReference('');
+          window.clearInterval(timer);
+          pushToast({ type: 'error', title: 'Pembayaran ditolak', description: 'Silakan upload ulang bukti pembayaran yang valid.' });
+        }
+      } catch {
+        // no-op
+      }
+    }, 8000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [manualPaymentStatus, openSuccess, paymentReference, premiumUnlocked, pushToast]);
 
   const missingFields = useMemo(() => getMissingFields(state), [state]);
   const nextQuestionKey = missingFields[0] as QuestionKey | undefined;
@@ -382,6 +483,7 @@ function WorkspaceChatContent({
         selectedMethod={selectedPaymentMethod}
         onClose={closeModal}
         onSelectMethod={(method, reason) => {
+          if (method === 'tripay_qris_auto') return;
           setSelectedPaymentMethod(method);
           openPayment(reason, method);
         }}
@@ -392,15 +494,46 @@ function WorkspaceChatContent({
         method={activeModal.type === 'payment' ? activeModal.method : selectedPaymentMethod}
         onClose={closeModal}
         processing={processingPayment}
-        onMarkPaid={() => {
-          if (activeModal.type !== 'payment') return;
+        manualStatus={manualPaymentStatus}
+        qrisImageUrl={qrisImageUrl}
+        proofFile={proofFile}
+        onProofFileChange={setProofFile}
+        onConfirmPayment={async () => {
+          if (activeModal.type !== 'payment' || activeModal.method !== 'qris_static_manual') return;
+          if (manualPaymentStatus === 'waiting_admin' || manualPaymentStatus === 'approved') return;
+
           setProcessingPayment(true);
-          window.setTimeout(() => {
+
+          try {
+            const reference = createManualReference(projectId);
+
+            if (proofFile) {
+              const result = await submitManualPaymentProof({ projectId, file: proofFile });
+              setPaymentReference(result.reference);
+            } else {
+              await confirmManualAlreadyPaid({
+                projectId,
+                amount: PREMIUM_AMOUNT,
+                reference,
+              });
+              setPaymentReference(reference);
+            }
+
+            setManualPaymentStatus('waiting_admin');
+            pushToast({
+              type: 'info',
+              title: 'Pending approval',
+              description: 'Pembayaran kamu sedang menunggu verifikasi admin.',
+            });
+          } catch (error) {
+            pushToast({
+              type: 'error',
+              title: 'Konfirmasi pembayaran gagal',
+              description: error instanceof Error ? error.message : 'Silakan coba lagi.',
+            });
+          } finally {
             setProcessingPayment(false);
-            setPremiumUnlocked(true);
-            openSuccess(activeModal.reason, activeModal.method);
-            pushToast({ type: 'success', title: 'Upgrade successful', description: 'Premium access is now active for this project.' });
-          }, 700);
+          }
         }}
       />
 

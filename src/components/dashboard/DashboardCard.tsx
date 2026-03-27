@@ -1,9 +1,11 @@
 import Link from 'next/link';
-import { Activity, CalendarClock, CircleCheck, CircleDashed, Crown, FlaskConical, Hash } from 'lucide-react';
+import { Activity, BadgeCheck, CalendarClock, CircleCheck, CircleDashed, Clock3, Crown, FlaskConical, Hash } from 'lucide-react';
+import type { PaymentStatus } from '@/api/payments';
 import type { Project } from '@/types/project';
 
 type DashboardCardProps = {
   project: Project;
+  paymentStatus?: PaymentStatus | null;
 };
 
 const statusMap: Record<Project['status'], { label: string; tone: string; icon: typeof CircleCheck }> = {
@@ -12,7 +14,7 @@ const statusMap: Record<Project['status'], { label: string; tone: string; icon: 
   generated: { label: 'Generated', tone: 'bg-emerald-50 text-emerald-700', icon: CircleCheck },
 };
 
-export function DashboardCard({ project }: DashboardCardProps) {
+export function DashboardCard({ project, paymentStatus = null }: DashboardCardProps) {
   const createdDate = new Date(project.created_at).toLocaleDateString('id-ID', { dateStyle: 'medium' });
   const status = statusMap[project.status];
   const StatusIcon = status.icon;
@@ -47,6 +49,20 @@ export function DashboardCard({ project }: DashboardCardProps) {
           <Activity className="h-4 w-4" />
           <span>Last activity: recently updated</span>
         </div>
+
+        {paymentStatus === 'pending' || paymentStatus === 'waiting_confirmation' ? (
+          <div className="inline-flex items-center gap-2 text-amber-700">
+            <Clock3 className="h-4 w-4" />
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold">Pending approval</span>
+          </div>
+        ) : null}
+
+        {paymentStatus === 'success' ? (
+          <div className="inline-flex items-center gap-2 text-emerald-700">
+            <BadgeCheck className="h-4 w-4" />
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold">Approved · Verified by admin</span>
+          </div>
+        ) : null}
       </dl>
 
       <Link

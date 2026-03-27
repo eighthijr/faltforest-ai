@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useReducer } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createProject, listProjects } from '../../api/projects';
+import { listPaymentHistory, type PaymentStatus } from '@/api/payments';
 import { Spinner, useToast } from '../ui';
 import type { Project } from '../../types/project';
 import { DashboardLayout } from './DashboardLayout';
@@ -75,6 +76,15 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
       try {
         const projects = await listProjects(userId);
         dispatch({ type: 'LOAD_SUCCESS', payload: projects });
+
+        const payments = await listPaymentHistory();
+        const latestStatusByProject: Record<string, PaymentStatus> = {};
+        payments.forEach((payment) => {
+          if (!latestStatusByProject[payment.project_id]) {
+            latestStatusByProject[payment.project_id] = payment.status;
+          }
+        });
+        setProjectPaymentStatus(latestStatusByProject);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Gagal memuat project.';
         dispatch({ type: 'LOAD_ERROR', payload: message });
@@ -90,6 +100,7 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
     [state.projects],
   );
   const hasFreeProject = freeProjectCount > 0;
+  const [projectPaymentStatus, setProjectPaymentStatus] = useState<Record<string, PaymentStatus>>({});
 
   const handleCreateProject = async () => {
     dispatch({ type: 'CREATE_START' });
@@ -175,7 +186,7 @@ export function ProjectDashboard({ userId, onUpgradeClick }: ProjectDashboardPro
         ) : (
           <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {state.projects.map((project) => (
-              <DashboardCard key={project.id} project={project} />
+              <DashboardCard key={project.id} project={project} paymentStatus={projectPaymentStatus[project.id] ?? null} />
             ))}
           </section>
         )}
