@@ -168,27 +168,27 @@ export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectD
     <DashboardLayout userId={userId} userEmail={userEmail}>
       <section className="space-y-6">
         <header className="rounded-3xl bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.08),0_8px_24px_rgba(15,23,42,0.08)] md:p-6">
-          <p className="text-sm text-slate-500">Dashboard / Overview</p>
+          <p className="text-sm text-slate-500">Dashboard / Ringkasan</p>
           <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">Dashboard</h1>
               <p className="mt-2 text-sm text-slate-600">Kelola project, lanjutkan workspace, dan pantau status generate secara real-time.</p>
-              <p className="mt-2 text-sm text-slate-500">Free plan: {freeProjectCount}/1 project · {hasFreeProject ? 'Upgrade untuk project tambahan.' : 'Siap mulai project pertama kamu.'}</p>
+              <p className="mt-2 text-sm text-slate-500">Paket gratis: {freeProjectCount}/1 project · {hasFreeProject ? 'Upgrade untuk project tambahan.' : 'Siap mulai project pertama kamu.'}</p>
             </div>
 
             <button
               type="button"
               onClick={handleCreateProject}
               disabled={state.creating}
-              className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(79,70,229,0.24),0_8px_16px_rgba(79,70,229,0.2)] transition-all duration-200 hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(79,70,229,0.24),0_8px_16px_rgba(79,70,229,0.2)] transition-all duration-200 hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             >
               {state.creating ? (
                 <span className="inline-flex items-center gap-2">
                   <Spinner className="text-white" />
-                  Creating...
+                  Membuat project...
                 </span>
               ) : (
-                'Create Project'
+                'Buat Project'
               )}
             </button>
           </div>
@@ -196,7 +196,7 @@ export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectD
 
         {hasFreeProject && (
           <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700 shadow-[0_1px_2px_rgba(146,64,14,0.12)]">
-            You already used your free project quota. Upgrade to unlock more projects.
+            Kuota project gratis sudah terpakai. Upgrade untuk membuka project tambahan.
           </p>
         )}
 
@@ -206,7 +206,7 @@ export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectD
           <p className="rounded-2xl bg-white px-4 py-8 text-sm text-slate-500 shadow-[0_1px_2px_rgba(15,23,42,0.08),0_8px_24px_rgba(15,23,42,0.08)]">Memuat project...</p>
         ) : state.projects.length === 0 ? (
           <p className="rounded-2xl bg-white px-4 py-8 text-sm text-slate-500 shadow-[0_1px_2px_rgba(15,23,42,0.08),0_8px_24px_rgba(15,23,42,0.08)]">
-            Belum ada project. Klik &quot;Create Project&quot; untuk mulai workflow.
+            Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.
           </p>
         ) : (
           <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">

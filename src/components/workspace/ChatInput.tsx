@@ -42,12 +42,22 @@ export function ChatInput({
   };
 
   const isDisabled = disabled || locked || waitingConfirmation;
+  const helperText = waitingConfirmation
+    ? 'Chat revisi akan terbuka setelah admin mengonfirmasi pembayaran.'
+    : locked
+      ? 'Upgrade premium untuk membuka chat revisi lanjutan.'
+      : null;
 
   return (
     <footer className="sticky bottom-0 shrink-0 border-t border-slate-200 bg-white px-3 py-2 md:px-6 md:py-3">
       <div className="mx-auto w-full max-w-4xl">
         <form onSubmit={onSubmit} className="flex items-end gap-2">
-          <button type="button" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500" aria-label="Attach file">
+          <button
+            type="button"
+            disabled={isDisabled}
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 disabled:cursor-not-allowed disabled:opacity-60"
+            aria-label="Lampirkan file"
+          >
             <Paperclip className="h-4 w-4" />
           </button>
 
@@ -73,9 +83,10 @@ export function ChatInput({
             className="inline-flex h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {locked ? <Lock className="h-4 w-4" /> : loading ? <Spinner className="text-white" /> : <SendHorizonal className="h-4 w-4" />}
-            <span className="hidden sm:inline">{loading ? 'Sending...' : 'Send'}</span>
+            <span className="hidden sm:inline">{loading ? 'Mengirim...' : 'Kirim'}</span>
           </button>
         </form>
+        {helperText ? <p className="mt-2 px-1 text-xs font-medium text-slate-500">{helperText}</p> : null}
       </div>
     </footer>
   );

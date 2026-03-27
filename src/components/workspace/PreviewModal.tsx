@@ -12,15 +12,15 @@ type PreviewModalProps = {
 
 export function PreviewModal({ open, html, onClose, onDownload, downloadDisabled = false, downloadLocked = false }: PreviewModalProps) {
   return (
-    <ModalShell open={open} onClose={onClose} title="Landing page preview" size="xl">
-      <div className="-m-6 flex h-full max-h-[94vh] min-h-[78vh] flex-col overflow-hidden rounded-3xl bg-white">
+    <ModalShell open={open} onClose={onClose} title="Preview landing page" size="xl">
+      <div className="-m-6 flex h-full max-h-[92vh] min-h-[70vh] flex-col overflow-hidden rounded-3xl bg-white">
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div>
-            <p className="text-base font-semibold text-slate-900">Landing page preview</p>
-            <p className="text-xs text-slate-500">Review hasil generate sebelum download.</p>
+            <p className="text-base font-semibold text-slate-900">Preview landing page</p>
+            <p className="text-xs text-slate-500">Review hasil generate sebelum diunduh.</p>
           </div>
           <button type="button" onClick={onClose} className="rounded-full border border-slate-300 px-3 py-1.5 text-sm text-slate-600 transition hover:bg-slate-50">
-            Close
+            Tutup
           </button>
         </div>
 
@@ -45,7 +45,7 @@ export function PreviewModal({ open, html, onClose, onDownload, downloadDisabled
             onClick={onClose}
             className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           >
-            Continue chatting
+            Lanjut chat
           </button>
           <button
             type="button"

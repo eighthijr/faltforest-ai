@@ -21,7 +21,7 @@ export function ChatBody({ messages, helperText, progressLabel, isGenerating = f
           <div className="rounded-2xl bg-indigo-50 px-4 py-3 text-sm text-indigo-800 shadow-[0_2px_8px_rgba(99,102,241,0.14)]">
             <p className="flex items-center gap-2 font-semibold">
               <Sparkles className="h-4 w-4" />
-              Guided chat workflow
+              Alur chat terpandu
             </p>
             <p className="mt-1 text-xs text-indigo-700">Jawab pertanyaan AI sampai brief lengkap, lalu sistem akan generate otomatis.</p>
           </div>
@@ -37,7 +37,7 @@ export function ChatBody({ messages, helperText, progressLabel, isGenerating = f
 
         {isGenerating ? (
           <p className="inline-flex animate-pulse items-center gap-2 self-start rounded-2xl bg-white px-3 py-2 text-xs text-slate-600 shadow-[0_1px_4px_rgba(15,23,42,0.12)]">
-            <Bot className="h-4 w-4" />AI is thinking...
+            <Bot className="h-4 w-4" />AI sedang memproses brief...
           </p>
         ) : null}
         {isGenerating ? (

@@ -1,4 +1,4 @@
-import { Circle, Settings2, Trash2 } from 'lucide-react';
+import { Circle, Trash2 } from 'lucide-react';
 import type { WorkspaceState } from '@/types/workspace';
 
 type ManualPaymentStatus = 'idle' | 'waiting_payment' | 'waiting_admin' | 'approved';
@@ -41,12 +41,10 @@ export function ChatHeader({ projectId, status, manualPaymentStatus = 'idle', pa
         </div>
 
         <div className="flex items-center gap-2">
-          <button type="button" className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition hover:bg-slate-200">
-            <Settings2 className="h-4 w-4" />
-          </button>
           <button
             type="button"
             onClick={onClearChat}
+            aria-label="Reset chat"
             className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition hover:bg-slate-200"
           >
             <Trash2 className="h-4 w-4" />
