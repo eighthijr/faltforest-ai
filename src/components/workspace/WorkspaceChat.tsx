@@ -9,8 +9,10 @@ import { getMissingFields, questionLabels, questionOrder, reduceWorkspace } from
 import { ChatBody } from './ChatBody';
 import { ChatHeader } from './ChatHeader';
 import { ChatInput } from './ChatInput';
-import { PaywallModal } from './PaywallModal';
+import { ModalProvider, useModalManager, type UpgradeReason } from './ModalProvider';
 import { PreviewModal } from './PreviewModal';
+import { PricingModal } from './PricingModal';
+import { UpgradeModal } from './UpgradeModal';
 import { WorkspaceLayout } from './WorkspaceLayout';
 
 type WorkspaceChatProps = {
@@ -19,19 +21,17 @@ type WorkspaceChatProps = {
   projectCount?: number;
   initialState?: 'draft' | 'ready' | 'generated';
   initialGeneratedCopy?: string | null;
-  onUpgradeClick?: (reason: 'download' | 'chat_after_generated') => void;
+  onUpgradeClick?: (reason: UpgradeReason) => void;
 };
 
 type LocalState = WorkspaceContext & {
   loading: boolean;
-  paywall: null | 'download' | 'chat_after_generated';
   generationError: string | null;
   messages: WorkspaceMessage[];
 };
 
 type LocalAction =
   | { type: 'SET_LOADING'; value: boolean }
-  | { type: 'SET_PAYWALL'; value: LocalState['paywall'] }
   | { type: 'SET_ERROR'; value: string | null }
   | { type: 'ADD_MESSAGE'; value: WorkspaceMessage }
   | { type: 'CLEAR_MESSAGES'; value: WorkspaceMessage[] }
@@ -68,8 +68,6 @@ function reducer(state: LocalState, action: LocalAction): LocalState {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, loading: action.value };
-    case 'SET_PAYWALL':
-      return { ...state, paywall: action.value };
     case 'SET_ERROR':
       return { ...state, generationError: action.value };
     case 'ADD_MESSAGE':
@@ -92,7 +90,15 @@ function reducer(state: LocalState, action: LocalAction): LocalState {
   }
 }
 
-export function WorkspaceChat({
+export function WorkspaceChat(props: WorkspaceChatProps) {
+  return (
+    <ModalProvider>
+      <WorkspaceChatContent {...props} />
+    </ModalProvider>
+  );
+}
+
+function WorkspaceChatContent({
   projectId,
   projectType,
   projectCount = 1,
@@ -101,9 +107,9 @@ export function WorkspaceChat({
   onUpgradeClick,
 }: WorkspaceChatProps) {
   const { pushToast } = useToast();
+  const { activeModal, closeModal, openPreview, openPricing, openUpgrade } = useModalManager();
   const [input, setInput] = useState('');
   const [hydrated, setHydrated] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [state, dispatch] = useReducer(reducer, {
     projectId,
     projectType,
@@ -112,7 +118,6 @@ export function WorkspaceChat({
     generatedCopy: initialGeneratedCopy,
     hasGeneratedOnce: initialState === 'generated',
     loading: false,
-    paywall: null,
     generationError: null,
     messages: [initialGreeting()],
   });
@@ -249,7 +254,7 @@ export function WorkspaceChat({
     if (!trimmed) return;
 
     if (state.state === 'generated' && state.projectType === 'free') {
-      dispatch({ type: 'SET_PAYWALL', value: 'chat_after_generated' });
+      openUpgrade('chat_after_generated');
       return;
     }
 
@@ -294,7 +299,7 @@ export function WorkspaceChat({
 
   const handleDownload = () => {
     if (state.projectType === 'free') {
-      dispatch({ type: 'SET_PAYWALL', value: 'download' });
+      openUpgrade('download');
       return;
     }
 
@@ -331,7 +336,7 @@ export function WorkspaceChat({
             progressLabel={progressLabel}
             isGenerating={state.loading}
             onMessageAction={(action) => {
-              if (action === 'preview') setPreviewOpen(true);
+              if (action === 'preview') openPreview();
             }}
           />
         }
@@ -351,22 +356,31 @@ export function WorkspaceChat({
         }
       />
 
-      <PaywallModal
-        open={Boolean(state.paywall)}
-        reason={state.paywall ?? 'download'}
-        onClose={() => dispatch({ type: 'SET_PAYWALL', value: null })}
+      <PreviewModal
+        open={activeModal.type === 'preview'}
+        html={state.generatedCopy}
+        onClose={closeModal}
+        onDownload={handleDownload}
+      />
+
+      <UpgradeModal
+        open={activeModal.type === 'upgrade'}
+        reason={activeModal.type === 'upgrade' ? activeModal.reason : 'download'}
+        onClose={closeModal}
         onUpgrade={() => {
-          const reason = state.paywall ?? 'download';
-          dispatch({ type: 'SET_PAYWALL', value: null });
-          onUpgradeClick?.(reason);
+          if (activeModal.type !== 'upgrade') return;
+          openPricing(activeModal.reason);
         }}
       />
 
-      <PreviewModal
-        open={previewOpen}
-        html={state.generatedCopy}
-        onClose={() => setPreviewOpen(false)}
-        onDownload={handleDownload}
+      <PricingModal
+        open={activeModal.type === 'pricing'}
+        reason={activeModal.type === 'pricing' ? activeModal.reason : 'download'}
+        onClose={closeModal}
+        onProceedPayment={(reason) => {
+          closeModal();
+          onUpgradeClick?.(reason);
+        }}
       />
     </>
   );

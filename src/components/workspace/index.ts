@@ -4,5 +4,7 @@ export { ChatHeader } from './ChatHeader';
 export { ChatBody } from './ChatBody';
 export { ChatMessage } from './ChatMessage';
 export { ChatInput } from './ChatInput';
-export { PaywallModal } from './PaywallModal';
+export { ModalProvider, useModalManager } from './ModalProvider';
 export { PreviewModal } from './PreviewModal';
+export { UpgradeModal } from './UpgradeModal';
+export { PricingModal } from './PricingModal';
