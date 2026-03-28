@@ -11,7 +11,8 @@ export function AuthCallback() {
       const { data } = await supabase.auth.getSession();
 
       const params = new URLSearchParams(window.location.search);
-      const next = params.get('next') === '/workspace' ? '/workspace' : '/dashboard';
+      const nextParam = params.get('next');
+      const next = nextParam === '/dashboard/workspace' || nextParam === '/workspace' ? '/dashboard/workspace' : '/dashboard';
       const email = data.session?.user?.email ?? null;
       const destination = isAdminEmail(email) ? '/dashboard' : next;
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { AuthModal } from './AuthModal';
 
-type RedirectTarget = '/dashboard' | '/workspace';
+type RedirectTarget = '/dashboard' | '/dashboard/workspace';
 
 export function AuthEntryPoints() {
   const [open, setOpen] = useState(false);
@@ -18,10 +18,10 @@ export function AuthEntryPoints() {
     <>
       <div style={{ display: 'flex', gap: '0.75rem' }}>
         <button type="button" onClick={() => openFor('/dashboard')}>
-          Login
+          Masuk
         </button>
-        <button type="button" onClick={() => openFor('/workspace')}>
-          Start building (CTA)
+        <button type="button" onClick={() => openFor('/dashboard/workspace')}>
+          Mulai bikin (CTA)
         </button>
       </div>
 
@@ -29,7 +29,7 @@ export function AuthEntryPoints() {
         isOpen={open}
         onClose={() => setOpen(false)}
         postAuthRedirect={target}
-        title={target === '/workspace' ? 'Get started' : 'Welcome back'}
+        title={target === '/dashboard/workspace' ? 'Mulai sekarang' : 'Selamat datang kembali'}
       />
     </>
   );

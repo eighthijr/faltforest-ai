@@ -1,4 +1,4 @@
-export function buildRedirectTo(nextPath: '/dashboard' | '/workspace') {
+export function buildRedirectTo(nextPath: '/dashboard' | '/dashboard/workspace') {
   const origin =
     typeof window !== 'undefined'
       ? window.location.origin

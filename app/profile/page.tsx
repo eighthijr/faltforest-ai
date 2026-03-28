@@ -8,7 +8,7 @@ import { DashboardLayout } from '@/components/dashboard';
 import { useProtectedRoute } from '@/components/auth';
 import type { Project } from '@/types/project';
 
-export default function ProfilePage() {
+export default function ProfilPage() {
   const { userId, loading: authLoading, error: authError } = useProtectedRoute('/');
   const [email, setEmail] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -43,7 +43,7 @@ export default function ProfilePage() {
   }, [projects]);
 
   if (authLoading) {
-    return <main className="px-4 py-10 text-sm text-slate-600">Checking authentication...</main>;
+    return <main className="px-4 py-10 text-sm text-slate-600">Memeriksa autentikasi...</main>;
   }
 
   if (authError || !userId) {
@@ -54,7 +54,7 @@ export default function ProfilePage() {
     <DashboardLayout userId={userId}>
       <section className="space-y-4">
         <article className="rounded-3xl bg-white p-6 shadow-[0_3px_12px_rgba(15,23,42,0.1)]">
-          <h1 className="text-2xl font-semibold text-slate-900">Profile</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Profil</h1>
           <p className="mt-1 text-sm text-slate-600">Kelola informasi akun dan ringkasan penggunaan.</p>
 
           {(loading || error) && <p className="mt-3 text-sm text-slate-600">{loading ? 'Memuat profil...' : error}</p>}
@@ -65,25 +65,25 @@ export default function ProfilePage() {
               <dd className="mt-1 font-medium text-slate-900">{email ?? '-'}</dd>
             </div>
             <div className="rounded-2xl bg-slate-50 p-4">
-              <dt className="inline-flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500"><FolderKanban className="h-4 w-4" />Total Projects</dt>
+              <dt className="inline-flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500"><FolderKanban className="h-4 w-4" />Total Proyek</dt>
               <dd className="mt-1 font-medium text-slate-900">{stats.total}</dd>
             </div>
             <div className="rounded-2xl bg-slate-50 p-4">
-              <dt className="text-xs uppercase tracking-wide text-slate-500">Free plan projects</dt>
+              <dt className="text-xs uppercase tracking-wide text-slate-500">Proyek paket gratis</dt>
               <dd className="mt-1 font-medium text-slate-900">{stats.free}</dd>
             </div>
             <div className="rounded-2xl bg-slate-50 p-4">
-              <dt className="inline-flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500"><ShieldCheck className="h-4 w-4" />Premium projects</dt>
+              <dt className="inline-flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500"><ShieldCheck className="h-4 w-4" />Proyek premium</dt>
               <dd className="mt-1 font-medium text-slate-900">{stats.premium}</dd>
             </div>
           </dl>
         </article>
 
         <article className="rounded-3xl bg-white p-6 shadow-[0_3px_12px_rgba(15,23,42,0.1)]">
-          <h2 className="text-lg font-semibold text-slate-900">Quick access</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Akses cepat</h2>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Link href="/transactions" className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">Transaction History</Link>
-            <Link href="/dashboard" className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">Back to Dashboard</Link>
+            <Link href="/dashboard/transactions" className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">Riwayat Transaksi</Link>
+            <Link href="/dashboard" className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">Kembali ke Dashboard</Link>
           </div>
         </article>
       </section>

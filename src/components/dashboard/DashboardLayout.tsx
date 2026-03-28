@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { BarChart3, CreditCard, LayoutDashboard, Menu, MessageSquareText, ShieldCheck } from 'lucide-react';
+import { BarChart3, LayoutDashboard, Menu, MessageSquareText, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { DashboardSidebar, type SidebarNavItem } from './DashboardSidebar';
 import type { Project } from '@/types/project';
@@ -17,16 +17,14 @@ type DashboardLayoutProps = {
 };
 
 const userNav: Array<Omit<SidebarNavItem, 'active'>> = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/workspace', label: 'Workspace', icon: MessageSquareText },
-  { href: '/pricing', label: 'Pricing', icon: CreditCard },
+  { href: '/dashboard', label: 'Beranda', icon: LayoutDashboard },
+  { href: '/dashboard/workspace', label: 'Ruang Kerja', icon: MessageSquareText },
 ];
 
 const adminNav: Array<Omit<SidebarNavItem, 'active'>> = [
-  { href: '/dashboard', label: 'Payments', icon: ShieldCheck },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/workspace', label: 'Workspace', icon: MessageSquareText },
-  { href: '/pricing', label: 'Pricing', icon: CreditCard },
+  { href: '/dashboard', label: 'Pembayaran', icon: ShieldCheck },
+  { href: '/dashboard/analytics', label: 'Analitik', icon: BarChart3 },
+  { href: '/dashboard/workspace', label: 'Ruang Kerja', icon: MessageSquareText },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -37,6 +35,7 @@ function isActive(pathname: string, href: string) {
 export function DashboardLayout({ children, userId, userEmail, mode = 'user', workspaceProjects = [], activeProjectId = null }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [signOutLoading, setSignOutLoading] = useState(false);
 
   const navItems = useMemo(() => {
     const source = mode === 'admin' ? adminNav : userNav;
@@ -44,6 +43,9 @@ export function DashboardLayout({ children, userId, userEmail, mode = 'user', wo
   }, [mode, pathname]);
 
   const handleSignOut = async () => {
+    if (signOutLoading) return;
+
+    setSignOutLoading(true);
     await supabase.auth.signOut();
     window.location.replace('/');
   };
@@ -55,12 +57,13 @@ export function DashboardLayout({ children, userId, userEmail, mode = 'user', wo
         onClose={() => setSidebarOpen(false)}
         navItems={navItems}
         title={mode === 'admin' ? 'FLATFOREST Admin' : 'FLATFOREST AI'}
-        subtitle={mode === 'admin' ? 'Control panel' : 'Landing page generator'}
+        subtitle={mode === 'admin' ? 'Panel kontrol' : 'Pembuat landing page'}
         profileLabel={userEmail ?? userId}
         onSignOut={handleSignOut}
+        signOutLoading={signOutLoading}
         workspaceProjects={workspaceProjects}
         activeProjectId={activeProjectId}
-        showWorkspaceProjects={pathname === '/workspace'}
+        showWorkspaceProjects={pathname.startsWith('/dashboard/workspace')}
       />
 
       <div className="min-h-screen lg:pl-72">

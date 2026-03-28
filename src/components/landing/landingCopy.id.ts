@@ -2,10 +2,10 @@ export const landingCopy = {
   navbar: {
     logo: 'FLATFOREST AI',
     menu: [
-      { label: 'How it works', href: '#how-it-works' },
-      { label: 'Pricing', href: '#pricing' },
+      { label: 'Cara kerja', href: '#how-it-works' },
+      { label: 'Harga', href: '#pricing' },
     ],
-    login: 'Login',
+    login: 'Masuk',
     cta: 'Coba Gratis',
   },
   hero: {
@@ -108,14 +108,14 @@ export const landingCopy = {
     brand: 'FLATFOREST AI',
     tagline: 'Landing page pintar buat bantu jualan lebih lancar.',
     productLinks: [
-      { label: 'How it works', href: '#how-it-works' },
-      { label: 'Pricing', href: '#pricing' },
-      { label: 'Login', href: '#login' },
+      { label: 'Cara kerja', href: '#how-it-works' },
+      { label: 'Harga', href: '#pricing' },
+      { label: 'Masuk', href: '#login' },
     ],
     support: 'support@flatforest.ai',
     legalLinks: [
-      { label: 'Privacy Policy', href: '#' },
-      { label: 'Terms of Service', href: '#' },
+      { label: 'Kebijakan Privasi', href: '#' },
+      { label: 'Syarat Layanan', href: '#' },
     ],
     smallCta: 'Coba Gratis',
   },

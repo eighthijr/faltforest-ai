@@ -10,9 +10,9 @@ const cardClass = 'rounded-3xl bg-white p-6 shadow-[0_4px_16px_rgba(15,23,42,0.1
 
 export function LandingPage() {
   const [authOpen, setAuthOpen] = useState(false);
-  const [authRedirectTarget, setAuthRedirectTarget] = useState<'/dashboard' | '/workspace'>('/workspace');
+  const [authRedirectTarget, setAuthRedirectTarget] = useState<'/dashboard' | '/dashboard/workspace'>('/dashboard/workspace');
 
-  const openAuth = (target: '/dashboard' | '/workspace') => {
+  const openAuth = (target: '/dashboard' | '/dashboard/workspace') => {
     setAuthRedirectTarget(target);
     setAuthOpen(true);
   };
@@ -29,7 +29,7 @@ export function LandingPage() {
             <button type="button" className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700" onClick={() => openAuth('/dashboard')}>
               {landingCopy.navbar.login}
             </button>
-            <button type="button" className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white" onClick={() => openAuth('/workspace')}>
+            <button type="button" className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white" onClick={() => openAuth('/dashboard/workspace')}>
               {landingCopy.navbar.cta}<ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -38,34 +38,34 @@ export function LandingPage() {
         <section className={`${cardClass}`}>
           <div className="grid gap-6 lg:grid-cols-2 lg:items-center">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700"><Clock3 className="h-4 w-4" /> Launch faster this week</p>
+              <p className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700"><Clock3 className="h-4 w-4" /> Luncurkan lebih cepat minggu ini</p>
               <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-5xl">{landingCopy.hero.title}</h1>
               <p className="mt-4 text-base text-slate-600 md:text-lg">{landingCopy.hero.subtitle}</p>
               <div className="mt-6 flex flex-wrap gap-2">
-                <button type="button" className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white" onClick={() => openAuth('/workspace')}>
+                <button type="button" className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white" onClick={() => openAuth('/dashboard/workspace')}>
                   {landingCopy.hero.primaryCta}
                 </button>
                 <button type="button" className="rounded-xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-700" onClick={() => openAuth('/dashboard')}>
-                  View dashboard first
+                  Lihat dashboard dulu
                 </button>
               </div>
-              <p className="mt-3 text-sm text-slate-500">{landingCopy.hero.microTrust} · Free project slot available today.</p>
+              <p className="mt-3 text-sm text-slate-500">{landingCopy.hero.microTrust} · Slot proyek gratis masih tersedia hari ini.</p>
             </div>
 
             <div className="rounded-3xl bg-slate-50 p-4 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.28)]">
-              <p className="text-sm font-semibold text-slate-800">Live product preview</p>
+              <p className="text-sm font-semibold text-slate-800">Pratinjau produk langsung</p>
               <div className="mt-3 space-y-3">
                 <div className="rounded-2xl bg-white p-3 shadow-sm">
-                  <p className="inline-flex items-center gap-2 text-sm font-medium text-slate-700"><MessageSquareText className="h-4 w-4 text-indigo-600" /> AI Chat Workspace</p>
-                  <p className="mt-1 text-xs text-slate-500">Guided prompts, typing indicator, and preview action.</p>
+                  <p className="inline-flex items-center gap-2 text-sm font-medium text-slate-700"><MessageSquareText className="h-4 w-4 text-indigo-600" /> Chat AI Ruang Kerja</p>
+                  <p className="mt-1 text-xs text-slate-500">Prompt terarah, indikator mengetik, dan aksi pratinjau.</p>
                 </div>
                 <div className="rounded-2xl bg-white p-3 shadow-sm">
-                  <p className="inline-flex items-center gap-2 text-sm font-medium text-slate-700"><LayoutTemplate className="h-4 w-4 text-indigo-600" /> Landing Result</p>
-                  <p className="mt-1 text-xs text-slate-500">Hero, benefits, social proof, and CTA generated instantly.</p>
+                  <p className="inline-flex items-center gap-2 text-sm font-medium text-slate-700"><LayoutTemplate className="h-4 w-4 text-indigo-600" /> Hasil Landing Page</p>
+                  <p className="mt-1 text-xs text-slate-500">Bagian hero, manfaat, bukti sosial, dan ajakan aksi dibuat otomatis.</p>
                 </div>
                 <div className="rounded-2xl bg-white p-3 shadow-sm">
-                  <p className="inline-flex items-center gap-2 text-sm font-medium text-slate-700"><Zap className="h-4 w-4 text-indigo-600" /> Conversion-focused</p>
-                  <p className="mt-1 text-xs text-slate-500">Clear offer, urgency copy, and call-to-action clarity.</p>
+                  <p className="inline-flex items-center gap-2 text-sm font-medium text-slate-700"><Zap className="h-4 w-4 text-indigo-600" /> Fokus konversi</p>
+                  <p className="mt-1 text-xs text-slate-500">Penawaran jelas, sense of urgency, dan ajakan aksi yang tegas.</p>
                 </div>
               </div>
             </div>
@@ -73,7 +73,7 @@ export function LandingPage() {
         </section>
 
         <section className={`mt-6 ${cardClass}`}>
-          <h2 className="text-2xl font-bold">Why teams use FLATFOREST</h2>
+          <h2 className="text-2xl font-bold">Kenapa tim memilih FLATFOREST</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {landingCopy.solution.points.map((point) => (
               <article key={point} className="rounded-2xl bg-slate-50 p-4">
@@ -86,7 +86,7 @@ export function LandingPage() {
 
 
         <section className={`mt-6 ${cardClass}`} id="pricing">
-          <h2 className="text-2xl font-bold">Pricing</h2>
+          <h2 className="text-2xl font-bold">Harga</h2>
           <p className="mt-2 text-sm text-slate-600">Mulai dari gratis, upgrade saat butuh download tanpa batas dan revisi lanjutan.</p>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {pricingPlans.map((plan) => (
@@ -98,7 +98,7 @@ export function LandingPage() {
               >
                 {plan.recommended && (
                   <span className="absolute -top-2 right-3 rounded-full bg-indigo-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                    Recommended
+                    Rekomendasi
                   </span>
                 )}
                 <h3 className="text-base font-semibold text-slate-900">{plan.name}</h3>
@@ -118,7 +118,7 @@ export function LandingPage() {
         </section>
 
         <section className={`mt-6 ${cardClass}`} id="how-it-works">
-          <h2 className="text-2xl font-bold">How it works</h2>
+          <h2 className="text-2xl font-bold">Cara kerja</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {landingCopy.howItWorks.steps.map((step, index) => (
               <article key={step.title} className="rounded-2xl bg-slate-50 p-4">
@@ -134,7 +134,7 @@ export function LandingPage() {
           <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold"><Bot className="h-4 w-4" />AI workspace ready</p>
           <h2 className="mt-3 text-2xl font-bold md:text-3xl">{landingCopy.cta.title}</h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-indigo-100 md:text-base">{landingCopy.cta.body}</p>
-          <button type="button" className="mt-5 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-indigo-700" onClick={() => openAuth('/workspace')}>
+          <button type="button" className="mt-5 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-indigo-700" onClick={() => openAuth('/dashboard/workspace')}>
             {landingCopy.cta.button}
           </button>
           <p className="mt-2 text-xs text-indigo-100">{landingCopy.cta.note}</p>
@@ -145,7 +145,7 @@ export function LandingPage() {
         isOpen={authOpen}
         onClose={() => setAuthOpen(false)}
         postAuthRedirect={authRedirectTarget}
-        title={authRedirectTarget === '/workspace' ? 'Mulai gratis sekarang' : 'Selamat datang kembali'}
+        title={authRedirectTarget === '/dashboard/workspace' ? 'Mulai gratis sekarang' : 'Selamat datang kembali'}
       />
     </main>
   );
