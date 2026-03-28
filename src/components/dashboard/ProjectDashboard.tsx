@@ -132,7 +132,7 @@ export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectD
         projectType: result.project.type,
         projectStatus: result.project.status,
       });
-      router.push(`/workspace?${params.toString()}`);
+      router.push(`/dashboard/workspace?${params.toString()}`);
     } catch (error) {
       const message =
         error instanceof Error

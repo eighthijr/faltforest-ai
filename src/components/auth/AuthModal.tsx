@@ -32,7 +32,7 @@ function GoogleIcon() {
 type AuthModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  postAuthRedirect: '/dashboard' | '/workspace';
+  postAuthRedirect: '/dashboard' | '/dashboard/workspace';
   title?: string;
 };
 
@@ -50,7 +50,7 @@ export function AuthModal({
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [closing, setClosing] = useState(false);
-  const [redirectingTo, setRedirectingTo] = useState<'/dashboard' | '/workspace' | null>(null);
+  const [redirectingTo, setRedirectingTo] = useState<'/dashboard' | '/dashboard/workspace' | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   const redirectTo = useMemo(() => buildRedirectTo(postAuthRedirect), [postAuthRedirect]);

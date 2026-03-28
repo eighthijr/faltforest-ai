@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, FolderKanban, LogOut, MessageSquareText, MoreHorizontal, UserCircle2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, FolderKanban, LoaderCircle, LogOut, MessageSquareText, UserCircle2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Project } from '@/types/project';
 
@@ -22,6 +22,7 @@ type DashboardSidebarProps = {
   profileLabel: string;
   profileSubLabel?: string;
   onSignOut?: () => void;
+  signOutLoading?: boolean;
   workspaceProjects?: Project[];
   activeProjectId?: string | null;
   showWorkspaceProjects?: boolean;
@@ -34,10 +35,11 @@ export function DashboardSidebar({
   onClose,
   navItems,
   title = 'FLATFOREST AI',
-  subtitle = 'Workspace',
+  subtitle = 'Ruang Kerja',
   profileLabel,
   profileSubLabel,
   onSignOut,
+  signOutLoading = false,
   workspaceProjects = [],
   activeProjectId = null,
   showWorkspaceProjects = false,
@@ -88,7 +90,7 @@ export function DashboardSidebar({
           </div>
 
           {showWorkspaceProjects ? (
-            <section className="space-y-3" aria-label="Workspace project list">
+            <section className="space-y-3" aria-label="Daftar proyek ruang kerja">
               <Link
                 href="/dashboard"
                 onClick={onClose}
@@ -97,13 +99,13 @@ export function DashboardSidebar({
                 <ArrowLeft className="h-4 w-4" />
                 Kembali ke menu utama
               </Link>
-              <p className="px-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">List Project</p>
+              <p className="px-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">List Proyek</p>
 
               <div className="space-y-1.5">
                 {workspaceProjects.map((project) => (
                   <Link
                     key={project.id}
-                    href={`/workspace?projectId=${project.id}`}
+                    href={`/dashboard/workspace?projectId=${project.id}`}
                     onClick={onClose}
                     className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
                       activeProjectId === project.id
@@ -112,7 +114,7 @@ export function DashboardSidebar({
                     }`}
                   >
                     <FolderKanban className="h-5 w-5 shrink-0" />
-                    <span className="truncate">Project #{project.id.slice(0, 8)}</span>
+                    <span className="truncate">Proyek #{project.id.slice(0, 8)}</span>
                   </Link>
                 ))}
               </div>
@@ -155,13 +157,12 @@ export function DashboardSidebar({
                 {profileSubLabel ? <p className="truncate text-xs text-slate-500">{profileSubLabel}</p> : null}
               </div>
             </div>
-            <MoreHorizontal className={`h-4 w-4 text-slate-500 transition-transform ${profileMenuOpen ? 'rotate-90' : ''}`} />
           </button>
 
           {profileMenuOpen ? (
             <div className="absolute bottom-[calc(100%+0.6rem)] left-0 right-0 z-50 rounded-xl border border-slate-200 bg-white p-1.5 shadow-[0_8px_24px_rgba(15,23,42,0.16)]">
               <Link
-                href="/profile"
+                href="/dashboard/profile"
                 onClick={onClose}
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
               >
@@ -169,21 +170,30 @@ export function DashboardSidebar({
                 Profil
               </Link>
               <Link
-                href="/support"
+                href="/dashboard/support"
                 onClick={onClose}
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
               >
                 <MessageSquareText className="h-4 w-4" />
-                Help (Support)
+                Bantuan
+              </Link>
+              <Link
+                href="/dashboard/transactions"
+                onClick={onClose}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              >
+                <CreditCard className="h-4 w-4" />
+                Riwayat transaksi
               </Link>
               {onSignOut ? (
                 <button
                   type="button"
                   onClick={onSignOut}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  disabled={signOutLoading}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <LogOut className="h-4 w-4" />
-                  Logout
+                  {signOutLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+                  {signOutLoading ? 'Keluar...' : 'Keluar'}
                 </button>
               ) : null}
             </div>

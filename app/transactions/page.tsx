@@ -96,8 +96,8 @@ export default function TransactionsPage() {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="/pricing" className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)]">
-            Upgrade Project
+          <Link href="/dashboard/workspace" className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(79,70,229,0.35)]">
+            Buka Ruang Kerja
           </Link>
           <Link href="/dashboard" className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
             Kembali ke Dashboard
@@ -113,14 +113,14 @@ export default function TransactionsPage() {
         ) : error ? (
           <p className="px-4 py-6 text-sm text-rose-700">{error}</p>
         ) : payments.length === 0 ? (
-          <p className="px-4 py-6 text-sm text-slate-600">Belum ada transaksi. Kamu bisa mulai upgrade dari halaman pricing.</p>
+          <p className="px-4 py-6 text-sm text-slate-600">Belum ada transaksi. Untuk upgrade, silakan lanjutkan dari ruang kerja.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
               <thead className="bg-slate-50 text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Reference</th>
-                  <th className="px-4 py-3 font-semibold">Project</th>
+                  <th className="px-4 py-3 font-semibold">Referensi</th>
+                  <th className="px-4 py-3 font-semibold">Proyek</th>
                   <th className="px-4 py-3 font-semibold">Metode</th>
                   <th className="px-4 py-3 font-semibold">Nominal</th>
                   <th className="px-4 py-3 font-semibold">Status</th>

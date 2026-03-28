@@ -26,7 +26,7 @@ export default function DashboardPage() {
   }
 
   if (!userId) {
-    return <p className="material-page p-6 text-sm text-slate-600">Redirecting...</p>;
+    return <p className="material-page p-6 text-sm text-slate-600">Sedang mengarahkan...</p>;
   }
 
   if (isAdminRole(role)) {
@@ -38,9 +38,12 @@ export default function DashboardPage() {
       userId={userId}
       userEmail={email}
       onUpgradeClick={(projectId) => {
-        const params = new URLSearchParams({ source: 'dashboard', reason: 'project_limit' });
-        if (projectId) params.set('projectId', projectId);
-        window.location.href = `/pricing?${params.toString()}`;
+        if (projectId) {
+          window.location.href = `/dashboard/workspace?projectId=${projectId}`;
+          return;
+        }
+
+        window.location.href = '/dashboard/workspace';
       }}
     />
   );

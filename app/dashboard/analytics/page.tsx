@@ -19,7 +19,7 @@ export default function DashboardAnalyticsPage() {
   }
 
   if (!userId) {
-    return <p className="material-page p-6 text-sm text-slate-600">Redirecting...</p>;
+    return <p className="material-page p-6 text-sm text-slate-600">Sedang mengarahkan...</p>;
   }
 
   if (!isAdminRole(role)) {

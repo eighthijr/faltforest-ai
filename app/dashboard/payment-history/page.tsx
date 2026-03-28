@@ -15,7 +15,7 @@ export default function DashboardPaymentHistoryPage() {
   }
 
   if (!userId) {
-    return <p className="material-page p-6 text-sm text-slate-600">Redirecting...</p>;
+    return <p className="material-page p-6 text-sm text-slate-600">Sedang mengarahkan...</p>;
   }
 
   return <PaymentHistoryDashboard userId={userId} />;
