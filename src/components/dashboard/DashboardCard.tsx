@@ -26,13 +26,28 @@ export function DashboardCard({ project, paymentStatus = null, onDelete }: Dashb
   const createdDate = new Date(project.created_at).toLocaleDateString('id-ID', { dateStyle: 'medium' });
   const status = statusMap[project.status];
   const StatusIcon = status.icon;
+  const isWaitingConfirmation = paymentStatus === 'pending' || paymentStatus === 'waiting_confirmation';
+  const projectTypeBadge = isWaitingConfirmation
+    ? {
+        label: 'Waiting Confirmation',
+        tone: 'border-amber-200 bg-amber-50 text-amber-700',
+      }
+    : project.type === 'premium'
+      ? {
+          label: 'Premium',
+          tone: 'border-violet-200 bg-violet-50 text-violet-700',
+        }
+      : {
+          label: 'Free',
+          tone: 'border-slate-200 bg-white text-slate-700',
+        };
 
   return (
     <article className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_2px_10px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] md:p-5">
       <div className="flex items-start justify-between gap-3">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-slate-700 shadow-sm">
+        <span className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] shadow-sm ${projectTypeBadge.tone}`}>
           <Crown className="h-3.5 w-3.5" />
-          {project.type === 'premium' ? 'Premium' : 'Free'}
+          {projectTypeBadge.label}
         </span>
 
         <div className="flex items-center gap-2">
@@ -82,7 +97,7 @@ export function DashboardCard({ project, paymentStatus = null, onDelete }: Dashb
         </div>
         <p className="mt-2 text-sm text-slate-500">Dibuat {createdDate}</p>
 
-        {paymentStatus === 'pending' || paymentStatus === 'waiting_confirmation' ? (
+        {isWaitingConfirmation ? (
           <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
             <Clock3 className="h-3.5 w-3.5" />
             Menunggu persetujuan
