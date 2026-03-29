@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jualan Makin Laris</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --text: #0f172a;
+        --muted: #475569;
+        --brand: #f97316;
+        --brand-dark: #ea580c;
+        --card: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .container {
+        width: min(960px, 92%);
+        margin: 0 auto;
+      }
+
+      section {
+        padding: 56px 0;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin-top: 0;
+        line-height: 1.25;
+      }
+
+      .hero {
+        padding: 80px 0 64px;
+        background: linear-gradient(180deg, #fff7ed 0%, #f8fafc 100%);
+      }
+
+      .badge {
+        display: inline-block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #9a3412;
+        background: #ffedd5;
+        border-radius: 999px;
+        padding: 8px 12px;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        font-size: clamp(30px, 6vw, 48px);
+        margin-bottom: 12px;
+      }
+
+      .lead {
+        font-size: 18px;
+        color: var(--muted);
+        max-width: 740px;
+      }
+
+      .cta {
+        display: inline-block;
+        margin-top: 24px;
+        text-decoration: none;
+        background: var(--brand);
+        color: white;
+        font-weight: 700;
+        padding: 14px 22px;
+        border-radius: 12px;
+      }
+
+      .cta:hover {
+        background: var(--brand-dark);
+      }
+
+      .grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+      }
+
+      .card p {
+        margin-bottom: 0;
+      }
+
+      .demo {
+        background: #fff;
+      }
+
+      .demo-steps {
+        counter-reset: langkah;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .demo-steps li {
+        counter-increment: langkah;
+        background: #fff7ed;
+        border-left: 5px solid var(--brand);
+        margin-bottom: 14px;
+        padding: 14px 16px;
+        border-radius: 10px;
+      }
+
+      .demo-steps li::before {
+        content: "Langkah " counter(langkah) ": ";
+        font-weight: 700;
+      }
+
+      .proof blockquote {
+        margin: 0;
+        font-size: 17px;
+      }
+
+      .proof .name {
+        margin-top: 10px;
+        font-weight: 700;
+        color: #334155;
+      }
+
+      .cta-box {
+        text-align: center;
+        background: #0f172a;
+        color: #f8fafc;
+        border-radius: 18px;
+        padding: 36px 24px;
+      }
+
+      .cta-box .cta {
+        margin-top: 14px;
+      }
+
+      footer {
+        padding: 24px 0 40px;
+        color: #64748b;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container">
+        <span class="badge">AIDA + BUKTI NYATA</span>
+        <h1>Jualan Online Lebih Ramai, Tanpa Pusing Setiap Hari</h1>
+        <p class="lead">
+          Anda fokus kirim barang dan layani pembeli. Semua pesan masuk rapi,
+          balasan cepat, dan pelanggan jadi lebih yakin untuk beli.
+        </p>
+        <a class="cta" href="#cta">Mulai Sekarang, Biar Jualan Naik</a>
+      </div>
+    </header>
+
+    <section id="problem">
+      <div class="container">
+        <h2>Masalah yang Sering Bikin Jualan Tertahan</h2>
+        <div class="grid grid-2">
+          <article class="card">
+            <h3>Pesan Menumpuk</h3>
+            <p>
+              Chat datang terus, tapi banyak yang telat dibalas. Akhirnya calon
+              pembeli pindah ke toko lain.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Jawaban Berulang</h3>
+            <p>
+              Pertanyaan sama dijawab lagi dan lagi. Tenaga habis, waktu buat
+              jualan malah berkurang.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Pembeli Ragu</h3>
+            <p>
+              Saat respon lambat, pembeli tidak yakin. Keranjang ditinggal,
+              transaksi batal.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="solution">
+      <div class="container">
+        <h2>Solusi Simpel untuk Seller Non-Teknis</h2>
+        <p class="lead">
+          Satu tempat untuk merapikan pesan, mempercepat balasan, dan bantu
+          Anda closing lebih banyak setiap hari.
+        </p>
+        <div class="grid grid-2">
+          <article class="card">
+            <h3>Pesan Jadi Rapi</h3>
+            <p>Semua percakapan tertata, jadi tidak ada calon pembeli terlewat.</p>
+          </article>
+          <article class="card">
+            <h3>Balasan Lebih Cepat</h3>
+            <p>
+              Gunakan jawaban siap pakai agar pembeli dapat respon dalam hitungan
+              detik.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Penjualan Lebih Lancar</h3>
+            <p>
+              Pembeli merasa dilayani dengan baik, lebih percaya, dan lebih cepat
+              checkout.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="demo" class="demo">
+      <div class="container">
+        <h2>Demo Singkat: Cara Kerjanya</h2>
+        <ol class="demo-steps">
+          <li>Pesan pembeli masuk ke satu halaman yang sama.</li>
+          <li>Anda pilih jawaban yang sudah disiapkan.</li>
+          <li>Pembeli langsung dapat respon yang jelas dan cepat.</li>
+          <li>Anda lanjut tutup penjualan tanpa ribet.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="benefits">
+      <div class="container">
+        <h2>Hasil yang Anda Rasakan</h2>
+        <div class="grid grid-2">
+          <article class="card">
+            <h3>Waktu Lebih Hemat</h3>
+            <p>Tidak lagi habis waktu untuk jawab hal yang sama berulang-ulang.</p>
+          </article>
+          <article class="card">
+            <h3>Pembeli Lebih Puas</h3>
+            <p>Respon cepat bikin pembeli merasa diperhatikan.</p>
+          </article>
+          <article class="card">
+            <h3>Omzet Lebih Naik</h3>
+            <p>Lebih banyak chat terjawab, lebih banyak juga yang jadi order.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="proof" class="proof">
+      <div class="container">
+        <h2>Bukti dari Pengguna</h2>
+        <div class="grid grid-2">
+          <article class="card">
+            <blockquote>
+              “Dulu saya sering telat balas chat. Sekarang lebih cepat, order
+              harian naik 2 kali lipat dalam 1 bulan.”
+            </blockquote>
+            <p class="name">— Rina, Seller Fashion</p>
+          </article>
+          <article class="card">
+            <blockquote>
+              “Saya tidak jago urusan rumit, tapi ini gampang dipakai. Calon
+              pembeli jadi lebih sering lanjut bayar.”
+            </blockquote>
+            <p class="name">— Dedi, Seller Makanan</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="cta">
+      <div class="container">
+        <div class="cta-box">
+          <h2>Jangan Biarkan Chat Dingin Jadi Order Hilang</h2>
+          <p>
+            Mulai hari ini, rapikan chat Anda dan ubah lebih banyak pembeli jadi
+            transaksi.
+          </p>
+          <a class="cta" href="#">Daftar Sekarang dan Naikkan Penjualan</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p>© 2026 JualanMaju. Dibuat untuk seller online yang ingin tumbuh cepat.</p>
+      </div>
+    </footer>
+  </body>
+</html>
