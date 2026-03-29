@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Activity, BadgeCheck, CalendarClock, CircleCheck, CircleDashed, Clock3, Crown, FlaskConical, Hash, Trash2 } from 'lucide-react';
+import { BadgeCheck, CircleCheck, CircleDashed, Clock3, Crown, FlaskConical, Trash2 } from 'lucide-react';
 import type { PaymentStatus } from '@/api/payments';
 import type { Project } from '@/types/project';
 import { Spinner } from '../ui';
@@ -14,9 +15,9 @@ type DashboardCardProps = {
 };
 
 const statusMap: Record<Project['status'], { label: string; tone: string; icon: typeof CircleCheck }> = {
-  draft: { label: 'Draft', tone: 'bg-amber-50 text-amber-700', icon: CircleDashed },
-  ready: { label: 'Sedang dibuat', tone: 'bg-violet-50 text-violet-700', icon: FlaskConical },
-  generated: { label: 'Selesai dibuat', tone: 'bg-emerald-50 text-emerald-700', icon: CircleCheck },
+  draft: { label: 'Draft', tone: 'bg-amber-100 text-amber-700', icon: CircleDashed },
+  ready: { label: 'Diproses', tone: 'bg-violet-100 text-violet-700', icon: FlaskConical },
+  generated: { label: 'Live', tone: 'bg-emerald-100 text-emerald-700', icon: CircleCheck },
 };
 
 export function DashboardCard({ project, paymentStatus = null, onDelete }: DashboardCardProps) {
@@ -27,69 +28,83 @@ export function DashboardCard({ project, paymentStatus = null, onDelete }: Dashb
   const StatusIcon = status.icon;
 
   return (
-    <article className="rounded-3xl bg-white p-5 shadow-[0_3px_12px_rgba(15,23,42,0.1)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,23,42,0.14)]">
+    <article className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_2px_10px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] md:p-5">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-900">Proyek Ruang Kerja</h3>
-          <p className="mt-1 text-sm text-slate-500">Lanjutkan proses pembuatan landing page kamu.</p>
-        </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-          <Crown className="h-4 w-4" />
-          {project.type === 'premium' ? 'Premium' : 'Gratis'}
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-slate-700 shadow-sm">
+          <Crown className="h-3.5 w-3.5" />
+          {project.type === 'premium' ? 'Premium' : 'Free'}
         </span>
+
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/support"
+            className="inline-flex items-center rounded-full bg-amber-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-amber-600"
+          >
+            Hubungi CS
+          </Link>
+          <button
+            type="button"
+            onClick={() => onDelete?.(project)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+            aria-label="Hapus project"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
-      <dl className="mt-4 grid gap-3 text-sm text-slate-600">
-        <div className="inline-flex items-center gap-2">
-          <StatusIcon className="h-4 w-4" />
-          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${status.tone}`}>{status.label}</span>
+      <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50/40 p-4">
+        <h3 className="line-clamp-3 text-center text-3xl font-extrabold leading-tight tracking-tight text-slate-900">
+          Proyek Landing Page Siap Pakai untuk Bisnis Kamu
+        </h3>
+      </div>
+
+      <div className="mt-4 border-t border-slate-100 pt-4">
+        <div className="flex items-center justify-between gap-3">
+          <p className="font-mono text-2xl font-bold uppercase tracking-tight text-slate-900">{project.id.slice(0, 8)}</p>
+          <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] ${status.tone}`}>
+            <StatusIcon className="h-3.5 w-3.5" />
+            {status.label}
+          </span>
         </div>
-        <div className="inline-flex items-center gap-2">
-          <CalendarClock className="h-4 w-4" />
-          <span>Dibuat {createdDate}</span>
-        </div>
-        <div className="inline-flex items-center gap-2">
-          <Hash className="h-4 w-4" />
-          <span className="truncate font-mono text-xs">{project.id}</span>
-        </div>
-        <div className="inline-flex items-center gap-2">
-          <Activity className="h-4 w-4" />
-          <span>Aktivitas terakhir: baru saja diperbarui</span>
-        </div>
+        <p className="mt-2 text-sm text-slate-500">Dibuat {createdDate}</p>
 
         {paymentStatus === 'pending' || paymentStatus === 'waiting_confirmation' ? (
-          <div className="inline-flex items-center gap-2 text-amber-700">
-            <Clock3 className="h-4 w-4" />
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold">Menunggu persetujuan</span>
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+            <Clock3 className="h-3.5 w-3.5" />
+            Menunggu persetujuan
           </div>
         ) : null}
 
         {paymentStatus === 'success' ? (
-          <div className="inline-flex items-center gap-2 text-emerald-700">
-            <BadgeCheck className="h-4 w-4" />
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold">Disetujui · Sudah diverifikasi admin</span>
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <BadgeCheck className="h-3.5 w-3.5" />
+            Pembayaran terverifikasi
           </div>
         ) : null}
-      </dl>
+      </div>
 
-      <div className="mt-5 flex items-center gap-2">
+      <div className="mt-5 flex items-center gap-3">
         <button
           type="button"
           onClick={() => {
             setRedirecting(true);
             router.push(`/dashboard/workspace?projectId=${project.id}`);
           }}
-          className="inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(79,70,229,0.32)] transition hover:bg-indigo-500"
+          className="inline-flex flex-1 items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-base font-semibold text-white shadow-[0_8px_18px_rgba(79,70,229,0.32)] transition hover:bg-indigo-500"
         >
-          Buka Ruang Kerja
+          Buka Workspace
         </button>
         <button
           type="button"
-          onClick={() => onDelete?.(project)}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
+          onClick={() => {
+            setRedirecting(true);
+            router.push(`/dashboard/workspace?projectId=${project.id}`);
+          }}
+          className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+          aria-label="Buka workspace cepat"
         >
-          <Trash2 className="h-4 w-4" />
-          Hapus
+          <span className="text-lg leading-none">↗</span>
         </button>
       </div>
 
