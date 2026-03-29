@@ -53,10 +53,23 @@ export function DashboardCard({ project, paymentStatus = null, onDelete }: Dashb
         </div>
       </div>
 
-      <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50/40 p-4">
-        <h3 className="line-clamp-3 text-center text-3xl font-extrabold leading-tight tracking-tight text-slate-900">
-          Proyek Landing Page Siap Pakai untuk Bisnis Kamu
-        </h3>
+      <div className="mt-5 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50/40">
+        {project.generated_html ? (
+          <div className="relative h-44 bg-slate-100">
+            <iframe
+              srcDoc={project.generated_html}
+              title={`Preview ${project.id}`}
+              className="pointer-events-none absolute left-1/2 top-0 h-[720px] w-[1280px] -translate-x-1/2 origin-top scale-[0.34] border-0 bg-white"
+              sandbox=""
+            />
+          </div>
+        ) : (
+          <div className="p-4">
+            <h3 className="line-clamp-3 text-center text-3xl font-extrabold leading-tight tracking-tight text-slate-900">
+              Proyek Landing Page Siap Pakai untuk Bisnis Kamu
+            </h3>
+          </div>
+        )}
       </div>
 
       <div className="mt-4 border-t border-slate-100 pt-4">
