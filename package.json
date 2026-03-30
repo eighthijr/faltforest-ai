@@ -10,10 +10,11 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.49.4",
     "next": "15.3.6",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "@supabase/supabase-js": "2.49.4"
+    "react-toastify": "^10.0.5"
   },
   "devDependencies": {
     "typescript": "5.8.3",

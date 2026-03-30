@@ -1,15 +1,9 @@
 'use client';
 
-import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useMemo } from 'react';
+import { ToastContainer, toast, type ToastOptions } from 'react-toastify';
 
 type ToastType = 'success' | 'error' | 'info';
-
-type ToastItem = {
-  id: string;
-  title: string;
-  description?: string;
-  type: ToastType;
-};
 
 type ToastInput = {
   title: string;
@@ -24,63 +18,49 @@ type ToastContextValue = {
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
-function getToastStyle(type: ToastType) {
-  if (type === 'success') return 'border-emerald-200 bg-emerald-50 text-emerald-900';
-  if (type === 'error') return 'border-rose-200 bg-rose-50 text-rose-900';
-  return 'border-slate-200 bg-white text-slate-900';
+function ToastContent({ title, description }: { title: string; description?: string }) {
+  return (
+    <div>
+      <p className="text-sm font-semibold">{title}</p>
+      {description && <p className="mt-1 text-xs opacity-90">{description}</p>}
+    </div>
+  );
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const pushToast = useCallback((input: ToastInput) => {
+    const options: ToastOptions = {
+      autoClose: input.durationMs ?? 2800,
+    };
 
-  const removeToast = useCallback((id: string) => {
-    setToasts((current) => current.filter((toast) => toast.id !== id));
+    const content = <ToastContent title={input.title} description={input.description} />;
+
+    if (input.type === 'success') {
+      toast.success(content, options);
+      return;
+    }
+
+    if (input.type === 'error') {
+      toast.error(content, options);
+      return;
+    }
+
+    toast.info(content, options);
   }, []);
-
-  const pushToast = useCallback(
-    (input: ToastInput) => {
-      const id = crypto.randomUUID();
-      const nextToast: ToastItem = {
-        id,
-        title: input.title,
-        description: input.description,
-        type: input.type ?? 'info',
-      };
-      setToasts((current) => [...current, nextToast]);
-
-      const duration = input.durationMs ?? 2800;
-      window.setTimeout(() => removeToast(id), duration);
-    },
-    [removeToast],
-  );
 
   const value = useMemo<ToastContextValue>(() => ({ pushToast }), [pushToast]);
 
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="pointer-events-none fixed right-4 top-4 z-[1000] flex w-[min(92vw,380px)] flex-col gap-2">
-        {toasts.map((toast) => (
-          <article
-            key={toast.id}
-            className={`pointer-events-auto rounded-xl border p-3 shadow-sm transition-all duration-200 animate-toast-in ${getToastStyle(
-              toast.type,
-            )}`}
-            role="status"
-            aria-live="polite"
-          >
-            <p className="text-sm font-semibold">{toast.title}</p>
-            {toast.description && <p className="mt-1 text-xs opacity-90">{toast.description}</p>}
-            <button
-              type="button"
-              onClick={() => removeToast(toast.id)}
-              className="mt-2 text-xs font-medium underline underline-offset-2"
-            >
-              Tutup
-            </button>
-          </article>
-        ))}
-      </div>
+      <ToastContainer
+        position="top-right"
+        closeOnClick
+        newestOnTop
+        theme="colored"
+        toastClassName="rounded-xl border p-3 shadow-sm"
+        bodyClassName="p-0"
+      />
     </ToastContext.Provider>
   );
 }
