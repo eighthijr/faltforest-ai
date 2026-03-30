@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
 import { Bot, Sparkles } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 import type { WorkspaceMessage } from '@/types/workspace';
@@ -13,9 +16,22 @@ type ChatBodyProps = {
 
 export function ChatBody({ messages, helperText, progressLabel, isGenerating = false, generatingSeconds = 0, onMessageAction }: ChatBodyProps) {
   const showOnboarding = messages.length <= 1;
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const container = scrollAreaRef.current;
+    if (!container) return;
+
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    const shouldAutoScroll = distanceFromBottom < 160;
+    if (!shouldAutoScroll) return;
+
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, isGenerating]);
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50 px-4 py-4 md:px-6">
+    <div ref={scrollAreaRef} className="min-h-0 flex-1 overflow-y-auto bg-slate-50 px-4 py-4 md:px-6">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
         {showOnboarding ? (
           <div className="rounded-2xl bg-indigo-50 px-4 py-3 text-sm text-indigo-800 shadow-[0_2px_8px_rgba(99,102,241,0.14)]">
@@ -47,6 +63,7 @@ export function ChatBody({ messages, helperText, progressLabel, isGenerating = f
         ) : null}
 
         {helperText ? <p className="text-xs text-slate-500">{helperText}</p> : null}
+        <div ref={bottomRef} aria-hidden />
       </div>
     </div>
   );
