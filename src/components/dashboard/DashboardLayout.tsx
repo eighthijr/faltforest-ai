@@ -83,7 +83,15 @@ export function DashboardLayout({ children, userId, userEmail, mode = 'user', wo
               </button>
             </header>
           ) : null}
-          <main className="w-full px-4 py-4 md:px-6 md:py-6">{children}</main>
+          <main
+            className={
+              isWorkspaceRoute
+                ? 'h-dvh w-full p-0 lg:h-screen'
+                : 'w-full px-4 py-4 md:px-6 md:py-6'
+            }
+          >
+            {children}
+          </main>
         </div>
       </DashboardSidebarProvider>
     </div>
