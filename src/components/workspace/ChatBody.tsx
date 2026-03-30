@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { Bot, Sparkles } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 import type { WorkspaceMessage } from '@/types/workspace';
@@ -12,9 +12,18 @@ type ChatBodyProps = {
   isGenerating?: boolean;
   generatingSeconds?: number;
   onMessageAction?: (action: NonNullable<WorkspaceMessage['cta']>['action']) => void;
+  imageUploadBubble?: ReactNode;
 };
 
-export function ChatBody({ messages, helperText, progressLabel, isGenerating = false, generatingSeconds = 0, onMessageAction }: ChatBodyProps) {
+export function ChatBody({
+  messages,
+  helperText,
+  progressLabel,
+  isGenerating = false,
+  generatingSeconds = 0,
+  onMessageAction,
+  imageUploadBubble,
+}: ChatBodyProps) {
   const showOnboarding = messages.length <= 1;
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -50,6 +59,7 @@ export function ChatBody({ messages, helperText, progressLabel, isGenerating = f
         {messages.map((message) => (
           <ChatMessage key={message.id} message={message} onAction={onMessageAction} />
         ))}
+        {imageUploadBubble}
 
         {isGenerating ? (
           <p className="inline-flex animate-pulse items-center gap-2 self-start rounded-2xl bg-white px-3 py-2 text-xs text-slate-600 shadow-[0_1px_4px_rgba(15,23,42,0.12)]">

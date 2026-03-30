@@ -17,6 +17,7 @@ import { UpgradeModal } from './UpgradeModal';
 import { PaymentModal } from './PaymentModal';
 import { SuccessModal } from './SuccessModal';
 import { WorkspaceLayout } from './WorkspaceLayout';
+import { ImageUploadBubble } from './ImageUploadBubble';
 
 const PREMIUM_AMOUNT = 99000;
 
@@ -63,8 +64,13 @@ function createManualReference(projectId: string) {
 const emptyAnswers: WorkspaceAnswers = {
   product: '',
   target: '',
+  problem: '',
   benefit: '',
+  offer: '',
+  cta: '',
+  whatsapp: '',
   images: '',
+  style: '',
 };
 
 const initialGreeting = (): WorkspaceMessage => ({
@@ -118,6 +124,8 @@ function WorkspaceChatContent({
   const { pushToast } = useToast();
   const { activeModal, closeModal, openPreview, openPaymentMethod, openUpgrade, openPayment, openSuccess } = useModalManager();
   const [input, setInput] = useState('');
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'tripay_qris_auto' | 'qris_static_manual'>('qris_static_manual');
   const [processingPayment, setProcessingPayment] = useState(false);
   const [premiumUnlocked, setPremiumUnlocked] = useState(projectType === 'premium');
@@ -302,8 +310,11 @@ function WorkspaceChatContent({
   const nextQuestionKey = missingFields[0] as QuestionKey | undefined;
   const nextQuestion = nextQuestionKey ? questionLabels[nextQuestionKey] : null;
   const answeredCount = questionOrder.length - missingFields.length;
+  const totalSteps = questionOrder.length;
   const progressLabel =
-    state.state === 'generated' ? 'Step 4 dari 4 • Hasil siap' : `Step ${Math.min(answeredCount + 1, 4)} dari 4 • Mengumpulkan brief`;
+    state.state === 'generated'
+      ? `Step ${totalSteps} dari ${totalSteps} • Hasil siap`
+      : `Step ${Math.min(answeredCount + 1, totalSteps)} dari ${totalSteps} • Mengumpulkan brief`;
   const runAutoGeneration = async (answers: WorkspaceAnswers) => {
     try {
       dispatch({ type: 'SET_LOADING', value: true });
@@ -351,24 +362,31 @@ function WorkspaceChatContent({
   };
 
   const submitText = (rawValue: string) => {
+    const key = nextQuestionKey;
     const trimmed = rawValue.trim();
-    if (!trimmed) return;
+    const canSubmitImageStep = key === 'images' && uploadedImageUrls.length > 0;
+    if (!trimmed && !canSubmitImageStep) return;
 
     if (state.state === 'generated' && state.projectType === 'free' && !premiumUnlocked) {
       openUpgrade('chat_after_generated');
       return;
     }
 
-    dispatch({ type: 'ADD_MESSAGE', value: { id: uid(), role: 'user', content: trimmed } });
+    const userMessage = trimmed || (canSubmitImageStep ? `[Upload ${uploadedImageUrls.length} gambar]` : trimmed);
+    dispatch({ type: 'ADD_MESSAGE', value: { id: uid(), role: 'user', content: userMessage } });
 
     if (state.state === 'draft') {
-      const key = nextQuestionKey;
       if (!key) return;
 
-      dispatch({ type: 'APPLY_EVENT', event: { type: 'ANSWER_SUBMITTED', key, value: trimmed } });
+      const finalValue =
+        key === 'images'
+          ? [trimmed, ...uploadedImageUrls].filter(Boolean).join(', ')
+          : trimmed;
+
+      dispatch({ type: 'APPLY_EVENT', event: { type: 'ANSWER_SUBMITTED', key, value: finalValue } });
       const updatedAnswers: WorkspaceAnswers = {
         ...state.answers,
-        [key]: trimmed,
+        [key]: finalValue,
       };
 
       const currentMissing = questionOrder.filter((question) => {
@@ -387,6 +405,10 @@ function WorkspaceChatContent({
         });
       } else {
         void runAutoGeneration(updatedAnswers);
+      }
+      if (key === 'images') {
+        setImageFiles([]);
+        setUploadedImageUrls([]);
       }
       setInput('');
       return;
@@ -489,6 +511,34 @@ function WorkspaceChatContent({
         ? `Kamu punya ${projectCount} project. Pindah project bisa dilakukan dari Dashboard.`
         : null;
 
+  const showImageUploader = state.state === 'draft' && nextQuestionKey === 'images';
+
+  const handleImageFilesChange = async (files: File[]) => {
+    setImageFiles(files);
+
+    try {
+      const encoded = await Promise.all(
+        files.map(
+          (file) =>
+            new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+              reader.onerror = () => reject(new Error(`Gagal membaca file ${file.name}`));
+              reader.readAsDataURL(file);
+            }),
+        ),
+      );
+      setUploadedImageUrls(encoded.filter(Boolean));
+    } catch (error) {
+      setUploadedImageUrls([]);
+      pushToast({
+        type: 'error',
+        title: 'Upload gambar gagal',
+        description: error instanceof Error ? error.message : 'Silakan coba upload ulang gambar.',
+      });
+    }
+  };
+
   return (
     <>
       <WorkspaceLayout
@@ -511,6 +561,19 @@ function WorkspaceChatContent({
             onMessageAction={(action) => {
               if (action === 'preview') openPreview();
             }}
+            imageUploadBubble={
+              showImageUploader ? (
+                <ImageUploadBubble
+                  files={imageFiles}
+                  disabled={state.loading}
+                  maxFiles={3}
+                  maxFileSize="500KB"
+                  onFilesChange={(files) => {
+                    void handleImageFilesChange(files);
+                  }}
+                />
+              ) : null
+            }
           />
         }
         input={

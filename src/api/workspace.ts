@@ -29,8 +29,13 @@ async function callGenerateEndpoint(input: GenerateCopyInput): Promise<string> {
       projectId: input.projectId,
       product: input.answers.product,
       target: input.answers.target,
+      problem: input.answers.problem,
       benefit: input.answers.benefit,
+      offer: input.answers.offer,
+      cta: input.answers.cta,
+      whatsapp: input.answers.whatsapp,
       images: input.answers.images,
+      style: input.answers.style,
     }),
   });
 

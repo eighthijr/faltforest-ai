@@ -1,12 +1,17 @@
 import type { WorkspaceContext, WorkspaceEvent, WorkspaceState } from '../types/workspace';
 
-export const questionOrder = ['product', 'target', 'benefit', 'images'] as const;
+export const questionOrder = ['product', 'target', 'problem', 'benefit', 'offer', 'cta', 'whatsapp', 'images', 'style'] as const;
 
 export const questionLabels: Record<(typeof questionOrder)[number], string> = {
   product: 'Apa produk yang kamu jual?',
   target: 'Siapa target pembeli utamamu?',
-  benefit: 'Apa manfaat utama produk ini?',
-  images: 'Masukkan link gambar produk (boleh lebih dari satu, pisahkan koma).',
+  problem: 'Masalah utama apa yang paling sering dialami target kamu?',
+  benefit: 'Apa hasil/manfaat utama yang dijanjikan?',
+  offer: 'Apa penawaran yang ingin ditonjolkan? (harga, bonus, garansi, promo)',
+  cta: 'User nanti diarahkan ke mana? (contoh: chat WA, daftar form, checkout)',
+  whatsapp: 'Masukkan nomor WhatsApp tujuan (format internasional tanpa +, contoh 62812xxxx).',
+  images: 'Masukkan link gambar (produk, testimoni, logo) dipisahkan koma. Jika belum ada, ketik "tidak ada".',
+  style: 'Gaya visual yang diinginkan apa? (contoh: clean, luxury dark, fun colorful)',
 };
 
 export function canTransition(current: WorkspaceState, next: WorkspaceState): boolean {

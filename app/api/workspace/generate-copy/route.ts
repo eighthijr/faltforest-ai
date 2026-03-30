@@ -4,8 +4,13 @@ type GenerateCopyPayload = {
   projectId?: string;
   product?: string;
   target?: string;
+  problem?: string;
   benefit?: string;
+  offer?: string;
+  cta?: string;
+  whatsapp?: string;
   images?: string;
+  style?: string;
 };
 
 type LandingPageSection = {
@@ -20,10 +25,12 @@ type LandingPageSpec = {
   heroSubheadline: string;
   primaryCta: string;
   secondaryCta: string;
+  whatsappCtaLabel: string;
   sections: LandingPageSection[];
   testimonialQuote: string;
   testimonialAuthor: string;
   faq: Array<{ question: string; answer: string }>;
+  imageUrls: string[];
   theme: {
     accent: string;
     background: 'light' | 'dark';
@@ -62,12 +69,31 @@ function ensureBullets(items: string[] | undefined, fallback: string) {
   return [fallback];
 }
 
+function parseImageUrls(rawValue: string | undefined) {
+  const candidates = (rawValue ?? '')
+    .split(/[\n,]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (candidates.some((item) => item.toLowerCase() === 'tidak ada')) return [];
+  return candidates.filter((item) => /^https?:\/\/\S+/i.test(item) || /^data:image\/[a-zA-Z]+;base64,/i.test(item)).slice(0, 6);
+}
+
+function summarizeImagePreference(rawValue: string | undefined) {
+  const urls = parseImageUrls(rawValue);
+  const remoteCount = urls.filter((item) => item.startsWith('http')).length;
+  const uploadedCount = urls.filter((item) => item.startsWith('data:image')).length;
+
+  if (urls.length === 0) return rawValue ?? '';
+  return `Total gambar: ${urls.length} (URL publik: ${remoteCount}, upload lokal: ${uploadedCount})`;
+}
+
 function normalizeSpec(input: Partial<LandingPageSpec>, body: Required<GenerateCopyPayload>): LandingPageSpec {
   const fallbackSections: LandingPageSection[] = [
     {
       title: 'Masalah yang sering terjadi',
-      body: `Banyak ${body.target} kesulitan mendapatkan hasil konsisten tanpa sistem yang jelas.`,
-      bullets: ['Waktu habis untuk trial and error', 'Sulit menemukan strategi yang cocok'],
+      body: body.problem,
+      bullets: ['Masalah ini menahan pertumbuhan penjualan', 'Sulit diselesaikan tanpa strategi yang tepat'],
     },
     {
       title: 'Solusi yang ditawarkan',
@@ -75,9 +101,9 @@ function normalizeSpec(input: Partial<LandingPageSpec>, body: Required<GenerateC
       bullets: ensureBullets(body.benefit.split(/[\n,]/), body.benefit),
     },
     {
-      title: 'Kenapa wajib ambil sekarang',
-      body: 'Mulai sekarang supaya hasil penjualan dan komisi bisa naik lebih cepat.',
-      bullets: ['Langsung bisa dipraktikkan', 'Fokus ke hasil yang terukur'],
+      title: 'Penawaran untuk kamu',
+      body: body.offer,
+      bullets: ['Penawaran dirancang untuk mempercepat keputusan beli', 'Cocok untuk target yang butuh hasil cepat'],
     },
   ];
 
@@ -91,14 +117,19 @@ function normalizeSpec(input: Partial<LandingPageSpec>, body: Required<GenerateC
     .slice(0, 4);
 
   const safeSections = normalizedSections.length > 0 ? normalizedSections : fallbackSections;
+  const normalizedImageUrls = (input.imageUrls ?? [])
+    .filter((item) => /^https?:\/\/\S+/i.test(item) || /^data:image\/[a-zA-Z]+;base64,/i.test(item))
+    .slice(0, 6);
+  const fallbackImageUrls = parseImageUrls(body.images);
 
   return {
     brandName: input.brandName?.trim() || body.product,
     heroHeadline: input.heroHeadline?.trim() || `${body.product}: solusi praktis untuk ${body.target}`,
     heroSubheadline:
       input.heroSubheadline?.trim() || `Dapatkan manfaat utama: ${body.benefit}. Siap pakai untuk percepat konversi.`,
-    primaryCta: input.primaryCta?.trim() || 'Ambil Sekarang',
-    secondaryCta: input.secondaryCta?.trim() || 'Lihat Detail',
+    primaryCta: input.primaryCta?.trim() || 'Konsultasi Sekarang',
+    secondaryCta: input.secondaryCta?.trim() || body.cta,
+    whatsappCtaLabel: input.whatsappCtaLabel?.trim() || 'Chat via WhatsApp',
     sections: safeSections,
     testimonialQuote:
       input.testimonialQuote?.trim() || `“Akhirnya saya punya cara yang lebih jelas untuk mencapai ${body.benefit}.”`,
@@ -107,10 +138,11 @@ function normalizeSpec(input: Partial<LandingPageSpec>, body: Required<GenerateC
       .map((faq) => ({ question: faq?.question?.trim() || '', answer: faq?.answer?.trim() || '' }))
       .filter((faq) => faq.question && faq.answer)
       .slice(0, 3),
+    imageUrls: normalizedImageUrls.length > 0 ? normalizedImageUrls : fallbackImageUrls,
     theme: {
       accent: normalizeHexColor(input.theme?.accent),
       background: input.theme?.background === 'dark' ? 'dark' : 'light',
-      styleTone: input.theme?.styleTone?.trim() || FALLBACK_THEME.styleTone,
+      styleTone: input.theme?.styleTone?.trim() || body.style || FALLBACK_THEME.styleTone,
     },
   };
 }
@@ -118,6 +150,8 @@ function normalizeSpec(input: Partial<LandingPageSpec>, body: Required<GenerateC
 function buildLandingPageHtml(spec: LandingPageSpec, body: Required<GenerateCopyPayload>) {
   const accent = normalizeHexColor(spec.theme.accent);
   const isDark = spec.theme.background === 'dark';
+  const whatsappNumber = body.whatsapp.replace(/\D/g, '');
+  const whatsappLink = whatsappNumber ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Halo, saya tertarik dengan ${body.product}`)}` : '#';
   const pageBg = isDark ? '#0f172a' : '#f8fafc';
   const cardBg = isDark ? '#111827' : '#ffffff';
   const textColor = isDark ? '#e5e7eb' : '#0f172a';
@@ -145,6 +179,21 @@ function buildLandingPageHtml(spec: LandingPageSpec, body: Required<GenerateCopy
           .join('')}</section>`
       : '';
 
+  const galleryHtml =
+    spec.imageUrls.length > 0
+      ? `<section class="card">
+          <h3>Galeri Visual</h3>
+          <div class="gallery">
+            ${spec.imageUrls
+              .map(
+                (url, index) =>
+                  `<figure><img src="${escapeHtml(url)}" alt="Visual ${index + 1} ${escapeHtml(spec.brandName)}" loading="lazy" /></figure>`,
+              )
+              .join('')}
+          </div>
+        </section>`
+      : '';
+
   return `<!DOCTYPE html>
 <html lang="id">
   <head>
@@ -155,12 +204,12 @@ function buildLandingPageHtml(spec: LandingPageSpec, body: Required<GenerateCopy
       :root { --accent: ${accent}; --page-bg: ${pageBg}; --card-bg: ${cardBg}; --text: ${textColor}; --muted: ${mutedColor}; }
       * { box-sizing: border-box; }
       body { margin: 0; font-family: Inter, Arial, sans-serif; background: var(--page-bg); color: var(--text); }
-      .container { max-width: 960px; margin: 0 auto; padding: 32px 20px 48px; display: grid; gap: 16px; }
+      .container { max-width: 1120px; margin: 0 auto; padding: 32px 20px 48px; display: grid; gap: 16px; }
       .card { background: var(--card-bg); border-radius: 16px; padding: 24px; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08); }
       .hero h1 { margin: 0 0 10px; font-size: 34px; line-height: 1.2; }
       .hero p { margin: 0; color: var(--muted); }
       .cta { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; }
-      .btn { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+      .btn { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
       .btn-primary { background: var(--accent); color: white; }
       .btn-secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
       .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
@@ -169,7 +218,11 @@ function buildLandingPageHtml(spec: LandingPageSpec, body: Required<GenerateCopy
       ul { margin: 0; padding-left: 20px; color: var(--muted); }
       .testimonial blockquote { margin: 0; font-size: 20px; line-height: 1.4; }
       .testimonial cite { display: block; margin-top: 12px; color: var(--muted); font-style: normal; }
+      .gallery { margin-top: 12px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+      .gallery figure { margin: 0; overflow: hidden; border-radius: 14px; background: rgba(148, 163, 184, 0.12); min-height: 180px; }
+      .gallery img { display: block; width: 100%; height: 100%; object-fit: cover; }
       .footer { text-align: center; color: var(--muted); font-size: 13px; }
+      @media (max-width: 640px) { .hero h1 { font-size: 28px; } .card { padding: 18px; } }
     </style>
   </head>
   <body>
@@ -179,12 +232,14 @@ function buildLandingPageHtml(spec: LandingPageSpec, body: Required<GenerateCopy
         <h1>${escapeHtml(spec.heroHeadline)}</h1>
         <p>${escapeHtml(spec.heroSubheadline)}</p>
         <div class="cta">
-          <button class="btn btn-primary">${escapeHtml(spec.primaryCta)}</button>
-          <button class="btn btn-secondary">${escapeHtml(spec.secondaryCta)}</button>
+          <a class="btn btn-primary" href="${escapeHtml(whatsappLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(spec.whatsappCtaLabel)}</a>
+          <a class="btn btn-secondary" href="#penawaran">${escapeHtml(spec.secondaryCta || spec.primaryCta)}</a>
         </div>
       </section>
 
-      <section class="grid">
+      ${galleryHtml}
+
+      <section class="grid" id="penawaran">
         ${sectionHtml}
       </section>
 
@@ -196,7 +251,9 @@ function buildLandingPageHtml(spec: LandingPageSpec, body: Required<GenerateCopy
       ${faqHtml}
 
       <section class="footer">
-        Dibuat otomatis untuk produk ${escapeHtml(body.product)} dengan target ${escapeHtml(body.target)}.
+        Dibuat otomatis untuk produk ${escapeHtml(body.product)} dengan target ${escapeHtml(body.target)}. CTA utama: ${escapeHtml(
+          body.cta,
+        )}.
       </section>
     </main>
   </body>
@@ -244,6 +301,7 @@ function buildPrompt(body: Required<GenerateCopyPayload>) {
     '  "heroSubheadline": "string",',
     '  "primaryCta": "string",',
     '  "secondaryCta": "string",',
+    '  "whatsappCtaLabel": "string",',
     '  "sections": [',
     '    { "title": "string", "body": "string", "bullets": ["string", "string"] }',
     '  ],',
@@ -252,6 +310,7 @@ function buildPrompt(body: Required<GenerateCopyPayload>) {
     '  "faq": [',
     '    { "question": "string", "answer": "string" }',
     '  ],',
+    '  "imageUrls": ["https://..."],',
     '  "theme": {',
     '    "accent": "#RRGGBB",',
     '    "background": "light atau dark",',
@@ -263,13 +322,19 @@ function buildPrompt(body: Required<GenerateCopyPayload>) {
     '- sections ideal 3 item, maksimal 4.',
     '- bullets setiap section minimal 2, maksimal 4.',
     '- faq ideal 2 item, maksimal 3.',
+    '- imageUrls ambil dari input gambar yang valid URL.',
     '- Bahasa Indonesia, persuasif, tanpa klaim berlebihan.',
     '- Semua teks harus spesifik, jangan gunakan placeholder.',
     '',
     `Produk: ${body.product}`,
     `Target audiens: ${body.target}`,
+    `Problem utama target: ${body.problem}`,
     `Manfaat utama: ${body.benefit}`,
-    `Preferensi gaya visual/gambar: ${body.images}`,
+    `Penawaran: ${body.offer}`,
+    `Tujuan CTA: ${body.cta}`,
+    `Nomor WhatsApp: ${body.whatsapp}`,
+    `Preferensi gaya visual/gambar: ${summarizeImagePreference(body.images)}`,
+    `Style visual yang diinginkan: ${body.style}`,
   ].join('\n');
 }
 
@@ -433,7 +498,18 @@ async function generateViaSupabaseEdge(body: Required<GenerateCopyPayload>, auth
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as GenerateCopyPayload;
-    const requiredFields: Array<keyof GenerateCopyPayload> = ['projectId', 'product', 'target', 'benefit', 'images'];
+    const requiredFields: Array<keyof GenerateCopyPayload> = [
+      'projectId',
+      'product',
+      'target',
+      'problem',
+      'benefit',
+      'offer',
+      'cta',
+      'whatsapp',
+      'images',
+      'style',
+    ];
     const missing = requiredFields.filter((field) => !body[field]?.trim());
 
     if (missing.length > 0) {
