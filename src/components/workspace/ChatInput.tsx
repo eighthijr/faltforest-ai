@@ -49,10 +49,10 @@ export function ChatInput({
       : null;
 
   return (
-    <footer className="sticky bottom-0 shrink-0 border-t border-slate-200 bg-white/95 px-3 py-2 backdrop-blur md:px-6 md:py-3">
+    <footer className="sticky bottom-0 shrink-0 border-t border-slate-200/80 bg-white/90 px-3 py-2.5 backdrop-blur-md md:px-6 md:py-3.5">
       <div className="mx-auto w-full max-w-4xl">
         <form onSubmit={onSubmit} className="flex items-end">
-          <div className="flex w-full items-center gap-2 rounded-[28px] border border-slate-200 bg-white px-2 py-2 shadow-[0_2px_10px_rgba(15,23,42,0.08)] focus-within:border-indigo-300 focus-within:shadow-[0_3px_14px_rgba(79,70,229,0.15)]">
+          <div className="flex w-full items-end gap-2 rounded-[28px] border border-slate-200/90 bg-white px-2.5 py-2 shadow-[0_2px_10px_rgba(15,23,42,0.07)] focus-within:border-indigo-300 focus-within:shadow-[0_4px_14px_rgba(79,70,229,0.15)]">
             <textarea
               ref={textareaRef}
               rows={1}
@@ -61,7 +61,7 @@ export function ChatInput({
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               disabled={isDisabled}
-              className="max-h-32 w-full resize-none overflow-y-auto bg-transparent px-3 py-[11px] text-sm leading-6 text-slate-700 outline-none placeholder:text-slate-400 md:max-h-40"
+              className="max-h-32 w-full resize-none overflow-y-auto bg-transparent px-3 py-[11px] text-[15px] leading-6 text-slate-700 outline-none placeholder:text-slate-400 md:max-h-40"
             />
 
             <button
@@ -70,7 +70,7 @@ export function ChatInput({
                 if (locked) onLockedClick?.();
               }}
               disabled={waitingConfirmation || (!locked && (disabled || !value.trim()))}
-              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-violet-400 text-white transition hover:bg-violet-300 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-500 text-white transition hover:from-indigo-500 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {locked ? <Lock className="h-4 w-4" /> : loading ? <Spinner className="text-white" /> : <SendHorizonal className="h-4 w-4" />}
             </button>
