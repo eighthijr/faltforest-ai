@@ -2,6 +2,7 @@
 
 import { Bot, ImagePlus } from 'lucide-react';
 import { FilePond, registerPlugin } from 'react-filepond';
+import type { FilePondFile } from 'filepond';
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 
@@ -22,6 +23,15 @@ export function ImageUploadBubble({
   maxFileSize = '500KB',
   onFilesChange,
 }: ImageUploadBubbleProps) {
+  const normalizeToFile = (item: FilePondFile): File => {
+    if (item.file instanceof File) return item.file;
+
+    return new File([item.file], item.filename, {
+      type: item.fileType || item.file.type,
+      lastModified: Date.now(),
+    });
+  };
+
   return (
     <article className="flex w-full justify-start gap-2">
       <span className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-indigo-600 shadow-[0_2px_8px_rgba(15,23,42,0.15)]">
@@ -38,7 +48,7 @@ export function ImageUploadBubble({
         <div className="mt-3">
           <FilePond
             files={files}
-            onupdatefiles={(items: Array<{ file: File }>) => onFilesChange(items.map((item: { file: File }) => item.file))}
+            onupdatefiles={(items: FilePondFile[]) => onFilesChange(items.map(normalizeToFile))}
             allowMultiple
             maxFiles={maxFiles}
             allowFileTypeValidation
