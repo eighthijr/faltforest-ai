@@ -57,6 +57,45 @@ body {
   animation: chat-message-in 220ms ease-out both;
 }
 
+@keyframes chat-message-in-ai {
+  from {
+    opacity: 0;
+    transform: translateY(10px) translateX(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+}
+
+@keyframes chat-message-in-user {
+  from {
+    opacity: 0;
+    transform: translateY(10px) translateX(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+}
+
+.animate-chat-message-ai {
+  animation: chat-message-in-ai 240ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.animate-chat-message-user {
+  animation: chat-message-in-user 240ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-chat-message,
+  .animate-chat-message-ai,
+  .animate-chat-message-user,
+  .animate-modal-in {
+    animation-duration: 1ms !important;
+  }
+}
+
 @keyframes modal-in {
   from {
     opacity: 0;
