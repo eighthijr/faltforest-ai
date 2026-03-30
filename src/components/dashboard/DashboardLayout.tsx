@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { BarChart3, LayoutDashboard, Menu, MessageSquareText, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { DashboardSidebar, type SidebarNavItem } from './DashboardSidebar';
+import { DashboardSidebarProvider } from './DashboardSidebarContext';
 import type { Project } from '@/types/project';
 
 type DashboardLayoutProps = {
@@ -37,6 +38,8 @@ export function DashboardLayout({ children, userId, userEmail, mode = 'user', wo
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [signOutLoading, setSignOutLoading] = useState(false);
 
+  const isWorkspaceRoute = pathname.startsWith('/dashboard/workspace');
+
   const navItems = useMemo(() => {
     const source = mode === 'admin' ? adminNav : userNav;
     return source.map((item) => ({ ...item, active: isActive(pathname, item.href) }));
@@ -66,19 +69,23 @@ export function DashboardLayout({ children, userId, userEmail, mode = 'user', wo
         showWorkspaceProjects={pathname.startsWith('/dashboard/workspace')}
       />
 
-      <div className="min-h-screen lg:pl-72">
-        <header className="sticky top-0 z-20 bg-slate-100/95 px-4 py-4 backdrop-blur lg:hidden">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen((prev) => !prev)}
-            aria-label="Toggle sidebar"
-            className="material-btn-outline rounded-xl p-3 text-slate-700"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-        </header>
-        <main className="w-full px-4 py-4 md:px-6 md:py-6">{children}</main>
-      </div>
+      <DashboardSidebarProvider value={{ toggleSidebar: () => setSidebarOpen((prev) => !prev) }}>
+        <div className="min-h-screen lg:pl-72">
+          {!isWorkspaceRoute ? (
+            <header className="sticky top-0 z-20 bg-slate-100/95 px-4 py-4 backdrop-blur lg:hidden">
+              <button
+                type="button"
+                onClick={() => setSidebarOpen((prev) => !prev)}
+                aria-label="Toggle sidebar"
+                className="material-btn-outline rounded-xl p-3 text-slate-700"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            </header>
+          ) : null}
+          <main className="w-full px-4 py-4 md:px-6 md:py-6">{children}</main>
+        </div>
+      </DashboardSidebarProvider>
     </div>
   );
 }

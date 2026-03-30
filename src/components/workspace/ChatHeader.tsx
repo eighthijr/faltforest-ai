@@ -1,4 +1,5 @@
-import { Circle, Trash2 } from 'lucide-react';
+import { Circle, Menu, Trash2 } from 'lucide-react';
+import { useDashboardSidebar } from '@/components/dashboard/DashboardSidebarContext';
 import type { WorkspaceState } from '@/types/workspace';
 
 type ManualPaymentStatus = 'idle' | 'waiting_payment' | 'waiting_admin' | 'approved';
@@ -19,13 +20,26 @@ const statusConfig: Record<WorkspaceState, { label: string; tone: string }> = {
 
 export function ChatHeader({ projectId, status, manualPaymentStatus = 'idle', paymentReference = '', onClearChat }: ChatHeaderProps) {
   const statusMeta = statusConfig[status];
+  const dashboardSidebar = useDashboardSidebar();
   const shortProjectId = projectId.length > 16 ? `${projectId.slice(0, 6)}...${projectId.slice(-6)}` : projectId;
 
   return (
     <header className="sticky top-0 z-10 border-b border-slate-200 bg-white px-4 py-3 md:px-6">
       <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-slate-900">Project Workspace</p>
+          <div className="flex items-center gap-2">
+            {dashboardSidebar ? (
+              <button
+                type="button"
+                onClick={dashboardSidebar.toggleSidebar}
+                aria-label="Toggle sidebar"
+                className="material-btn-outline rounded-xl p-2 text-slate-700 lg:hidden"
+              >
+                <Menu className="h-4 w-4" />
+              </button>
+            ) : null}
+            <p className="text-sm font-semibold text-slate-900">Project Workspace</p>
+          </div>
           <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
             <span className="rounded-full bg-slate-100 px-2 py-1 font-mono">{shortProjectId}</span>
             <span className={`inline-flex items-center gap-1.5 font-semibold ${statusMeta.tone}`}>
