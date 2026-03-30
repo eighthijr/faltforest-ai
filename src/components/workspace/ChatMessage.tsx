@@ -18,15 +18,15 @@ export function ChatMessage({ message, onAction }: ChatMessageProps) {
   return (
     <article className={`flex w-full items-end gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
-        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200/70 bg-white text-indigo-600 shadow-[0_2px_6px_rgba(15,23,42,0.12)]">
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-[#23262d] text-indigo-300 shadow-[0_2px_10px_rgba(2,6,23,0.45)]">
           <Bot className="h-4 w-4" />
         </span>
       )}
       <div
         className={`animate-chat-message max-w-[82%] rounded-[22px] px-4 py-3.5 text-[15px] leading-relaxed shadow-[0_2px_8px_rgba(15,23,42,0.1)] ${
           isUser
-            ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white animate-chat-message-user'
-            : 'border border-slate-200/70 bg-white text-slate-800 animate-chat-message-ai'
+            ? 'bg-gradient-to-br from-indigo-500 to-violet-500 text-white animate-chat-message-user'
+            : 'border border-white/10 bg-[#2a2d34] text-slate-100 animate-chat-message-ai'
         }`}
       >
         {blocks.map((block, index) => {
@@ -56,7 +56,7 @@ export function ChatMessage({ message, onAction }: ChatMessageProps) {
         ) : null}
       </div>
       {isUser && (
-        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-800 text-white shadow-[0_2px_6px_rgba(15,23,42,0.16)]">
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-700 text-white shadow-[0_2px_10px_rgba(2,6,23,0.45)]">
           <User className="h-4 w-4" />
         </span>
       )}

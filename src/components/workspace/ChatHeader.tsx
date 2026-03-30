@@ -11,9 +11,9 @@ type ChatHeaderProps = {
 };
 
 const statusConfig: Record<WorkspaceState, { label: string; tone: string }> = {
-  draft: { label: 'AI collecting brief', tone: 'text-amber-700' },
-  ready: { label: 'AI generating result', tone: 'text-violet-700' },
-  generated: { label: 'AI ready for edits', tone: 'text-emerald-700' },
+  draft: { label: 'Collecting brief', tone: 'text-amber-300' },
+  ready: { label: 'Generating', tone: 'text-violet-300' },
+  generated: { label: 'Ready for edits', tone: 'text-emerald-300' },
 };
 
 export function ChatHeader({ status, manualPaymentStatus = 'idle', paymentReference = '' }: ChatHeaderProps) {
@@ -21,7 +21,7 @@ export function ChatHeader({ status, manualPaymentStatus = 'idle', paymentRefere
   const dashboardSidebar = useDashboardSidebar();
 
   return (
-    <header className="sticky top-0 z-10 border-b border-slate-200/70 bg-white/85 px-4 py-3 backdrop-blur-md md:px-6">
+    <header className="sticky top-0 z-10 border-b border-white/10 bg-[#1b1d22]/95 px-4 py-3 text-white backdrop-blur-md md:px-6">
       <div className="mx-auto flex w-full max-w-4xl items-start gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -30,23 +30,23 @@ export function ChatHeader({ status, manualPaymentStatus = 'idle', paymentRefere
               onClick={dashboardSidebar?.toggleSidebar}
               aria-label="Toggle sidebar"
               disabled={!dashboardSidebar}
-              className="material-btn-outline h-10 w-10 rounded-2xl p-0 text-slate-700 lg:hidden disabled:cursor-default disabled:opacity-60"
+              className="h-10 w-10 rounded-2xl border border-white/15 bg-white/5 p-0 text-slate-100 transition hover:bg-white/10 lg:hidden disabled:cursor-default disabled:opacity-60"
             >
               <Menu className="h-5 w-5" />
             </button>
             <div>
-              <p className="text-base font-semibold tracking-tight text-slate-900">Project Workspace</p>
-              <p className="text-[11px] font-medium text-slate-500">Guided copywriting assistant</p>
+              <p className="text-base font-semibold tracking-tight text-slate-100">Project Workspace</p>
+              <p className="text-[11px] font-medium text-slate-400">Guided copywriting assistant</p>
             </div>
           </div>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-            <span className={`inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 font-semibold shadow-[0_1px_3px_rgba(15,23,42,0.1)] ${statusMeta.tone}`}>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+            <span className={`inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-2.5 py-1 font-semibold ${statusMeta.tone}`}>
               <Circle className="h-3 w-3 fill-current" />
               {statusMeta.label}
             </span>
           </div>
           {manualPaymentStatus === 'waiting_admin' ? (
-            <p className="mt-2 rounded-xl border border-amber-200/70 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-800">
+            <p className="mt-2 rounded-xl border border-amber-300/30 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-200">
               Menunggu konfirmasi pembayaran{paymentReference ? ` (${paymentReference})` : ''}. Cek juga di Dashboard / Transactions.
             </p>
           ) : null}
