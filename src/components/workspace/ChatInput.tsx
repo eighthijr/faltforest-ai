@@ -1,5 +1,5 @@
 import { FormEvent, KeyboardEvent, useEffect, useRef } from 'react';
-import { Lock, Paperclip, SendHorizonal } from 'lucide-react';
+import { Lock, SendHorizonal } from 'lucide-react';
 import { Spinner } from '../ui';
 
 type ChatInputProps = {
@@ -30,8 +30,8 @@ export function ChatInput({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
-    textarea.style.height = '0px';
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 168)}px`;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(Math.max(textarea.scrollHeight, 44), 168)}px`;
   }, [value]);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -49,19 +49,10 @@ export function ChatInput({
       : null;
 
   return (
-    <footer className="sticky bottom-0 shrink-0 border-t border-slate-200 bg-white px-3 py-2 md:px-6 md:py-3">
+    <footer className="sticky bottom-0 shrink-0 border-t border-slate-200 bg-white/95 px-3 py-2 backdrop-blur md:px-6 md:py-3">
       <div className="mx-auto w-full max-w-4xl">
-        <form onSubmit={onSubmit} className="flex items-end gap-2">
-          <button
-            type="button"
-            disabled={isDisabled}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 disabled:cursor-not-allowed disabled:opacity-60"
-            aria-label="Lampirkan file"
-          >
-            <Paperclip className="h-4 w-4" />
-          </button>
-
-          <div className="flex-1 rounded-3xl bg-slate-100 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.35)] focus-within:shadow-[inset_0_0_0_2px_rgba(79,70,229,0.5)]">
+        <form onSubmit={onSubmit} className="flex items-end">
+          <div className="flex w-full items-center gap-2 rounded-[28px] border border-slate-200 bg-white px-2 py-2 shadow-[0_2px_10px_rgba(15,23,42,0.08)] focus-within:border-indigo-300 focus-within:shadow-[0_3px_14px_rgba(79,70,229,0.15)]">
             <textarea
               ref={textareaRef}
               rows={1}
@@ -70,21 +61,20 @@ export function ChatInput({
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               disabled={isDisabled}
-              className="max-h-32 w-full resize-none overflow-y-auto bg-transparent py-1 text-sm text-slate-800 outline-none placeholder:text-slate-400 md:max-h-40"
+              className="max-h-32 w-full resize-none overflow-y-auto bg-transparent px-3 py-[11px] text-sm leading-6 text-slate-700 outline-none placeholder:text-slate-400 md:max-h-40"
             />
-          </div>
 
-          <button
-            type="submit"
-            onClick={() => {
-              if (locked) onLockedClick?.();
-            }}
-            disabled={waitingConfirmation || (!locked && (disabled || !value.trim()))}
-            className="inline-flex h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {locked ? <Lock className="h-4 w-4" /> : loading ? <Spinner className="text-white" /> : <SendHorizonal className="h-4 w-4" />}
-            <span className="hidden sm:inline">{loading ? 'Mengirim...' : 'Kirim'}</span>
-          </button>
+            <button
+              type="submit"
+              onClick={() => {
+                if (locked) onLockedClick?.();
+              }}
+              disabled={waitingConfirmation || (!locked && (disabled || !value.trim()))}
+              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-violet-400 text-white transition hover:bg-violet-300 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {locked ? <Lock className="h-4 w-4" /> : loading ? <Spinner className="text-white" /> : <SendHorizonal className="h-4 w-4" />}
+            </button>
+          </div>
         </form>
         {helperText ? <p className="mt-2 px-1 text-xs font-medium text-slate-500">{helperText}</p> : null}
       </div>
