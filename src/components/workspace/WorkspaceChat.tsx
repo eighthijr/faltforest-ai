@@ -598,7 +598,7 @@ function WorkspaceChatContent({
             setManualPaymentStatus('waiting_admin');
             pushToast({
               type: 'info',
-              title: 'Pending approval',
+              title: 'Menunggu persetujuan',
               description: 'Pembayaran kamu sedang menunggu verifikasi admin.',
             });
             closeModal();

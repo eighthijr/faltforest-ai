@@ -24,27 +24,27 @@ type PaymentMethodModalProps = {
 const paymentOptions: PaymentMethodOption[] = [
   {
     id: 'tripay_qris_auto',
-    title: 'QRIS Tripay (AUTO)',
-    subtitle: 'Automatic verification',
-    description: 'Verification happens instantly after payment. Currently unavailable.',
+    title: 'QRIS Tripay (OTOMATIS)',
+    subtitle: 'Verifikasi otomatis',
+    description: 'Verifikasi berlangsung instan setelah pembayaran. Saat ini belum tersedia.',
     state: 'disabled',
-    badge: 'Coming Soon',
+    badge: 'Segera Hadir',
   },
   {
     id: 'qris_static_manual',
-    title: 'QRIS Static (MANUAL)',
-    subtitle: 'Manual verification',
-    description: 'Upload proof after payment. Verified by admin.',
+    title: 'QRIS Statis (MANUAL)',
+    subtitle: 'Verifikasi manual',
+    description: 'Unggah bukti transfer setelah bayar. Diverifikasi oleh admin.',
     state: 'active',
-    badge: 'Active',
+    badge: 'Aktif',
   },
 ];
 
 export function PaymentMethodModal({ open, reason, selectedMethod, onClose, onSelectMethod }: PaymentMethodModalProps) {
   return (
-    <ModalShell open={open} onClose={onClose} title="Choose payment method" size="md">
-      <p className="text-sm font-semibold text-slate-900">Choose payment method</p>
-      <p className="mt-1 text-sm text-slate-600">Select available method. Automatic gateway is temporarily disabled.</p>
+    <ModalShell open={open} onClose={onClose} title="Pilih metode pembayaran" size="md">
+      <p className="text-sm font-semibold text-slate-900">Pilih metode pembayaran</p>
+      <p className="mt-1 text-sm text-slate-600">Pilih metode yang tersedia. Gateway otomatis sedang dinonaktifkan sementara.</p>
 
       <div className="mt-5 space-y-3">
         {paymentOptions.map((option) => {
@@ -86,11 +86,11 @@ export function PaymentMethodModal({ open, reason, selectedMethod, onClose, onSe
         })}
       </div>
 
-      <p className="mt-4 rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600">Trust signal: manual payment is verified by admin before Premium is activated.</p>
+      <p className="mt-4 rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600">Jaminan: pembayaran manual akan diverifikasi admin sebelum Premium diaktifkan.</p>
 
       <div className="mt-6">
         <button type="button" onClick={onClose} className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700">
-          Back
+          Kembali
         </button>
       </div>
     </ModalShell>
