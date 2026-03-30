@@ -51,7 +51,7 @@ export function DashboardLayout({ children, userId, userEmail, mode = 'user', wo
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
+    <div className="material-page min-h-screen bg-slate-100 text-slate-900">
       <DashboardSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -72,7 +72,7 @@ export function DashboardLayout({ children, userId, userEmail, mode = 'user', wo
             type="button"
             onClick={() => setSidebarOpen((prev) => !prev)}
             aria-label="Toggle sidebar"
-            className="inline-flex items-center justify-center rounded-xl bg-white p-3 text-slate-700 shadow-[0_3px_12px_rgba(15,23,42,0.14)]"
+            className="material-btn-outline rounded-xl p-3 text-slate-700"
           >
             <Menu className="h-5 w-5" />
           </button>

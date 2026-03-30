@@ -180,7 +180,7 @@ export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectD
   return (
     <DashboardLayout userId={userId} userEmail={userEmail}>
       <section className="space-y-6">
-        <header className="rounded-3xl bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.08),0_8px_24px_rgba(15,23,42,0.08)] md:p-6">
+        <header className="material-surface p-4 md:p-6">
           <p className="text-sm text-slate-500">Dashboard / Ringkasan</p>
           <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
@@ -193,7 +193,7 @@ export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectD
               type="button"
               onClick={handleCreateProject}
               disabled={state.creating}
-              className="inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(79,70,229,0.24),0_8px_16px_rgba(79,70,229,0.2)] transition-all duration-200 hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+              className="material-btn-filled w-full px-4 py-3 sm:w-auto"
             >
               {state.creating ? (
                 <span className="inline-flex items-center gap-2">
@@ -216,9 +216,9 @@ export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectD
         {state.error && <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700 shadow-[0_1px_2px_rgba(190,24,93,0.14)]">{state.error}</p>}
 
         {state.loading ? (
-          <p className="rounded-2xl bg-white px-4 py-8 text-sm text-slate-500 shadow-[0_1px_2px_rgba(15,23,42,0.08),0_8px_24px_rgba(15,23,42,0.08)]">Memuat project...</p>
+          <p className="material-surface rounded-2xl px-4 py-8 text-sm text-slate-500">Memuat project...</p>
         ) : state.projects.length === 0 ? (
-          <p className="rounded-2xl bg-white px-4 py-8 text-sm text-slate-500 shadow-[0_1px_2px_rgba(15,23,42,0.08),0_8px_24px_rgba(15,23,42,0.08)]">
+          <p className="material-surface rounded-2xl px-4 py-8 text-sm text-slate-500">
             Belum ada project. Klik &quot;Buat Project&quot; untuk mulai workflow.
           </p>
         ) : (
