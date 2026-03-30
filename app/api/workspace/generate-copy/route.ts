@@ -26,7 +26,16 @@ type LandingPageSpec = {
   primaryCta: string;
   secondaryCta: string;
   whatsappCtaLabel: string;
+  trustChips: string[];
+  stats: Array<{ label: string; value: string }>;
   sections: LandingPageSection[];
+  offer: {
+    title: string;
+    priceLabel: string;
+    includes: string[];
+    urgency: string;
+    guarantee: string;
+  };
   testimonialQuote: string;
   testimonialAuthor: string;
   faq: Array<{ question: string; answer: string }>;
@@ -121,6 +130,7 @@ function normalizeSpec(input: Partial<LandingPageSpec>, body: Required<GenerateC
     .filter((item) => /^https?:\/\/\S+/i.test(item) || /^data:image\/[a-zA-Z]+;base64,/i.test(item))
     .slice(0, 6);
   const fallbackImageUrls = parseImageUrls(body.images);
+  const offerIncludes = ensureBullets(input.offer?.includes, body.offer);
 
   return {
     brandName: input.brandName?.trim() || body.product,
@@ -130,7 +140,19 @@ function normalizeSpec(input: Partial<LandingPageSpec>, body: Required<GenerateC
     primaryCta: input.primaryCta?.trim() || 'Konsultasi Sekarang',
     secondaryCta: input.secondaryCta?.trim() || body.cta,
     whatsappCtaLabel: input.whatsappCtaLabel?.trim() || 'Chat via WhatsApp',
+    trustChips: ensureBullets(input.trustChips, 'Tanpa setup rumit').slice(0, 4),
+    stats: (input.stats ?? [])
+      .map((stat) => ({ label: stat?.label?.trim() || '', value: stat?.value?.trim() || '' }))
+      .filter((stat) => stat.label && stat.value)
+      .slice(0, 3),
     sections: safeSections,
+    offer: {
+      title: input.offer?.title?.trim() || 'Paket yang paling relevan untuk kebutuhanmu',
+      priceLabel: input.offer?.priceLabel?.trim() || body.offer,
+      includes: offerIncludes,
+      urgency: input.offer?.urgency?.trim() || 'Bonus onboarding berlaku terbatas minggu ini.',
+      guarantee: input.offer?.guarantee?.trim() || 'Jaminan revisi copy sampai pesan utama terasa pas.',
+    },
     testimonialQuote:
       input.testimonialQuote?.trim() || `“Akhirnya saya punya cara yang lebih jelas untuk mencapai ${body.benefit}.”`,
     testimonialAuthor: input.testimonialAuthor?.trim() || 'Seller/Affiliator Indonesia',
@@ -164,17 +186,22 @@ function buildLandingPageHtml(spec: LandingPageSpec, body: Required<GenerateCopy
         <h3>${escapeHtml(section.title)}</h3>
         <p>${escapeHtml(section.body)}</p>
         <ul>
-          ${section.bullets.map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join('')}
+          ${section.bullets.map((bullet) => `<li><span>✓</span>${escapeHtml(bullet)}</li>`).join('')}
         </ul>
       </section>`,
     )
     .join('');
 
+  const trustChipHtml = spec.trustChips.map((chip) => `<span>${escapeHtml(chip)}</span>`).join('');
+  const stats = spec.stats.length > 0 ? spec.stats : [{ label: 'Fokus utama', value: 'Konversi & kejelasan pesan' }];
+  const statsHtml = stats.map((stat) => `<article><strong>${escapeHtml(stat.value)}</strong><p>${escapeHtml(stat.label)}</p></article>`).join('');
+
   const faqHtml =
     spec.faq.length > 0
-      ? `<section class="card faq-card"><h3>FAQ</h3>${spec.faq
+      ? `<section class="card faq-card"><h3>Pertanyaan yang sering muncul</h3>${spec.faq
           .map(
-            (item) => `<div><h4>${escapeHtml(item.question)}</h4><p>${escapeHtml(item.answer)}</p></div>`,
+            (item) =>
+              `<details><summary>${escapeHtml(item.question)}</summary><p>${escapeHtml(item.answer)}</p></details>`,
           )
           .join('')}</section>`
       : '';
@@ -199,48 +226,86 @@ function buildLandingPageHtml(spec: LandingPageSpec, body: Required<GenerateCopy
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${escapeHtml(spec.brandName)} - Landing Page</title>
+    <title>${escapeHtml(spec.brandName)} - Landing Page Konversi</title>
     <style>
       :root { --accent: ${accent}; --page-bg: ${pageBg}; --card-bg: ${cardBg}; --text: ${textColor}; --muted: ${mutedColor}; }
       * { box-sizing: border-box; }
       body { margin: 0; font-family: Inter, Arial, sans-serif; background: var(--page-bg); color: var(--text); }
-      .container { max-width: 1120px; margin: 0 auto; padding: 32px 20px 48px; display: grid; gap: 16px; }
-      .card { background: var(--card-bg); border-radius: 16px; padding: 24px; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08); }
-      .hero h1 { margin: 0 0 10px; font-size: 34px; line-height: 1.2; }
-      .hero p { margin: 0; color: var(--muted); }
+      .container { max-width: 1140px; margin: 0 auto; padding: 20px 20px 56px; display: grid; gap: 18px; }
+      .card { background: var(--card-bg); border-radius: 18px; padding: 24px; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08); }
+      .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+      .brand { font-weight: 800; letter-spacing: 0.02em; }
+      .chip-row { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+      .chip-row span { font-size: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(79, 70, 229, 0.1); color: var(--accent); font-weight: 600; }
+      .hero { display: grid; gap: 14px; }
+      .hero h1 { margin: 0 0 10px; font-size: 36px; line-height: 1.15; max-width: 16ch; }
+      .hero p { margin: 0; color: var(--muted); max-width: 62ch; }
       .cta { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; }
       .btn { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
       .btn-primary { background: var(--accent); color: white; }
       .btn-secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-      .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      .stats-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      .stats-grid article { border-radius: 14px; padding: 14px; background: rgba(148, 163, 184, 0.12); }
+      .stats-grid strong { display: block; font-size: 18px; margin-bottom: 6px; }
+      .stats-grid p { margin: 0; font-size: 13px; color: var(--muted); }
+      .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
       .section-card h3, .faq-card h3 { margin: 0 0 8px; }
       .section-card p, .faq-card p { color: var(--muted); margin: 0 0 10px; }
-      ul { margin: 0; padding-left: 20px; color: var(--muted); }
-      .testimonial blockquote { margin: 0; font-size: 20px; line-height: 1.4; }
+      ul { margin: 0; padding-left: 0; list-style: none; color: var(--muted); display: grid; gap: 8px; }
+      li { display: flex; align-items: flex-start; gap: 8px; }
+      li span { color: var(--accent); font-weight: 700; }
+      .offer-card { border: 1px solid rgba(79, 70, 229, 0.3); background: linear-gradient(165deg, rgba(79, 70, 229, 0.12), rgba(79, 70, 229, 0.03)); }
+      .offer-card h3 { margin: 0; }
+      .offer-price { margin: 8px 0 14px; font-size: 28px; font-weight: 800; }
+      .subtle { color: var(--muted); font-size: 13px; margin-top: 10px; }
+      .testimonial blockquote { margin: 0; font-size: 22px; line-height: 1.35; }
       .testimonial cite { display: block; margin-top: 12px; color: var(--muted); font-style: normal; }
       .gallery { margin-top: 12px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
       .gallery figure { margin: 0; overflow: hidden; border-radius: 14px; background: rgba(148, 163, 184, 0.12); min-height: 180px; }
       .gallery img { display: block; width: 100%; height: 100%; object-fit: cover; }
+      details { border-top: 1px solid rgba(148, 163, 184, 0.3); padding: 12px 0; }
+      details:first-of-type { border-top: 0; padding-top: 0; }
+      summary { cursor: pointer; font-weight: 700; }
       .footer { text-align: center; color: var(--muted); font-size: 13px; }
-      @media (max-width: 640px) { .hero h1 { font-size: 28px; } .card { padding: 18px; } }
+      @media (max-width: 640px) { .hero h1 { font-size: 30px; } .card { padding: 18px; } }
     </style>
   </head>
   <body>
     <main class="container" data-style-tone="${escapeHtml(spec.theme.styleTone)}">
       <section class="card hero">
-        <small>${escapeHtml(spec.brandName)} · Template Landing Page Seller/Affiliator</small>
+        <div class="topbar">
+          <small class="brand">${escapeHtml(spec.brandName)}</small>
+          <small>Template berbasis praktik landing page konversi tinggi</small>
+        </div>
         <h1>${escapeHtml(spec.heroHeadline)}</h1>
         <p>${escapeHtml(spec.heroSubheadline)}</p>
+        <div class="chip-row">${trustChipHtml}</div>
         <div class="cta">
           <a class="btn btn-primary" href="${escapeHtml(whatsappLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(spec.whatsappCtaLabel)}</a>
           <a class="btn btn-secondary" href="#penawaran">${escapeHtml(spec.secondaryCta || spec.primaryCta)}</a>
         </div>
       </section>
 
+      <section class="stats-grid">
+        ${statsHtml}
+      </section>
+
       ${galleryHtml}
 
       <section class="grid" id="penawaran">
         ${sectionHtml}
+        <section class="card offer-card">
+          <h3>${escapeHtml(spec.offer.title)}</h3>
+          <p class="offer-price">${escapeHtml(spec.offer.priceLabel)}</p>
+          <ul>
+            ${spec.offer.includes.map((item) => `<li><span>✓</span>${escapeHtml(item)}</li>`).join('')}
+          </ul>
+          <p class="subtle">${escapeHtml(spec.offer.urgency)}</p>
+          <p class="subtle">${escapeHtml(spec.offer.guarantee)}</p>
+          <div class="cta">
+            <a class="btn btn-primary" href="${escapeHtml(whatsappLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(spec.primaryCta)}</a>
+          </div>
+        </section>
       </section>
 
       <section class="card testimonial">
@@ -302,9 +367,20 @@ function buildPrompt(body: Required<GenerateCopyPayload>) {
     '  "primaryCta": "string",',
     '  "secondaryCta": "string",',
     '  "whatsappCtaLabel": "string",',
+    '  "trustChips": ["string", "string"],',
+    '  "stats": [',
+    '    { "label": "string", "value": "string" }',
+    '  ],',
     '  "sections": [',
     '    { "title": "string", "body": "string", "bullets": ["string", "string"] }',
     '  ],',
+    '  "offer": {',
+    '    "title": "string",',
+    '    "priceLabel": "string",',
+    '    "includes": ["string", "string"],',
+    '    "urgency": "string",',
+    '    "guarantee": "string"',
+    '  },',
     '  "testimonialQuote": "string",',
     '  "testimonialAuthor": "string",',
     '  "faq": [',
@@ -319,11 +395,18 @@ function buildPrompt(body: Required<GenerateCopyPayload>) {
     '}',
     '',
     'Aturan penting:',
-    '- sections ideal 3 item, maksimal 4.',
+    '- Bangun copy dengan urutan: value proposition jelas, proof, offer, objection handling, CTA.',
+    '- sections ideal 3 item, maksimal 4. Fokus: masalah, solusi, outcome.',
     '- bullets setiap section minimal 2, maksimal 4.',
+    '- trustChips 3-4 item (contoh: Tanpa coding, Siap pakai, Support cepat).',
+    '- stats 2-3 item dengan angka/klaim yang kredibel tanpa berlebihan.',
+    '- offer wajib berisi judul paket, priceLabel, isi paket, urgency, dan guarantee.',
     '- faq ideal 2 item, maksimal 3.',
     '- imageUrls ambil dari input gambar yang valid URL.',
-    '- Bahasa Indonesia, persuasif, tanpa klaim berlebihan.',
+    '- Bahasa Indonesia, persuasif, ringkas, tanpa klaim berlebihan.',
+    '- Headline maksimum 14 kata dan harus menyebut hasil utama yang diinginkan target.',
+    '- Subheadline menjawab: untuk siapa, masalah apa, dan hasil apa.',
+    '- CTA harus memakai kata kerja jelas (contoh: Mulai, Konsultasi, Coba).',
     '- Semua teks harus spesifik, jangan gunakan placeholder.',
     '',
     `Produk: ${body.product}`,
