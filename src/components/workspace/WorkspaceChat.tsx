@@ -544,11 +544,9 @@ function WorkspaceChatContent({
       <WorkspaceLayout
         header={
           <ChatHeader
-            projectId={projectId}
             status={state.state}
             manualPaymentStatus={manualPaymentStatus}
             paymentReference={paymentReference}
-            onClearChat={() => dispatch({ type: 'CLEAR_MESSAGES', value: [initialGreeting()] })}
           />
         }
         body={
