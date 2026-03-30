@@ -30,8 +30,8 @@ export function ChatInput({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
-    textarea.style.height = '0px';
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 168)}px`;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(Math.max(textarea.scrollHeight, 44), 168)}px`;
   }, [value]);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -52,7 +52,7 @@ export function ChatInput({
     <footer className="sticky bottom-0 shrink-0 border-t border-slate-200 bg-white/95 px-3 py-2 backdrop-blur md:px-6 md:py-3">
       <div className="mx-auto w-full max-w-4xl">
         <form onSubmit={onSubmit} className="flex items-end">
-          <div className="flex w-full items-end gap-2 rounded-[28px] border border-slate-200 bg-white px-2 py-2 shadow-[0_2px_10px_rgba(15,23,42,0.08)] focus-within:border-indigo-300 focus-within:shadow-[0_3px_14px_rgba(79,70,229,0.15)]">
+          <div className="flex w-full items-center gap-2 rounded-[28px] border border-slate-200 bg-white px-2 py-2 shadow-[0_2px_10px_rgba(15,23,42,0.08)] focus-within:border-indigo-300 focus-within:shadow-[0_3px_14px_rgba(79,70,229,0.15)]">
             <textarea
               ref={textareaRef}
               rows={1}
@@ -61,7 +61,7 @@ export function ChatInput({
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               disabled={isDisabled}
-              className="max-h-32 w-full resize-none overflow-y-auto bg-transparent px-3 py-2 text-sm text-slate-700 outline-none placeholder:text-slate-400 md:max-h-40"
+              className="max-h-32 w-full resize-none overflow-y-auto bg-transparent px-3 py-[11px] text-sm leading-6 text-slate-700 outline-none placeholder:text-slate-400 md:max-h-40"
             />
 
             <button
