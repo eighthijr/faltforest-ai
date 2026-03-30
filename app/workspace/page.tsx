@@ -18,6 +18,10 @@ function isProjectStatus(value: string | null): value is Project['status'] {
   return value === 'draft' || value === 'ready' || value === 'generated';
 }
 
+function lastProjectStorageKey(userId: string) {
+  return `workspace:last-project:${userId}`;
+}
+
 export default function WorkspacePage() {
   const searchParams = useSearchParams();
   const searchKey = searchParams.toString();
@@ -39,9 +43,14 @@ export default function WorkspacePage() {
         const searchProjectType = searchParams.get('projectType');
         const searchProjectStatus = searchParams.get('projectStatus');
         const userProjects = await listProjects(userId);
+        const rememberedProjectId =
+          typeof window !== 'undefined' ? window.localStorage.getItem(lastProjectStorageKey(userId)) : null;
 
         const preferredProject = searchProjectId
           ? userProjects.find((project) => project.id === searchProjectId) ?? null
+          : null;
+        const rememberedProject = !searchProjectId && rememberedProjectId
+          ? userProjects.find((project) => project.id === rememberedProjectId) ?? null
           : null;
 
         const fallbackProject =
@@ -56,7 +65,7 @@ export default function WorkspacePage() {
               }
             : null;
 
-        const resolvedProject = preferredProject ?? userProjects[0] ?? fallbackProject;
+        const resolvedProject = preferredProject ?? rememberedProject ?? userProjects[0] ?? fallbackProject;
 
         if (searchProjectId && !preferredProject) {
           setError('Project tidak ditemukan atau kamu tidak punya akses.');
@@ -73,6 +82,11 @@ export default function WorkspacePage() {
 
     void loadWorkspaceProject();
   }, [searchKey, userId]);
+
+  useEffect(() => {
+    if (!userId || !selectedProject || typeof window === 'undefined') return;
+    window.localStorage.setItem(lastProjectStorageKey(userId), selectedProject.id);
+  }, [userId, selectedProject]);
 
   if (authLoading || loading) {
     return <p className="material-page p-6 text-sm text-slate-600">Checking workspace access...</p>;
