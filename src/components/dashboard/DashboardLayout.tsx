@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { BarChart3, LayoutDashboard, Menu, MessageSquareText, ShieldCheck } from 'lucide-react';
+import { BarChart3, CreditCard, LayoutDashboard, Menu, MessageSquareText, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { DashboardSidebar, type SidebarNavItem } from './DashboardSidebar';
 import { DashboardSidebarProvider } from './DashboardSidebarContext';
@@ -20,6 +20,8 @@ type DashboardLayoutProps = {
 const userNav: Array<Omit<SidebarNavItem, 'active'>> = [
   { href: '/dashboard', label: 'Beranda', icon: LayoutDashboard },
   { href: '/dashboard/workspace', label: 'Ruang Kerja', icon: MessageSquareText },
+  { href: '/dashboard/transactions', label: 'Transaksi', icon: CreditCard },
+  { href: '/dashboard/support', label: 'Bantuan', icon: MessageSquareText },
 ];
 
 const adminNav: Array<Omit<SidebarNavItem, 'active'>> = [
