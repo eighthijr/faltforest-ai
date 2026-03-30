@@ -2,7 +2,16 @@ import type { ProjectType } from './project';
 
 export type WorkspaceState = 'draft' | 'ready' | 'generated';
 
-export type QuestionKey = 'product' | 'target' | 'benefit' | 'images';
+export type QuestionKey =
+  | 'product'
+  | 'target'
+  | 'problem'
+  | 'benefit'
+  | 'offer'
+  | 'cta'
+  | 'whatsapp'
+  | 'images'
+  | 'style';
 
 export type WorkspaceAnswers = Record<QuestionKey, string>;
 

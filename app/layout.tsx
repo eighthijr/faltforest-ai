@@ -1,5 +1,6 @@
 import './globals.css';
 import 'react-toastify/dist/ReactToastify.css';
+import 'filepond/dist/filepond.min.css';
 import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { AppProviders } from '@/components/layout/AppProviders';
