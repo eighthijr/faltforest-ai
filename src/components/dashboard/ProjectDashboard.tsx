@@ -66,6 +66,18 @@ type ProjectDashboardProps = {
   onUpgradeClick?: (projectId?: string) => void;
 };
 
+const paymentStatusPriority: Record<PaymentStatus, number> = {
+  waiting_confirmation: 4,
+  pending: 3,
+  success: 2,
+  rejected: 1,
+};
+
+function pickProjectPaymentStatus(current: PaymentStatus | undefined, next: PaymentStatus): PaymentStatus {
+  if (!current) return next;
+  return paymentStatusPriority[next] > paymentStatusPriority[current] ? next : current;
+}
+
 export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectDashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
   const router = useRouter();
@@ -82,9 +94,10 @@ export function ProjectDashboard({ userId, userEmail, onUpgradeClick }: ProjectD
         const payments = await listPaymentHistory();
         const latestStatusByProject: Record<string, PaymentStatus> = {};
         payments.forEach((payment) => {
-          if (!latestStatusByProject[payment.project_id]) {
-            latestStatusByProject[payment.project_id] = payment.status;
-          }
+          latestStatusByProject[payment.project_id] = pickProjectPaymentStatus(
+            latestStatusByProject[payment.project_id],
+            payment.status,
+          );
         });
         setProjectPaymentStatus(latestStatusByProject);
       } catch (error) {
