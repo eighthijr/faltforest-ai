@@ -47,7 +47,7 @@ export function DashboardCard({ project, paymentStatus = null, onDelete }: Dashb
   const ProjectTypeIcon = projectTypeBadge.icon;
 
   return (
-    <article className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_2px_10px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] md:p-5">
+    <article className="material-elevated-card p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] md:p-5">
       <div className="flex items-start justify-between gap-3">
         <span className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] shadow-sm ${projectTypeBadge.tone}`}>
           <ProjectTypeIcon className="h-3.5 w-3.5" />
@@ -123,7 +123,7 @@ export function DashboardCard({ project, paymentStatus = null, onDelete }: Dashb
             setRedirecting(true);
             router.push(`/dashboard/workspace?projectId=${project.id}`);
           }}
-          className="inline-flex flex-1 items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-base font-semibold text-white shadow-[0_8px_18px_rgba(79,70,229,0.32)] transition hover:bg-indigo-500"
+          className="material-btn-filled flex-1 px-4 py-3 text-base"
         >
           Buka Workspace
         </button>
@@ -133,7 +133,7 @@ export function DashboardCard({ project, paymentStatus = null, onDelete }: Dashb
             setRedirecting(true);
             router.push(`/dashboard/workspace?projectId=${project.id}`);
           }}
-          className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+          className="material-btn-outline h-12 w-12 rounded-2xl px-0 py-0 text-slate-600 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
           aria-label="Buka workspace cepat"
         >
           <span className="text-lg leading-none">↗</span>

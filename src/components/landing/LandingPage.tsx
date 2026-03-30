@@ -6,7 +6,7 @@ import { pricingPlans } from '@/lib/pricing';
 import { landingCopy } from './landingCopy.id';
 import { AuthModal } from '../auth';
 
-const cardClass = 'rounded-3xl bg-white p-6 shadow-[0_4px_16px_rgba(15,23,42,0.1)] md:p-8';
+const cardClass = 'material-elevated-card md:p-8';
 
 export function LandingPage() {
   const [authOpen, setAuthOpen] = useState(false);
@@ -18,18 +18,18 @@ export function LandingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 pb-8 text-slate-900">
+    <main className="material-page min-h-screen bg-slate-100 pb-8 text-slate-900">
       <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6">
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-white px-4 py-3 shadow-[0_4px_16px_rgba(15,23,42,0.1)]">
+        <header className="material-surface mb-6 flex flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700"><Sparkles className="h-5 w-5" /></span>
             <p className="text-base font-bold tracking-tight">{landingCopy.navbar.logo}</p>
           </div>
           <div className="flex items-center gap-2">
-            <button type="button" className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700" onClick={() => openAuth('/dashboard')}>
+            <button type="button" className="material-btn-tonal px-4 py-2" onClick={() => openAuth('/dashboard')}>
               {landingCopy.navbar.login}
             </button>
-            <button type="button" className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white" onClick={() => openAuth('/dashboard/workspace')}>
+            <button type="button" className="material-btn-filled px-4 py-2" onClick={() => openAuth('/dashboard/workspace')}>
               {landingCopy.navbar.cta}<ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -42,10 +42,10 @@ export function LandingPage() {
               <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-5xl">{landingCopy.hero.title}</h1>
               <p className="mt-4 text-base text-slate-600 md:text-lg">{landingCopy.hero.subtitle}</p>
               <div className="mt-6 flex flex-wrap gap-2">
-                <button type="button" className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white" onClick={() => openAuth('/dashboard/workspace')}>
+                <button type="button" className="material-btn-filled" onClick={() => openAuth('/dashboard/workspace')}>
                   {landingCopy.hero.primaryCta}
                 </button>
-                <button type="button" className="rounded-xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-700" onClick={() => openAuth('/dashboard')}>
+                <button type="button" className="material-btn-outline" onClick={() => openAuth('/dashboard')}>
                   Lihat dashboard dulu
                 </button>
               </div>
@@ -134,7 +134,7 @@ export function LandingPage() {
           <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold"><Bot className="h-4 w-4" />AI workspace ready</p>
           <h2 className="mt-3 text-2xl font-bold md:text-3xl">{landingCopy.cta.title}</h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-indigo-100 md:text-base">{landingCopy.cta.body}</p>
-          <button type="button" className="mt-5 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-indigo-700" onClick={() => openAuth('/dashboard/workspace')}>
+          <button type="button" className="material-btn-outline mt-5 border-white/80 text-indigo-700" onClick={() => openAuth('/dashboard/workspace')}>
             {landingCopy.cta.button}
           </button>
           <p className="mt-2 text-xs text-indigo-100">{landingCopy.cta.note}</p>

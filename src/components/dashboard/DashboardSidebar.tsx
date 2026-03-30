@@ -79,7 +79,7 @@ export function DashboardSidebar({
       />
 
       <aside
-        className={`fixed left-0 top-0 z-40 flex min-h-screen w-72 flex-col justify-between bg-white px-4 py-6 shadow-[0_8px_24px_rgba(15,23,42,0.12)] transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-40 flex min-h-screen w-72 flex-col justify-between border-r border-slate-200 bg-white px-4 py-6 shadow-[0_8px_24px_rgba(15,23,42,0.12)] transition-transform duration-300 lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -107,10 +107,10 @@ export function DashboardSidebar({
                     key={project.id}
                     href={`/dashboard/workspace?projectId=${project.id}`}
                     onClick={onClose}
-                    className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
+                    className={`material-nav-item ${
                       activeProjectId === project.id
-                        ? 'bg-indigo-600 text-white shadow-[0_4px_14px_rgba(79,70,229,0.35)]'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'material-nav-item-active'
+                        : 'material-nav-item-idle'
                     }`}
                   >
                     <FolderKanban className="h-5 w-5 shrink-0" />
@@ -128,11 +128,7 @@ export function DashboardSidebar({
                     key={item.href}
                     href={item.href}
                     onClick={onClose}
-                    className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
-                      item.active
-                        ? 'bg-indigo-600 text-white shadow-[0_4px_14px_rgba(79,70,229,0.35)]'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`}
+                    className={`material-nav-item ${item.active ? 'material-nav-item-active' : 'material-nav-item-idle'}`}
                   >
                     <Icon className="h-5 w-5" />
                     <span>{item.label}</span>
