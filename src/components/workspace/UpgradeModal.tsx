@@ -11,21 +11,21 @@ type UpgradeModalProps = {
 };
 
 const reasonText: Record<UpgradeReason, string> = {
-  download: 'Unlock Premium to download your generated landing page instantly.',
-  chat_after_generated: 'Unlock Premium to continue editing via chat after generation.',
+  download: 'Buka Premium untuk mengunduh landing page yang sudah kamu generate secara instan.',
+  chat_after_generated: 'Buka Premium untuk lanjut mengedit lewat chat setelah generate selesai.',
 };
 
 export function UpgradeModal({ open, reason, onClose, onUpgradeNow }: UpgradeModalProps) {
   return (
-    <ModalShell open={open} onClose={onClose} title="Upgrade to Premium" size="md">
+    <ModalShell open={open} onClose={onClose} title="Upgrade ke Premium" size="md">
       <div className="inline-flex rounded-full bg-amber-100 p-2 text-amber-700">
         <Lock className="size-5" />
       </div>
-      <h3 className="mt-4 text-xl font-semibold text-slate-900">Upgrade to Premium</h3>
+      <h3 className="mt-4 text-xl font-semibold text-slate-900">Upgrade ke Premium</h3>
       <p className="mt-2 text-sm text-slate-600">{reasonText[reason]}</p>
 
       <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
-        <p className="text-xs uppercase tracking-wide text-indigo-700">Premium plan</p>
+        <p className="text-xs uppercase tracking-wide text-indigo-700">Paket Premium</p>
         <p className="mt-1 text-base font-semibold text-indigo-900">{premiumPlan.name}</p>
         <p className="text-sm text-indigo-800">{premiumPlan.priceLabel}</p>
         <ul className="mt-3 space-y-1.5 text-sm text-indigo-900">
@@ -40,14 +40,14 @@ export function UpgradeModal({ open, reason, onClose, onUpgradeNow }: UpgradeMod
 
       <div className="mt-6 flex gap-3">
         <button type="button" onClick={onClose} className="flex-1 rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700">
-          Maybe later
+          Nanti dulu
         </button>
         <button
           type="button"
           onClick={onUpgradeNow}
           className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
         >
-          Upgrade Now
+          Upgrade sekarang
           <ArrowRight className="size-4" />
         </button>
       </div>
