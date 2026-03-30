@@ -42,23 +42,23 @@ export function ChatBody({
   return (
     <div
       ref={scrollAreaRef}
-      className="min-h-0 flex-1 overflow-y-auto bg-[linear-gradient(180deg,#f8fafc_0%,#f1f5f9_100%)] px-4 py-5 md:px-6 md:py-6"
+      className="min-h-0 flex-1 overflow-y-auto bg-[#14161a] px-4 py-5 md:px-6 md:py-6"
     >
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
         {showOnboarding ? (
-          <div className="rounded-2xl border border-indigo-200/80 bg-indigo-50/80 px-4 py-3 text-sm text-indigo-800 shadow-[0_2px_10px_rgba(99,102,241,0.14)]">
+          <div className="rounded-2xl border border-indigo-400/20 bg-indigo-500/10 px-4 py-3 text-sm text-indigo-100 shadow-[0_2px_10px_rgba(30,41,59,0.35)]">
             <p className="flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="h-4 w-4" />
               Alur chat terpandu
             </p>
-            <p className="mt-1 text-xs leading-relaxed text-indigo-700">
+            <p className="mt-1 text-xs leading-relaxed text-indigo-200/90">
               Jawab pertanyaan AI sampai brief lengkap, lalu sistem akan generate otomatis.
             </p>
           </div>
         ) : null}
 
         {progressLabel ? (
-          <p className="self-start rounded-full border border-slate-200/70 bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-slate-600 shadow-[0_1px_4px_rgba(15,23,42,0.09)]">
+          <p className="self-start rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-300">
             {progressLabel}
           </p>
         ) : null}
@@ -69,17 +69,17 @@ export function ChatBody({
         {imageUploadBubble}
 
         {isGenerating ? (
-          <p className="inline-flex animate-pulse items-center gap-2 self-start rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 shadow-[0_1px_4px_rgba(15,23,42,0.1)]">
+          <p className="inline-flex animate-pulse items-center gap-2 self-start rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-xs text-slate-300">
             <Bot className="h-4 w-4" />AI sedang memproses brief...
           </p>
         ) : null}
         {isGenerating ? (
-          <p className="self-start rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-700">
+          <p className="self-start rounded-full bg-indigo-500/15 px-3 py-1 text-[11px] font-semibold text-indigo-200">
             Generating landing page • {Math.max(0, generatingSeconds)}s
           </p>
         ) : null}
 
-        {helperText ? <p className="text-xs text-slate-500">{helperText}</p> : null}
+        {helperText ? <p className="text-xs text-slate-400">{helperText}</p> : null}
         <div ref={bottomRef} aria-hidden />
       </div>
     </div>
